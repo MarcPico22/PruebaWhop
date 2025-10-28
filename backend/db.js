@@ -28,9 +28,11 @@ function initDatabase() {
   
   const createConfigTableSQL = `
     CREATE TABLE IF NOT EXISTS config (
-      key TEXT PRIMARY KEY,
+      key TEXT NOT NULL,
+      tenant_id TEXT NOT NULL,
       value TEXT NOT NULL,
-      updated_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now'))
+      updated_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
+      PRIMARY KEY (key, tenant_id)
     )
   `;
   
@@ -45,23 +47,39 @@ function initDatabase() {
     )
   `;
   
+  const createNotificationSettingsTableSQL = `
+    CREATE TABLE IF NOT EXISTS notification_settings (
+      tenant_id TEXT PRIMARY KEY,
+      notification_email TEXT,
+      email_on_recovery INTEGER NOT NULL DEFAULT 1,
+      email_on_failure INTEGER NOT NULL DEFAULT 0,
+      daily_summary INTEGER NOT NULL DEFAULT 0,
+      weekly_summary INTEGER NOT NULL DEFAULT 0,
+      alert_threshold INTEGER NOT NULL DEFAULT 10,
+      send_alerts INTEGER NOT NULL DEFAULT 1,
+      updated_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now'))
+    )
+  `;
+  
+  const createTenantIntegrationsTableSQL = `
+    CREATE TABLE IF NOT EXISTS tenant_integrations (
+      tenant_id TEXT PRIMARY KEY,
+      stripe_secret_key TEXT,
+      stripe_publishable_key TEXT,
+      stripe_webhook_secret TEXT,
+      sendgrid_api_key TEXT,
+      from_email TEXT,
+      is_stripe_connected INTEGER NOT NULL DEFAULT 0,
+      is_sendgrid_connected INTEGER NOT NULL DEFAULT 0,
+      updated_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now'))
+    )
+  `;
+  
   db.exec(createTableSQL);
   db.exec(createConfigTableSQL);
   db.exec(createUsersTableSQL);
-  
-  // Insertar configuración por defecto si no existe
-  const defaultConfig = {
-    retry_intervals: process.env.RETRY_INTERVALS || '60,300,900',
-    max_retries: '3',
-    from_email: process.env.FROM_EMAIL || 'no-reply@local.dev'
-  };
-  
-  for (const [key, value] of Object.entries(defaultConfig)) {
-    const existing = db.prepare('SELECT * FROM config WHERE key = ?').get(key);
-    if (!existing) {
-      db.prepare('INSERT INTO config (key, value) VALUES (?, ?)').run(key, value);
-    }
-  }
+  db.exec(createNotificationSettingsTableSQL);
+  db.exec(createTenantIntegrationsTableSQL);
   
   console.log('✅ Base de datos inicializada');
 }
@@ -71,8 +89,8 @@ function initDatabase() {
  */
 function insertPayment(payment) {
   const stmt = db.prepare(`
-    INSERT INTO payments (id, email, product, amount, status, retries, token, retry_link, next_attempt)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    INSERT INTO payments (id, email, product, amount, status, retries, token, retry_link, next_attempt, tenant_id)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `);
   
   const now = Math.floor(Date.now() / 1000);
@@ -88,29 +106,30 @@ function insertPayment(payment) {
     payment.retries || 0,
     payment.token,
     payment.retry_link,
-    nextAttempt
+    nextAttempt,
+    payment.tenant_id
   );
 }
 
 /**
- * Obtiene todos los pagos con filtro opcional por status
+ * Obtiene todos los pagos con filtro opcional por status (filtrado por tenant)
  */
-function getPayments(status = null) {
+function getPayments(tenantId, status = null) {
   if (status) {
-    return db.prepare('SELECT * FROM payments WHERE status = ? ORDER BY created_at DESC').all(status);
+    return db.prepare('SELECT * FROM payments WHERE tenant_id = ? AND status = ? ORDER BY created_at DESC').all(tenantId, status);
   }
-  return db.prepare('SELECT * FROM payments ORDER BY created_at DESC').all();
+  return db.prepare('SELECT * FROM payments WHERE tenant_id = ? ORDER BY created_at DESC').all(tenantId);
 }
 
 /**
- * Obtiene un pago por ID
+ * Obtiene un pago por ID (filtrado por tenant)
  */
-function getPaymentById(id) {
-  return db.prepare('SELECT * FROM payments WHERE id = ?').get(id);
+function getPaymentById(id, tenantId) {
+  return db.prepare('SELECT * FROM payments WHERE id = ? AND tenant_id = ?').get(id, tenantId);
 }
 
 /**
- * Obtiene un pago por token
+ * Obtiene un pago por token (público, sin filtro de tenant)
  */
 function getPaymentByToken(token) {
   return db.prepare('SELECT * FROM payments WHERE token = ?').get(token);
@@ -151,23 +170,23 @@ function updatePaymentStatus(id, status, retries = null, nextAttempt = null) {
 }
 
 /**
- * Obtiene estadísticas del dashboard
+ * Obtiene estadísticas del dashboard (filtrado por tenant)
  */
-function getStats() {
-  const total = db.prepare('SELECT COUNT(*) as count FROM payments').get().count;
-  const pending = db.prepare("SELECT COUNT(*) as count FROM payments WHERE status = 'pending'").get().count;
-  const recovered = db.prepare("SELECT COUNT(*) as count FROM payments WHERE status = 'recovered'").get().count;
-  const failed = db.prepare("SELECT COUNT(*) as count FROM payments WHERE status = 'failed-permanent'").get().count;
-  const totalRecovered = db.prepare("SELECT SUM(amount) as total FROM payments WHERE status = 'recovered'").get().total || 0;
+function getStats(tenantId) {
+  const total = db.prepare('SELECT COUNT(*) as count FROM payments WHERE tenant_id = ?').get(tenantId).count;
+  const pending = db.prepare("SELECT COUNT(*) as count FROM payments WHERE tenant_id = ? AND status = 'pending'").get(tenantId).count;
+  const recovered = db.prepare("SELECT COUNT(*) as count FROM payments WHERE tenant_id = ? AND status = 'recovered'").get(tenantId).count;
+  const failed = db.prepare("SELECT COUNT(*) as count FROM payments WHERE tenant_id = ? AND status = 'failed-permanent'").get(tenantId).count;
+  const totalRecovered = db.prepare("SELECT SUM(amount) as total FROM payments WHERE tenant_id = ? AND status = 'recovered'").get(tenantId).total || 0;
   
   return { total, pending, recovered, failed, totalRecovered };
 }
 
 /**
- * Obtiene toda la configuración
+ * Obtiene toda la configuración (filtrado por tenant)
  */
-function getConfig() {
-  const rows = db.prepare('SELECT key, value FROM config').all();
+function getConfig(tenantId) {
+  const rows = db.prepare('SELECT key, value FROM config WHERE tenant_id = ?').all(tenantId);
   const config = {};
   rows.forEach(row => {
     config[row.key] = row.value;
@@ -176,39 +195,39 @@ function getConfig() {
 }
 
 /**
- * Obtiene un valor de configuración específico
+ * Obtiene un valor de configuración específico (filtrado por tenant)
  */
-function getConfigValue(key) {
-  const row = db.prepare('SELECT value FROM config WHERE key = ?').get(key);
+function getConfigValue(key, tenantId) {
+  const row = db.prepare('SELECT value FROM config WHERE key = ? AND tenant_id = ?').get(key, tenantId);
   return row ? row.value : null;
 }
 
 /**
- * Actualiza un valor de configuración
+ * Actualiza un valor de configuración (por tenant)
  */
-function updateConfig(key, value) {
+function updateConfig(key, value, tenantId) {
   const now = Math.floor(Date.now() / 1000);
   return db.prepare(`
-    INSERT INTO config (key, value, updated_at) 
-    VALUES (?, ?, ?)
-    ON CONFLICT(key) DO UPDATE SET value = ?, updated_at = ?
-  `).run(key, value, now, value, now);
+    INSERT INTO config (key, tenant_id, value, updated_at) 
+    VALUES (?, ?, ?, ?)
+    ON CONFLICT(key, tenant_id) DO UPDATE SET value = ?, updated_at = ?
+  `).run(key, tenantId, value, now, value, now);
 }
 
 /**
- * Actualiza múltiples valores de configuración
+ * Actualiza múltiples valores de configuración (por tenant)
  */
-function updateMultipleConfig(configObj) {
+function updateMultipleConfig(configObj, tenantId) {
   const stmt = db.prepare(`
-    INSERT INTO config (key, value, updated_at) 
-    VALUES (?, ?, ?)
-    ON CONFLICT(key) DO UPDATE SET value = ?, updated_at = ?
+    INSERT INTO config (key, tenant_id, value, updated_at) 
+    VALUES (?, ?, ?, ?)
+    ON CONFLICT(key, tenant_id) DO UPDATE SET value = ?, updated_at = ?
   `);
   
   const now = Math.floor(Date.now() / 1000);
   const transaction = db.transaction((configs) => {
     for (const [key, value] of Object.entries(configs)) {
-      stmt.run(key, value, now, value, now);
+      stmt.run(key, tenantId, value, now, value, now);
     }
   });
   
@@ -225,7 +244,18 @@ function createUser(user) {
     VALUES (?, ?, ?, ?, ?)
   `);
   
-  return stmt.run(user.id, user.email, user.password, user.company_name, user.tenant_id);
+  const result = stmt.run(user.id, user.email, user.password, user.company_name, user.tenant_id);
+  
+  // Crear configuración por defecto para este tenant
+  const defaultConfig = {
+    retry_intervals: process.env.RETRY_INTERVALS || '60,300,900',
+    max_retries: '3',
+    from_email: process.env.FROM_EMAIL || 'no-reply@local.dev'
+  };
+  
+  updateMultipleConfig(defaultConfig, user.tenant_id);
+  
+  return result;
 }
 
 /**
@@ -240,6 +270,152 @@ function getUserByEmail(email) {
  */
 function getUserByTenantId(tenantId) {
   return db.prepare('SELECT * FROM users WHERE tenant_id = ?').get(tenantId);
+}
+
+/**
+ * Obtiene la configuración de notificaciones de un tenant
+ */
+function getNotificationSettings(tenantId) {
+  let settings = db.prepare('SELECT * FROM notification_settings WHERE tenant_id = ?').get(tenantId);
+  
+  // Si no existe, crear con valores por defecto
+  if (!settings) {
+    const user = getUserByTenantId(tenantId);
+    const now = Math.floor(Date.now() / 1000);
+    
+    db.prepare(`
+      INSERT INTO notification_settings (
+        tenant_id, 
+        notification_email, 
+        email_on_recovery, 
+        email_on_failure, 
+        daily_summary, 
+        weekly_summary,
+        alert_threshold,
+        send_alerts,
+        updated_at
+      ) VALUES (?, ?, 1, 0, 0, 0, 10, 1, ?)
+    `).run(tenantId, user?.email || null, now);
+    
+    settings = db.prepare('SELECT * FROM notification_settings WHERE tenant_id = ?').get(tenantId);
+  }
+  
+  return settings;
+}
+
+/**
+ * Actualiza la configuración de notificaciones de un tenant
+ */
+function updateNotificationSettings(tenantId, settings) {
+  const now = Math.floor(Date.now() / 1000);
+  const current = getNotificationSettings(tenantId);
+  
+  const updates = {
+    notification_email: settings.notification_email !== undefined ? settings.notification_email : current.notification_email,
+    email_on_recovery: settings.email_on_recovery !== undefined ? (settings.email_on_recovery ? 1 : 0) : current.email_on_recovery,
+    email_on_failure: settings.email_on_failure !== undefined ? (settings.email_on_failure ? 1 : 0) : current.email_on_failure,
+    daily_summary: settings.daily_summary !== undefined ? (settings.daily_summary ? 1 : 0) : current.daily_summary,
+    weekly_summary: settings.weekly_summary !== undefined ? (settings.weekly_summary ? 1 : 0) : current.weekly_summary,
+    alert_threshold: settings.alert_threshold !== undefined ? settings.alert_threshold : current.alert_threshold,
+    send_alerts: settings.send_alerts !== undefined ? (settings.send_alerts ? 1 : 0) : current.send_alerts,
+    updated_at: now
+  };
+  
+  db.prepare(`
+    UPDATE notification_settings 
+    SET notification_email = ?,
+        email_on_recovery = ?,
+        email_on_failure = ?,
+        daily_summary = ?,
+        weekly_summary = ?,
+        alert_threshold = ?,
+        send_alerts = ?,
+        updated_at = ?
+    WHERE tenant_id = ?
+  `).run(
+    updates.notification_email,
+    updates.email_on_recovery,
+    updates.email_on_failure,
+    updates.daily_summary,
+    updates.weekly_summary,
+    updates.alert_threshold,
+    updates.send_alerts,
+    updates.updated_at,
+    tenantId
+  );
+  
+  return getNotificationSettings(tenantId);
+}
+
+/**
+ * Obtiene las integraciones (API keys) de un tenant
+ * NOTA: Las keys están encriptadas en la DB
+ */
+function getTenantIntegrations(tenantId) {
+  let integrations = db.prepare('SELECT * FROM tenant_integrations WHERE tenant_id = ?').get(tenantId);
+  
+  // Si no existe, crear con valores por defecto
+  if (!integrations) {
+    const now = Math.floor(Date.now() / 1000);
+    
+    db.prepare(`
+      INSERT INTO tenant_integrations (
+        tenant_id,
+        is_stripe_connected,
+        is_sendgrid_connected,
+        updated_at
+      ) VALUES (?, 0, 0, ?)
+    `).run(tenantId, now);
+    
+    integrations = db.prepare('SELECT * FROM tenant_integrations WHERE tenant_id = ?').get(tenantId);
+  }
+  
+  return integrations;
+}
+
+/**
+ * Actualiza las integraciones de un tenant
+ * IMPORTANTE: Las keys deben venir ya encriptadas
+ */
+function updateTenantIntegrations(tenantId, data) {
+  const now = Math.floor(Date.now() / 1000);
+  const current = getTenantIntegrations(tenantId);
+  
+  const updates = {
+    stripe_secret_key: data.stripe_secret_key !== undefined ? data.stripe_secret_key : current.stripe_secret_key,
+    stripe_publishable_key: data.stripe_publishable_key !== undefined ? data.stripe_publishable_key : current.stripe_publishable_key,
+    stripe_webhook_secret: data.stripe_webhook_secret !== undefined ? data.stripe_webhook_secret : current.stripe_webhook_secret,
+    sendgrid_api_key: data.sendgrid_api_key !== undefined ? data.sendgrid_api_key : current.sendgrid_api_key,
+    from_email: data.from_email !== undefined ? data.from_email : current.from_email,
+    is_stripe_connected: data.is_stripe_connected !== undefined ? (data.is_stripe_connected ? 1 : 0) : current.is_stripe_connected,
+    is_sendgrid_connected: data.is_sendgrid_connected !== undefined ? (data.is_sendgrid_connected ? 1 : 0) : current.is_sendgrid_connected,
+    updated_at: now
+  };
+  
+  db.prepare(`
+    UPDATE tenant_integrations
+    SET stripe_secret_key = ?,
+        stripe_publishable_key = ?,
+        stripe_webhook_secret = ?,
+        sendgrid_api_key = ?,
+        from_email = ?,
+        is_stripe_connected = ?,
+        is_sendgrid_connected = ?,
+        updated_at = ?
+    WHERE tenant_id = ?
+  `).run(
+    updates.stripe_secret_key,
+    updates.stripe_publishable_key,
+    updates.stripe_webhook_secret,
+    updates.sendgrid_api_key,
+    updates.from_email,
+    updates.is_stripe_connected,
+    updates.is_sendgrid_connected,
+    updates.updated_at,
+    tenantId
+  );
+  
+  return getTenantIntegrations(tenantId);
 }
 
 module.exports = {
@@ -258,5 +434,9 @@ module.exports = {
   updateMultipleConfig,
   createUser,
   getUserByEmail,
-  getUserByTenantId
+  getUserByTenantId,
+  getNotificationSettings,
+  updateNotificationSettings,
+  getTenantIntegrations,
+  updateTenantIntegrations
 };
