@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from './AuthContext';
+import { API_URL } from './config';
 
 export default function StripePayment({ payment, onClose, onSuccess }) {
   const { user } = useAuth();
@@ -12,7 +13,7 @@ export default function StripePayment({ payment, onClose, onSuccess }) {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:3000/api/stripe/create-checkout-session', {
+      const response = await fetch('${API_URL}/api/stripe/create-checkout-session', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

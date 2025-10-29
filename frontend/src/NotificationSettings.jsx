@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from './AuthContext'
-
-const API_URL = 'http://localhost:3000'
+import { API_URL } from './config'
 
 export default function NotificationSettings({ onClose }) {
   const { token, user } = useAuth()

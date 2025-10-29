@@ -5,8 +5,7 @@ import { Navigate } from 'react-router-dom'
 import Settings from './Settings'
 import StripePayment from './StripePayment'
 import NotificationSettings from './NotificationSettings'
-
-const API_URL = 'http://localhost:3000'
+import { API_URL } from './config'
 
 export default function Dashboard() {
   const { user, logout, token } = useAuth()

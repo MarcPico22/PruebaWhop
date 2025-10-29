@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { API_URL } from '../config';
 
 /**
  * Componente para configurar integraciones (Stripe + SendGrid + Whop)
@@ -43,7 +44,7 @@ function IntegrationsSettings() {
     setLoading(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:3000/api/integrations', {
+      const response = await fetch(`${API_URL}/api/integrations`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -70,7 +71,7 @@ function IntegrationsSettings() {
     
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:3000/api/integrations', {
+      const response = await fetch('${API_URL}/api/integrations', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -106,7 +107,7 @@ function IntegrationsSettings() {
     
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:3000/api/integrations', {
+      const response = await fetch('${API_URL}/api/integrations', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -142,7 +143,7 @@ function IntegrationsSettings() {
     
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:3000/api/integrations', {
+      const response = await fetch('${API_URL}/api/integrations', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -177,7 +178,7 @@ function IntegrationsSettings() {
     
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:3000/api/whop/sync', {
+      const response = await fetch('${API_URL}/api/whop/sync', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`

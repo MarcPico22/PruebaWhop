@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
 import IntegrationsSettings from './components/IntegrationsSettings'
-
-const API_URL = 'http://localhost:3000'
+import { API_URL } from './config'
 
 export default function Settings({ onClose, token }) {
   const [activeTab, setActiveTab] = useState('general')

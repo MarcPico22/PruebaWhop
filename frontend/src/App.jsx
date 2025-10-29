@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react'
 import Settings from './Settings'
 
-const API_URL = 'http://localhost:3000'
+import './index.css'
+import { AuthProvider } from './AuthContext'
+import { API_URL } from './config'
 
 function App() {
   const [payments, setPayments] = useState([])
