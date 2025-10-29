@@ -12,7 +12,9 @@ const {
   getNotificationSettings,
   updateNotificationSettings,
   getTenantIntegrations,
-  updateTenantIntegrations
+  updateTenantIntegrations,
+  getSubscription,
+  updateSubscription
 } = require('./db');
 const { sendPaymentFailedEmail } = require('./mailer');
 const { processRetry } = require('./retry-logic');
@@ -30,6 +32,25 @@ const {
   validateStripeKey, 
   validateSendGridKey 
 } = require('./encryption');
+const { getAllPlans, getPlan, getUsagePercentage, shouldShowLimitWarning } = require('./plans');
+const { 
+  checkPlanLimits, 
+  trackPaymentUsage, 
+  attachSubscription,
+  checkPlanLimitsWebhook,
+  trackPaymentUsageWebhook
+} = require('./subscription-middleware');
+const {
+  syncFailedPayments,
+  validateWhopApiKey,
+  processWhopWebhook
+} = require('./whop-service');
+const {
+  createCheckoutSession: createBillingCheckout,
+  createPortalSession,
+  verifyWebhook,
+  handleBillingWebhook
+} = require('./billing-service');
 
 const router = express.Router();
 
@@ -101,7 +122,7 @@ router.get('/api/auth/me', authenticateToken, (req, res) => {
  * Webhook de Whop - recibe notificación de pago fallido
  * NOTA: El webhook debe incluir tenant_id en el body para asociar el pago a una empresa
  */
-router.post('/webhook/whop', async (req, res) => {
+router.post('/webhook/whop', checkPlanLimitsWebhook, async (req, res) => {
   try {
     const { event, data, tenant_id } = req.body;
     
@@ -139,6 +160,9 @@ router.post('/webhook/whop', async (req, res) => {
     };
     
     insertPayment(payment);
+    
+    // Incrementar contador de pagos usados
+    trackPaymentUsageWebhook(req, res, () => {});
     
     // Enviar email inicial
     await sendPaymentFailedEmail(data.email, data.product, data.amount, retryLink, tenant_id);
@@ -545,8 +569,9 @@ router.get('/retry/:token', (req, res) => {
 
 /**
  * POST /seed-test-payment - Crear pago de prueba - PROTEGIDA
+ * AHORA CON VERIFICACIÓN DE LÍMITES
  */
-router.post('/seed-test-payment', authenticateToken, async (req, res) => {
+router.post('/seed-test-payment', authenticateToken, checkPlanLimits, async (req, res) => {
   try {
     const tenantId = req.user.tenantId;
     const token = uuidv4();
@@ -566,6 +591,10 @@ router.post('/seed-test-payment', authenticateToken, async (req, res) => {
     };
     
     insertPayment(testPayment);
+    
+    // Incrementar contador de pagos usados
+    trackPaymentUsage(req, res, () => {});
+    
     await sendPaymentFailedEmail(testPayment.email, testPayment.product, testPayment.amount, retryLink, tenantId);
     
     console.log(`✅ Pago de prueba creado: ${testPayment.id} para tenant ${tenantId}`);
@@ -903,6 +932,286 @@ router.post('/api/integrations', authenticateToken, (req, res) => {
   } catch (error) {
     console.error('❌ Error actualizando integraciones:', error);
     res.status(500).json({ error: error.message || 'Error actualizando integraciones' });
+  }
+});
+
+/**
+ * ============================================
+ *  RUTAS DE SUSCRIPCIONES Y BILLING
+ * ============================================
+ */
+
+/**
+ * GET /api/subscription
+ * Obtiene la suscripción actual del tenant
+ */
+router.get('/api/subscription', authenticateToken, attachSubscription, (req, res) => {
+  try {
+    const subscription = req.subscription;
+    const plan = getPlan(subscription.plan);
+    const usage = getUsagePercentage(subscription);
+    const showWarning = shouldShowLimitWarning(subscription);
+    
+    const now = Math.floor(Date.now() / 1000);
+    const trialDaysLeft = subscription.trial_ends_at 
+      ? Math.max(0, Math.ceil((subscription.trial_ends_at - now) / 86400))
+      : 0;
+    
+    res.json({
+      success: true,
+      subscription: {
+        plan: subscription.plan,
+        planName: plan.name,
+        status: subscription.status,
+        paymentsUsed: subscription.payments_used,
+        paymentsLimit: subscription.payments_limit,
+        usagePercentage: usage,
+        showWarning,
+        trialEndsAt: subscription.trial_ends_at,
+        trialDaysLeft,
+        currentPeriodEnd: subscription.current_period_end,
+        stripeCustomerId: subscription.stripe_customer_id,
+        stripeSubscriptionId: subscription.stripe_subscription_id
+      },
+      check: req.usageCheck
+    });
+  } catch (error) {
+    console.error('Error obteniendo suscripción:', error);
+    res.status(500).json({ error: 'Error obteniendo suscripción' });
+  }
+});
+
+/**
+ * GET /api/plans
+ * Obtiene todos los planes disponibles
+ */
+router.get('/api/plans', (req, res) => {
+  try {
+    const plans = getAllPlans();
+    // Convertir IDs a mayúsculas para el frontend
+    const normalizedPlans = plans.map(plan => ({
+      ...plan,
+      id: plan.id.toUpperCase()
+    }));
+    
+    res.json({
+      success: true,
+      plans: normalizedPlans
+    });
+  } catch (error) {
+    console.error('Error obteniendo planes:', error);
+    res.status(500).json({ error: 'Error obteniendo planes' });
+  }
+});
+
+/**
+ * POST /api/create-checkout
+ * Crea sesión de Stripe Checkout para upgrade
+ */
+router.post('/api/create-checkout', authenticateToken, async (req, res) => {
+  try {
+    const { planId } = req.body;
+    const { email, tenantId } = req.user;
+    
+    if (!planId) {
+      return res.status(400).json({ error: 'Plan ID es requerido' });
+    }
+    
+    // Convertir planId a minúsculas para que coincida con PLANS
+    const normalizedPlanId = planId.toLowerCase();
+    
+    const plan = getPlan(normalizedPlanId);
+    if (!plan) {
+      return res.status(400).json({ error: 'Plan no encontrado' });
+    }
+    
+    if (normalizedPlanId === 'free') {
+      return res.status(400).json({ error: 'No puedes comprar el plan gratuito' });
+    }
+    
+    const baseUrl = process.env.BASE_URL || 'http://localhost:5173';
+    const session = await createBillingCheckout(
+      tenantId,
+      normalizedPlanId,
+      email,
+      `${baseUrl}/dashboard?upgrade=success`,
+      `${baseUrl}/pricing?upgrade=canceled`
+    );
+    
+    res.json({
+      success: true,
+      url: session.url,
+      sessionId: session.id
+    });
+    
+  } catch (error) {
+    console.error('Error creando checkout:', error);
+    res.status(500).json({ error: error.message || 'Error creando checkout' });
+  }
+});
+
+/**
+ * POST /api/create-portal
+ * Crea sesión del Customer Portal de Stripe
+ */
+router.post('/api/create-portal', authenticateToken, async (req, res) => {
+  try {
+    const subscription = getSubscription(req.user.tenantId);
+    
+    if (!subscription.stripe_customer_id) {
+      return res.status(400).json({ 
+        error: 'No tienes una suscripción activa',
+        message: 'Primero debes suscribirte a un plan de pago'
+      });
+    }
+    
+    const { returnUrl } = req.body;
+    const baseUrl = process.env.BASE_URL || 'http://localhost:5173';
+    const finalReturnUrl = returnUrl || `${baseUrl}/dashboard`;
+    
+    const session = await createPortalSession(
+      subscription.stripe_customer_id,
+      finalReturnUrl
+    );
+    
+    res.json({
+      success: true,
+      url: session.url
+    });
+    
+  } catch (error) {
+    console.error('Error creando portal:', error);
+    res.status(500).json({ error: error.message || 'Error creando portal' });
+  }
+});
+
+/**
+ * POST /webhook/stripe-billing
+ * Webhook de Stripe para eventos de billing
+ */
+router.post('/webhook/stripe-billing', async (req, res) => {
+  try {
+    const sig = req.headers['stripe-signature'];
+    const webhookSecret = process.env.STRIPE_BILLING_WEBHOOK_SECRET;
+    
+    if (!webhookSecret) {
+      console.warn('⚠️ STRIPE_BILLING_WEBHOOK_SECRET no configurado');
+      return res.status(400).json({ error: 'Webhook secret no configurado' });
+    }
+    
+    let event;
+    try {
+      event = verifyWebhook(req.body, sig, webhookSecret);
+    } catch (err) {
+      console.error('❌ Error verificando webhook:', err.message);
+      return res.status(400).json({ error: `Webhook Error: ${err.message}` });
+    }
+    
+    console.log(`📨 Webhook recibido: ${event.type}`);
+    
+    await handleBillingWebhook(event);
+    
+    res.json({ received: true });
+    
+  } catch (error) {
+    console.error('❌ Error procesando webhook de billing:', error);
+    res.status(500).json({ error: 'Error procesando webhook' });
+  }
+});
+
+/**
+ * POST /api/whop/sync - Sincronizar pagos fallidos desde Whop manualmente
+ * Botón "Sincronizar con Whop" en el Dashboard
+ */
+router.post('/api/whop/sync', authenticateToken, async (req, res) => {
+  try {
+    const tenantId = req.user.tenantId;
+    
+    // Obtener API key de Whop del tenant
+    const integrations = getTenantIntegrations(tenantId);
+    
+    if (!integrations || !integrations.whop_api_key) {
+      return res.status(400).json({
+        error: 'Whop no configurado',
+        message: 'Debes configurar tu API key de Whop en Configuración → Integraciones'
+      });
+    }
+    
+    // Desencriptar API key
+    const whopApiKey = decrypt(integrations.whop_api_key);
+    
+    // Sincronizar pagos
+    const result = await syncFailedPayments(whopApiKey, tenantId);
+    
+    res.json({
+      success: result.success,
+      message: `Sincronización completada: ${result.inserted} pagos nuevos importados`,
+      stats: result
+    });
+    
+  } catch (error) {
+    console.error('❌ Error en sincronización manual:', error);
+    res.status(500).json({
+      error: 'Error sincronizando',
+      message: error.message
+    });
+  }
+});
+
+/**
+ * POST /webhook/whop-sync/:tenantId - Webhook de Whop para notificaciones en tiempo real
+ * Whop debe estar configurado para enviar webhooks a esta URL
+ */
+router.post('/webhook/whop-sync/:tenantId', async (req, res) => {
+  try {
+    const { tenantId } = req.params;
+    
+    // Procesar webhook
+    const result = await processWhopWebhook(req.body, tenantId);
+    
+    res.json({
+      success: result.success,
+      message: result.message
+    });
+    
+  } catch (error) {
+    console.error('❌ Error procesando webhook de Whop:', error);
+    res.status(500).json({
+      error: 'Error procesando webhook',
+      message: error.message
+    });
+  }
+});
+
+/**
+ * GET /api/whop/status - Verificar estado de conexión con Whop
+ */
+router.get('/api/whop/status', authenticateToken, async (req, res) => {
+  try {
+    const tenantId = req.user.tenantId;
+    const integrations = getTenantIntegrations(tenantId);
+    
+    if (!integrations || !integrations.whop_api_key) {
+      return res.json({
+        connected: false,
+        message: 'Whop no configurado'
+      });
+    }
+    
+    const whopApiKey = decrypt(integrations.whop_api_key);
+    const isValid = await validateWhopApiKey(whopApiKey);
+    
+    res.json({
+      connected: isValid,
+      message: isValid ? 'Conexión activa' : 'API key inválida'
+    });
+    
+  } catch (error) {
+    console.error('❌ Error verificando Whop:', error);
+    res.status(500).json({
+      connected: false,
+      error: error.message
+    });
   }
 });
 

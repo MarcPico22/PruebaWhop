@@ -13,6 +13,7 @@ export default function Dashboard() {
   const { darkMode, toggleDarkMode } = useTheme()
   const [payments, setPayments] = useState([])
   const [stats, setStats] = useState(null)
+  const [subscription, setSubscription] = useState(null)
   const [filter, setFilter] = useState('all')
   const [loading, setLoading] = useState(true)
   const [retryingId, setRetryingId] = useState(null)
@@ -54,6 +55,24 @@ export default function Dashboard() {
       console.error('Error cargando pagos:', error)
       setLoading(false)
       showMessage('Error de conexión con el backend', 'error')
+    }
+  }
+
+  // Cargar información de suscripción
+  const fetchSubscription = async () => {
+    try {
+      const response = await fetch(`${API_URL}/api/subscription`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      })
+      
+      if (response.ok) {
+        const data = await response.json()
+        setSubscription(data.subscription)
+      }
+    } catch (error) {
+      console.error('Error cargando suscripción:', error)
     }
   }
 
@@ -158,8 +177,37 @@ export default function Dashboard() {
     })
   }
 
+  // Abrir Customer Portal de Stripe
+  const handleManageSubscription = async () => {
+    try {
+      const response = await fetch(`${API_URL}/api/create-portal`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          returnUrl: window.location.href
+        })
+      })
+      
+      const data = await response.json()
+      
+      if (data.success && data.url) {
+        // Redirigir al Customer Portal de Stripe
+        window.location.href = data.url
+      } else {
+        showMessage('❌ Error abriendo portal de gestión', 'error')
+      }
+    } catch (error) {
+      console.error('Error abriendo portal:', error)
+      showMessage('❌ Error de conexión', 'error')
+    }
+  }
+
   useEffect(() => {
     fetchPayments()
+    fetchSubscription()
     const interval = setInterval(fetchPayments, 10000)
     return () => clearInterval(interval)
   }, [filter, token])
@@ -175,6 +223,19 @@ export default function Dashboard() {
                 💰 Whop Retry
               </h1>
               <span className="text-sm text-gray-500 dark:text-gray-400">| {user.company_name}</span>
+              {subscription && (
+                <span className={`px-2.5 py-1 text-xs font-semibold rounded-full ${
+                  subscription.plan === 'free' 
+                    ? 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300' 
+                    : subscription.plan === 'pro'
+                    ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300'
+                    : 'bg-gradient-to-r from-yellow-100 to-orange-100 text-orange-800 dark:from-yellow-900/30 dark:to-orange-900/30 dark:text-orange-300'
+                }`}>
+                  {subscription.plan === 'free' && '🆓 FREE'}
+                  {subscription.plan === 'pro' && '💎 PRO'}
+                  {subscription.plan === 'enterprise' && '👑 ENTERPRISE'}
+                </span>
+              )}
             </div>
             <div className="flex items-center space-x-4">
               <button
@@ -184,6 +245,12 @@ export default function Dashboard() {
               >
                 {darkMode ? '🌞' : '🌙'}
               </button>
+              <a
+                href="/pricing"
+                className="px-4 py-2 text-sm font-medium text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-lg transition-colors"
+              >
+                💎 Planes
+              </a>
               <span className="text-sm text-gray-600 dark:text-gray-300">{user.email}</span>
               <button
                 onClick={logout}
@@ -196,6 +263,93 @@ export default function Dashboard() {
         </div>
       </nav>
 
+      {/* Subscription Limit Banner */}
+      {subscription && (
+        <>
+          {/* Warning Banner (80%+) */}
+          {(subscription.usagePercentage || 0) >= 80 && (subscription.usagePercentage || 0) < 100 && (
+            <div className="bg-yellow-50 dark:bg-yellow-900/20 border-b border-yellow-200 dark:border-yellow-800">
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <span className="text-2xl">⚠️</span>
+                    <div>
+                      <p className="text-sm font-semibold text-yellow-800 dark:text-yellow-200">
+                        Acercándose al límite del plan {subscription.plan.toUpperCase()}
+                      </p>
+                      <p className="text-xs text-yellow-700 dark:text-yellow-300">
+                        Has usado {subscription.paymentsUsed} de {subscription.paymentsLimit} pagos ({(subscription.usagePercentage || 0).toFixed(0)}%)
+                      </p>
+                    </div>
+                  </div>
+                  <a
+                    href="/pricing"
+                    className="px-4 py-2 bg-yellow-600 hover:bg-yellow-700 text-white text-sm font-medium rounded-lg transition-colors"
+                  >
+                    Actualizar Plan
+                  </a>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Limit Reached Banner (100%) */}
+          {(subscription.usagePercentage || 0) >= 100 && (
+            <div className="bg-red-50 dark:bg-red-900/20 border-b border-red-200 dark:border-red-800">
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <span className="text-2xl">🚫</span>
+                    <div>
+                      <p className="text-sm font-semibold text-red-800 dark:text-red-200">
+                        Límite de pagos alcanzado
+                      </p>
+                      <p className="text-xs text-red-700 dark:text-red-300">
+                        No puedes procesar más pagos este mes. Actualiza tu plan para continuar.
+                      </p>
+                    </div>
+                  </div>
+                  <a
+                    href="/pricing"
+                    className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded-lg transition-colors"
+                  >
+                    Actualizar Ahora
+                  </a>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Trial Info Banner */}
+          {subscription.status === 'trialing' && (
+            <div className="bg-blue-50 dark:bg-blue-900/20 border-b border-blue-200 dark:border-blue-800">
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <span className="text-2xl">🎁</span>
+                    <div>
+                      <p className="text-sm font-semibold text-blue-800 dark:text-blue-200">
+                        Trial gratuito activo
+                      </p>
+                      <p className="text-xs text-blue-700 dark:text-blue-300">
+                        {subscription.trialDaysLeft} días restantes · 
+                        Usando {subscription.paymentsUsed} de {subscription.paymentsLimit} pagos
+                      </p>
+                    </div>
+                  </div>
+                  <a
+                    href="/pricing"
+                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors"
+                  >
+                    Ver Planes
+                  </a>
+                </div>
+              </div>
+            </div>
+          )}
+        </>
+      )}
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Alert Message */}
         {message && (
@@ -205,6 +359,67 @@ export default function Dashboard() {
             'bg-blue-50 border border-blue-200 text-blue-800'
           }`}>
             {message.text}
+          </div>
+        )}
+
+        {/* Plan Info Card */}
+        {subscription && (
+          <div className="bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-900/20 dark:to-indigo-900/20 rounded-lg shadow-sm border border-purple-200 dark:border-purple-800 p-6 mb-8">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <div className="text-4xl">
+                  {subscription.plan === 'free' && '🆓'}
+                  {subscription.plan === 'pro' && '💎'}
+                  {subscription.plan === 'enterprise' && '👑'}
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900 dark:text-white">
+                    Plan {subscription.planName}
+                  </h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-300">
+                    {subscription.paymentsUsed} / {subscription.paymentsLimit === 999999 ? '∞' : subscription.paymentsLimit} pagos usados este mes
+                    {subscription.status === 'trialing' && ` · ${subscription.trialDaysLeft} días de trial`}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center space-x-3">
+                {subscription.plan !== 'enterprise' && (
+                  <a
+                    href="/pricing"
+                    className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white text-sm font-medium rounded-lg transition-colors"
+                  >
+                    Mejorar Plan
+                  </a>
+                )}
+                {subscription.stripeCustomerId && (
+                  <button
+                    onClick={handleManageSubscription}
+                    className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white text-sm font-medium rounded-lg transition-colors"
+                  >
+                    Gestionar Suscripción
+                  </button>
+                )}
+              </div>
+            </div>
+            {/* Progress Bar */}
+            <div className="mt-4">
+              <div className="flex justify-between text-xs text-gray-600 dark:text-gray-400 mb-1">
+                <span>Uso del mes</span>
+                <span>{(subscription.usagePercentage || 0).toFixed(1)}%</span>
+              </div>
+              <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                <div
+                  className={`h-2 rounded-full transition-all ${
+                    (subscription.usagePercentage || 0) >= 100 
+                      ? 'bg-red-500' 
+                      : (subscription.usagePercentage || 0) >= 80 
+                      ? 'bg-yellow-500' 
+                      : 'bg-green-500'
+                  }`}
+                  style={{ width: `${Math.min(subscription.usagePercentage || 0, 100)}%` }}
+                ></div>
+              </div>
+            </div>
           </div>
         )}
 

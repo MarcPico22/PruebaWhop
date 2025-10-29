@@ -4,12 +4,18 @@ const cors = require('cors');
 const { initDatabase } = require('./db');
 const routes = require('./routes');
 const { startRetryScheduler } = require('./retry-logic');
+const { startWhopSyncScheduler } = require('./whop-scheduler');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Middleware
 app.use(cors());
+
+// Webhook de Stripe necesita raw body ANTES de parsear JSON
+app.use('/webhook/stripe-billing', express.raw({ type: 'application/json' }));
+
+// Para el resto de rutas, parsear JSON normalmente
 app.use(express.json());
 
 // Inicializar base de datos
@@ -38,6 +44,7 @@ app.listen(PORT, () => {
   console.log(`   curl -X POST http://localhost:${PORT}/seed-test-payment`);
   console.log('');
   
-  // Iniciar scheduler de reintentos
+  // Iniciar schedulers
   startRetryScheduler();
+  startWhopSyncScheduler();
 });

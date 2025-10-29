@@ -69,8 +69,26 @@ function initDatabase() {
       stripe_webhook_secret TEXT,
       sendgrid_api_key TEXT,
       from_email TEXT,
+      whop_api_key TEXT,
       is_stripe_connected INTEGER NOT NULL DEFAULT 0,
       is_sendgrid_connected INTEGER NOT NULL DEFAULT 0,
+      is_whop_connected INTEGER NOT NULL DEFAULT 0,
+      updated_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now'))
+    )
+  `;
+  
+  const createSubscriptionsTableSQL = `
+    CREATE TABLE IF NOT EXISTS subscriptions (
+      tenant_id TEXT PRIMARY KEY,
+      plan TEXT NOT NULL DEFAULT 'free',
+      stripe_customer_id TEXT,
+      stripe_subscription_id TEXT,
+      status TEXT NOT NULL DEFAULT 'trial',
+      trial_ends_at INTEGER,
+      current_period_end INTEGER,
+      payments_limit INTEGER NOT NULL DEFAULT 50,
+      payments_used INTEGER NOT NULL DEFAULT 0,
+      created_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
       updated_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now'))
     )
   `;
@@ -79,7 +97,27 @@ function initDatabase() {
   db.exec(createConfigTableSQL);
   db.exec(createUsersTableSQL);
   db.exec(createNotificationSettingsTableSQL);
+  db.exec(createSubscriptionsTableSQL);
   db.exec(createTenantIntegrationsTableSQL);
+  
+  // Migración: Agregar columnas de Whop si no existen
+  try {
+    db.exec(`
+      ALTER TABLE tenant_integrations ADD COLUMN whop_api_key TEXT;
+    `);
+    console.log('✅ Columna whop_api_key agregada');
+  } catch (err) {
+    // Columna ya existe, ignorar
+  }
+  
+  try {
+    db.exec(`
+      ALTER TABLE tenant_integrations ADD COLUMN is_whop_connected INTEGER NOT NULL DEFAULT 0;
+    `);
+    console.log('✅ Columna is_whop_connected agregada');
+  } catch (err) {
+    // Columna ya existe, ignorar
+  }
   
   console.log('✅ Base de datos inicializada');
 }
@@ -418,6 +456,103 @@ function updateTenantIntegrations(tenantId, data) {
   return getTenantIntegrations(tenantId);
 }
 
+/**
+ * Obtiene la suscripción de un tenant
+ */
+function getSubscription(tenantId) {
+  let subscription = db.prepare('SELECT * FROM subscriptions WHERE tenant_id = ?').get(tenantId);
+  
+  // Si no existe, crear suscripción FREE con trial de 14 días
+  if (!subscription) {
+    const now = Math.floor(Date.now() / 1000);
+    const trialEnds = now + (14 * 24 * 60 * 60); // 14 días
+    
+    db.prepare(`
+      INSERT INTO subscriptions (tenant_id, plan, status, trial_ends_at, payments_limit, payments_used)
+      VALUES (?, 'free', 'trial', ?, 50, 0)
+    `).run(tenantId, trialEnds);
+    
+    subscription = db.prepare('SELECT * FROM subscriptions WHERE tenant_id = ?').get(tenantId);
+  }
+  
+  return subscription;
+}
+
+/**
+ * Actualiza la suscripción de un tenant
+ */
+function updateSubscription(tenantId, data) {
+  const now = Math.floor(Date.now() / 1000);
+  const current = getSubscription(tenantId);
+  
+  const updates = {
+    plan: data.plan !== undefined ? data.plan : current.plan,
+    stripe_customer_id: data.stripe_customer_id !== undefined ? data.stripe_customer_id : current.stripe_customer_id,
+    stripe_subscription_id: data.stripe_subscription_id !== undefined ? data.stripe_subscription_id : current.stripe_subscription_id,
+    status: data.status !== undefined ? data.status : current.status,
+    trial_ends_at: data.trial_ends_at !== undefined ? data.trial_ends_at : current.trial_ends_at,
+    current_period_end: data.current_period_end !== undefined ? data.current_period_end : current.current_period_end,
+    payments_limit: data.payments_limit !== undefined ? data.payments_limit : current.payments_limit,
+    payments_used: data.payments_used !== undefined ? data.payments_used : current.payments_used,
+    updated_at: now
+  };
+  
+  db.prepare(`
+    UPDATE subscriptions
+    SET plan = ?,
+        stripe_customer_id = ?,
+        stripe_subscription_id = ?,
+        status = ?,
+        trial_ends_at = ?,
+        current_period_end = ?,
+        payments_limit = ?,
+        payments_used = ?,
+        updated_at = ?
+    WHERE tenant_id = ?
+  `).run(
+    updates.plan,
+    updates.stripe_customer_id,
+    updates.stripe_subscription_id,
+    updates.status,
+    updates.trial_ends_at,
+    updates.current_period_end,
+    updates.payments_limit,
+    updates.payments_used,
+    updates.updated_at,
+    tenantId
+  );
+  
+  return getSubscription(tenantId);
+}
+
+/**
+ * Incrementa el contador de pagos usados
+ */
+function incrementPaymentsUsed(tenantId) {
+  db.prepare(`
+    UPDATE subscriptions
+    SET payments_used = payments_used + 1,
+        updated_at = strftime('%s', 'now')
+    WHERE tenant_id = ?
+  `).run(tenantId);
+  
+  return getSubscription(tenantId);
+}
+
+/**
+ * Resetea el contador de pagos usados (para planes mensuales)
+ */
+function resetPaymentsUsed(tenantId) {
+  db.prepare(`
+    UPDATE subscriptions
+    SET payments_used = 0,
+        updated_at = strftime('%s', 'now')
+    WHERE tenant_id = ?
+  `).run(tenantId);
+  
+  return getSubscription(tenantId);
+}
+
 module.exports = {
   db,
   initDatabase,
@@ -438,5 +573,9 @@ module.exports = {
   getNotificationSettings,
   updateNotificationSettings,
   getTenantIntegrations,
-  updateTenantIntegrations
+  updateTenantIntegrations,
+  getSubscription,
+  updateSubscription,
+  incrementPaymentsUsed,
+  resetPaymentsUsed
 };

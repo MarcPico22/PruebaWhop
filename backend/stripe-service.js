@@ -180,7 +180,6 @@ async function createPaymentIntent(amount, currency = 'usd', metadata = {}) {
 }
 
 module.exports = {
-  stripe,
   createCheckoutSession,
   getStripeInstance,
   verifyWebhookSignature,

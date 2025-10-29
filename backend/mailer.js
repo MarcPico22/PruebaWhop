@@ -79,7 +79,8 @@ async function sendEmail(to, subject, text, html, tenantId = null) {
     return { sent: true, isDemo: config.isDemo };
   } catch (error) {
     console.error('❌ Error enviando email:', error.message);
-    throw error;
+    // NO lanzar el error, solo loguearlo para que no crashee el servidor
+    return { sent: false, error: error.message };
   }
 }
 

@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 
 /**
- * Componente para configurar integraciones (Stripe + SendGrid)
+ * Componente para configurar integraciones (Stripe + SendGrid + Whop)
  * Cada empresa configura sus propias API keys
  */
 function IntegrationsSettings() {
   const [activeTab, setActiveTab] = useState('stripe');
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [syncing, setSyncing] = useState(false);
   const [message, setMessage] = useState(null);
   
   // Estado para Stripe
@@ -21,6 +22,11 @@ function IntegrationsSettings() {
   const [sendgridData, setSendgridData] = useState({
     sendgrid_api_key: '',
     from_email: ''
+  });
+  
+  // Estado para Whop
+  const [whopData, setWhopData] = useState({
+    whop_api_key: ''
   });
   
   // Estado para mostrar keys enmascaradas
@@ -126,6 +132,76 @@ function IntegrationsSettings() {
     }
   };
 
+  /**
+   * Guarda configuración de Whop
+   */
+  const saveWhop = async (e) => {
+    e.preventDefault();
+    setSaving(true);
+    setMessage(null);
+    
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('http://localhost:3000/api/integrations', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(whopData)
+      });
+      
+      const result = await response.json();
+      
+      if (response.ok) {
+        setMessage({ type: 'success', text: '✅ Whop configurado correctamente' });
+        setWhopData({ whop_api_key: '' });
+        await loadIntegrations();
+      } else {
+        setMessage({ type: 'error', text: `❌ ${result.error || 'Error guardando Whop'}` });
+      }
+    } catch (error) {
+      setMessage({ type: 'error', text: '❌ Error de conexión' });
+      console.error('Error:', error);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  /**
+   * Sincroniza pagos fallidos desde Whop manualmente
+   */
+  const syncWhopPayments = async () => {
+    setSyncing(true);
+    setMessage(null);
+    
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('http://localhost:3000/api/whop/sync', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      const result = await response.json();
+      
+      if (response.ok) {
+        setMessage({ 
+          type: 'success', 
+          text: `✅ ${result.message} (${result.stats.total} total, ${result.stats.inserted} nuevos)` 
+        });
+      } else {
+        setMessage({ type: 'error', text: `❌ ${result.error || 'Error sincronizando'}` });
+      }
+    } catch (error) {
+      setMessage({ type: 'error', text: '❌ Error de conexión' });
+      console.error('Error:', error);
+    } finally {
+      setSyncing(false);
+    }
+  };
+
   if (loading) {
     return (
       <div style={{ textAlign: 'center', padding: '40px' }}>
@@ -191,6 +267,21 @@ function IntegrationsSettings() {
           }}
         >
           📧 SendGrid
+        </button>
+        <button
+          onClick={() => setActiveTab('whop')}
+          style={{
+            padding: '12px 24px',
+            border: 'none',
+            background: 'none',
+            cursor: 'pointer',
+            fontWeight: '600',
+            color: activeTab === 'whop' ? '#2563EB' : '#6B7280',
+            borderBottom: activeTab === 'whop' ? '3px solid #2563EB' : 'none',
+            marginBottom: '-2px'
+          }}
+        >
+          🔄 Whop API
         </button>
       </div>
 
@@ -401,6 +492,137 @@ function IntegrationsSettings() {
               {saving ? 'Guardando...' : 'Guardar SendGrid'}
             </button>
           </form>
+        </div>
+      )}
+
+      {/* Whop API Tab */}
+      {activeTab === 'whop' && (
+        <div>
+          <h3>Configuración de Whop API</h3>
+          <p style={{ color: '#666', marginBottom: '20px' }}>
+            Conecta tu cuenta de Whop para sincronizar automáticamente los pagos fallidos.
+          </p>
+          
+          {/* Estado actual */}
+          {currentIntegrations?.is_whop_connected && (
+            <div style={{
+              padding: '16px',
+              backgroundColor: '#D1FAE5',
+              border: '1px solid #10B981',
+              borderRadius: '8px',
+              marginBottom: '20px'
+            }}>
+              <p style={{ margin: '0 0 8px 0', fontWeight: '600', color: '#065F46' }}>
+                ✅ Whop API conectada
+              </p>
+              <p style={{ margin: '4px 0', fontSize: '14px', color: '#047857', fontFamily: 'monospace' }}>
+                API Key: {currentIntegrations.whop_api_key || 'No configurada'}
+              </p>
+              
+              {/* Botón de sincronización manual */}
+              <button
+                onClick={syncWhopPayments}
+                disabled={syncing}
+                style={{
+                  marginTop: '15px',
+                  padding: '10px 20px',
+                  backgroundColor: syncing ? '#9CA3AF' : '#10B981',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '6px',
+                  fontWeight: '600',
+                  cursor: syncing ? 'not-allowed' : 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}
+              >
+                {syncing ? '🔄 Sincronizando...' : '🔄 Sincronizar Ahora'}
+              </button>
+              <p style={{ fontSize: '12px', color: '#047857', marginTop: '8px' }}>
+                💡 La sincronización automática se ejecuta cada 5 minutos
+              </p>
+            </div>
+          )}
+
+          <form onSubmit={saveWhop}>
+            <div style={{ marginBottom: '20px' }}>
+              <label style={{ display: 'block', fontWeight: '600', marginBottom: '8px' }}>
+                Whop API Key *
+              </label>
+              <input
+                type="password"
+                value={whopData.whop_api_key}
+                onChange={(e) => setWhopData({ ...whopData, whop_api_key: e.target.value })}
+                placeholder="whop_xxxxxxxxxxxxx"
+                style={{
+                  width: '100%',
+                  padding: '10px',
+                  border: '1px solid #D1D5DB',
+                  borderRadius: '6px',
+                  fontFamily: 'monospace',
+                  fontSize: '14px'
+                }}
+                required
+              />
+              <p style={{ fontSize: '12px', color: '#6B7280', marginTop: '4px' }}>
+                Obtén tu API key desde <a href="https://whop.com/settings/api" target="_blank" rel="noopener noreferrer">Whop Dashboard → Settings → API</a>
+              </p>
+            </div>
+
+            <button
+              type="submit"
+              disabled={saving}
+              style={{
+                padding: '12px 32px',
+                backgroundColor: saving ? '#9CA3AF' : '#2563EB',
+                color: 'white',
+                border: 'none',
+                borderRadius: '6px',
+                fontWeight: '600',
+                cursor: saving ? 'not-allowed' : 'pointer'
+              }}
+            >
+              {saving ? 'Guardando...' : 'Guardar Whop API'}
+            </button>
+          </form>
+
+          {/* Información sobre Webhooks */}
+          <div style={{
+            marginTop: '30px',
+            padding: '16px',
+            backgroundColor: '#EFF6FF',
+            border: '1px solid #3B82F6',
+            borderRadius: '8px'
+          }}>
+            <h4 style={{ margin: '0 0 10px 0', color: '#1E40AF' }}>
+              🔔 Configurar Webhook en Whop (Opcional)
+            </h4>
+            <p style={{ fontSize: '14px', color: '#1E40AF', margin: '0 0 10px 0' }}>
+              Para recibir notificaciones en tiempo real de pagos fallidos:
+            </p>
+            <ol style={{ fontSize: '14px', color: '#1E40AF', margin: '0', paddingLeft: '20px' }}>
+              <li>Ve a Whop Dashboard → Settings → Webhooks</li>
+              <li>Crea un nuevo webhook con esta URL:</li>
+            </ol>
+            <code style={{
+              display: 'block',
+              marginTop: '10px',
+              padding: '10px',
+              backgroundColor: 'white',
+              border: '1px solid #3B82F6',
+              borderRadius: '4px',
+              fontFamily: 'monospace',
+              fontSize: '13px',
+              color: '#1E40AF',
+              overflowX: 'auto'
+            }}>
+              {window.location.origin}/webhook/whop-sync/{localStorage.getItem('userId') || 'YOUR_TENANT_ID'}
+            </code>
+            <p style={{ fontSize: '12px', color: '#1E40AF', margin: '10px 0 0 0' }}>
+              3. Selecciona el evento: <strong>payment.failed</strong>
+            </p>
+          </div>
         </div>
       )}
 
