@@ -1,9 +1,19 @@
 const Database = require('better-sqlite3');
 const path = require('path');
+const fs = require('fs');
 
 // Conexión a SQLite
 const dbPath = process.env.DATABASE_URL || './data.db';
+
+// Crear directorio si no existe (para Railway)
+const dbDir = path.dirname(dbPath);
+if (!fs.existsSync(dbDir)) {
+  fs.mkdirSync(dbDir, { recursive: true });
+  console.log(`✅ Directorio creado: ${dbDir}`);
+}
+
 const db = new Database(dbPath);
+console.log(`✅ Base de datos conectada: ${dbPath}`);
 
 /**
  * Inicializa la base de datos y crea la tabla payments si no existe
