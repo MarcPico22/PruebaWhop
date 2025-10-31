@@ -15,6 +15,18 @@ export default function LandingPage() {
               <span className="text-2xl font-bold text-indigo-600">Whop Recovery</span>
             </div>
             <div className="flex items-center gap-4">
+              <Link
+                to="/pricing"
+                className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 transition"
+              >
+                Precios
+              </Link>
+              <Link
+                to="/faq"
+                className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 transition"
+              >
+                FAQ
+              </Link>
               {user ? (
                 <Link
                   to="/dashboard"
