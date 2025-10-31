@@ -2,8 +2,9 @@ const Database = require('better-sqlite3');
 const path = require('path');
 const fs = require('fs');
 
-// Conexión a SQLite
-const dbPath = process.env.DATABASE_URL || './data.db';
+// Conexión a SQLite - RAILWAY PERSISTENT VOLUME
+// En Railway debes configurar un volumen en /data
+const dbPath = process.env.DATABASE_URL || (process.env.RAILWAY_ENVIRONMENT ? '/data/database.sqlite' : './data.db');
 
 // Crear directorio si no existe (para Railway)
 const dbDir = path.dirname(dbPath);
