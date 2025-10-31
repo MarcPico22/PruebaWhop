@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider } from './AuthContext.jsx'
 import { ThemeProvider } from './ThemeContext.jsx'
+import LandingPage from './LandingPage.jsx'
 import Login from './Login.jsx'
 import Signup from './Signup.jsx'
 import Dashboard from './Dashboard.jsx'
@@ -15,11 +16,12 @@ ReactDOM.createRoot(document.getElementById('root')).render(
       <ThemeProvider>
         <AuthProvider>
           <Routes>
+            <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Signup />} />
             <Route path="/signup" element={<Signup />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/pricing" element={<Pricing />} />
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
           </Routes>
         </AuthProvider>
       </ThemeProvider>
