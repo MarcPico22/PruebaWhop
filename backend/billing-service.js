@@ -7,7 +7,7 @@ const {
 } = require('./email');
 
 /**
- * Crea un Stripe Customer para un tenant
+ * Crea un Stripe Customer para un tenant HOLAA
  */
 async function createCustomer(email, tenantId, companyName) {
   try {
