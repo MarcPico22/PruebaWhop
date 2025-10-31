@@ -1230,4 +1230,48 @@ router.get('/api/whop/status', authenticateToken, async (req, res) => {
   }
 });
 
+/**
+ * POST /api/test-email - Endpoint temporal para probar emails (ELIMINAR EN PRODUCCIÓN)
+ */
+router.post('/api/test-email', async (req, res) => {
+  try {
+    const { type, email } = req.body;
+    
+    if (!email) {
+      return res.status(400).json({ error: 'Email requerido' });
+    }
+    
+    let result;
+    
+    switch (type) {
+      case 'welcome':
+        result = await sendWelcomeEmail(email, 'Usuario de Prueba');
+        break;
+      case 'payment-success':
+        result = await sendPaymentSuccessEmail(email, 'Usuario de Prueba', '49.00', 'pro');
+        break;
+      case 'payment-failed':
+        result = await sendPaymentFailedEmailSG(email, 'Usuario de Prueba', 'Fondos insuficientes');
+        break;
+      case 'recovery':
+        result = await sendRecoverySuccessEmail(email, 'Usuario de Prueba', '29.99', 'Cliente Ejemplo');
+        break;
+      default:
+        return res.status(400).json({ error: 'Tipo no válido. Usa: welcome, payment-success, payment-failed, recovery' });
+    }
+    
+    res.json({ 
+      success: result.success,
+      message: `Email de prueba (${type}) enviado a ${email}`
+    });
+    
+  } catch (error) {
+    console.error('❌ Error enviando email de prueba:', error);
+    res.status(500).json({ 
+      error: 'Error enviando email',
+      message: error.message 
+    });
+  }
+});
+
 module.exports = router;
