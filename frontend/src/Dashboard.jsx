@@ -214,21 +214,22 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
-      {/* Navbar */}
-      <nav className="bg-white dark:bg-gray-800 shadow-sm border-b dark:border-gray-700 transition-colors duration-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-3">
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
-                💰 Whop Recovery
+      {/* Navbar - Mobile Optimized */}
+      <nav className="bg-white dark:bg-gray-800 shadow-sm border-b dark:border-gray-700 transition-colors duration-200 sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-14 sm:h-16">
+            {/* Logo + Company */}
+            <div className="flex items-center space-x-2 sm:space-x-3 flex-1 min-w-0">
+              <h1 className="text-lg sm:text-2xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent whitespace-nowrap">
+                💰 <span className="hidden xs:inline">Whop Recovery</span><span className="xs:hidden">WR</span>
               </h1>
               {user.company_name && (
-                <span className="text-sm font-medium text-gray-600 dark:text-gray-400 border-l pl-3">
+                <span className="hidden sm:inline text-sm font-medium text-gray-600 dark:text-gray-400 border-l pl-3 truncate">
                   {user.company_name}
                 </span>
               )}
               {subscription && (
-                <span className={`px-2.5 py-1 text-xs font-semibold rounded-full ${
+                <span className={`hidden md:inline px-2.5 py-1 text-xs font-semibold rounded-full ${
                   subscription.plan === 'free' 
                     ? 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300' 
                     : subscription.plan === 'pro'
@@ -241,29 +242,31 @@ export default function Dashboard() {
                 </span>
               )}
             </div>
-            <div className="flex items-center space-x-4">
+            
+            {/* Actions - Mobile Optimized */}
+            <div className="flex items-center space-x-1 sm:space-x-2">
               <button
                 onClick={toggleDarkMode}
-                className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+                className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors active:scale-95"
                 title={darkMode ? 'Modo Claro' : 'Modo Oscuro'}
               >
                 {darkMode ? '🌞' : '🌙'}
               </button>
               <a
                 href="/pricing"
-                className="px-4 py-2 text-sm font-medium text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-lg transition-colors"
+                className="hidden sm:inline-block px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-lg transition-colors"
               >
                 💎 Planes
               </a>
-              <span className="text-sm text-gray-600 dark:text-gray-300">{user.email}</span>
               <button
                 onClick={() => {
                   logout();
                   navigate('/');
                 }}
-                className="px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                className="px-2 sm:px-4 py-2 text-xs sm:text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors active:scale-95"
               >
-                Cerrar sesión
+                <span className="hidden sm:inline">Cerrar sesión</span>
+                <span className="sm:hidden">Salir</span>
               </button>
             </div>
           </div>
@@ -430,11 +433,11 @@ export default function Dashboard() {
           </div>
         )}
 
-        {/* Stats */}
+        {/* Stats - Mobile Optimized Grid */}
         {stats && (
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-6 mb-6 sm:mb-8">
             <StatCard 
-              title="Total Pagos" 
+              title="Total" 
               value={stats.total} 
               icon="📊" 
               color="bg-blue-500"
@@ -458,10 +461,11 @@ export default function Dashboard() {
               color="bg-red-500"
             />
             <StatCard 
-              title="$ Recuperado" 
+              title="💰 Recuperado" 
               value={`$${stats.totalRecovered.toFixed(2)}`} 
               icon="💰" 
               color="bg-purple-500"
+              className="col-span-2 sm:col-span-1"
             />
           </div>
         )}
@@ -527,66 +531,134 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Payments Table */}
+        {/* Payments Table/Cards - Responsive */}
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border dark:border-gray-700 overflow-hidden transition-colors duration-200">
-          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-            <thead className="bg-gray-50 dark:bg-gray-900">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Email</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Producto</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Monto</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Estado</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Reintentos</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Acciones</th>
-              </tr>
-            </thead>
-            <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-              {loading ? (
+          {/* Desktop Table */}
+          <div className="hidden lg:block overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+              <thead className="bg-gray-50 dark:bg-gray-900">
                 <tr>
-                  <td colSpan="6" className="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
-                    Cargando pagos...
-                  </td>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Email</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Producto</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Monto</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Estado</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Reintentos</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Acciones</th>
                 </tr>
-              ) : getFilteredPayments().length === 0 ? (
-                <tr>
-                  <td colSpan="6" className="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
-                    {searchTerm ? 'No se encontraron pagos que coincidan con la búsqueda' : 'No hay pagos registrados'}
-                  </td>
-                </tr>
-              ) : (
-                getFilteredPayments().map((payment) => (
-                  <tr key={payment.id} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                    <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">{payment.email}</td>
-                    <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">{payment.product}</td>
-                    <td className="px-6 py-4 text-sm font-medium text-gray-900 dark:text-gray-100">${payment.amount}</td>
-                    <td className="px-6 py-4">
-                      <StatusBadge status={payment.status} />
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">{payment.retries}/3</td>
-                    <td className="px-6 py-4 text-sm">
-                      {payment.status === 'pending' && (
-                        <div className="flex gap-2">
-                          <button
-                            onClick={() => handleRetry(payment.id)}
-                            disabled={retryingId === payment.id}
-                            className="px-3 py-1 bg-purple-600 text-white rounded hover:bg-purple-700 disabled:opacity-50 text-sm"
-                          >
-                            {retryingId === payment.id ? '⏳ Procesando...' : '🔄 Reintentar'}
-                          </button>
-                          <button
-                            onClick={() => setSelectedPayment(payment)}
-                            className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
-                          >
-                            💳 Stripe
-                          </button>
-                        </div>
-                      )}
+              </thead>
+              <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                {loading ? (
+                  <tr>
+                    <td colSpan="6" className="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
+                      Cargando pagos...
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                ) : getFilteredPayments().length === 0 ? (
+                  <tr>
+                    <td colSpan="6" className="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
+                      {searchTerm ? 'No se encontraron pagos que coincidan con la búsqueda' : 'No hay pagos registrados'}
+                    </td>
+                  </tr>
+                ) : (
+                  getFilteredPayments().map((payment) => (
+                    <tr key={payment.id} className="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                      <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">{payment.email}</td>
+                      <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">{payment.product}</td>
+                      <td className="px-6 py-4 text-sm font-medium text-gray-900 dark:text-gray-100">${payment.amount}</td>
+                      <td className="px-6 py-4">
+                        <StatusBadge status={payment.status} />
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">{payment.retries}/3</td>
+                      <td className="px-6 py-4 text-sm">
+                        {payment.status === 'pending' && (
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => handleRetry(payment.id)}
+                              disabled={retryingId === payment.id}
+                              className="px-3 py-1 bg-purple-600 text-white rounded hover:bg-purple-700 disabled:opacity-50 text-sm"
+                            >
+                              {retryingId === payment.id ? '⏳ Procesando...' : '🔄 Reintentar'}
+                            </button>
+                            <button
+                              onClick={() => setSelectedPayment(payment)}
+                              className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
+                            >
+                              💳 Stripe
+                            </button>
+                          </div>
+                        )}
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Mobile Cards */}
+          <div className="lg:hidden divide-y divide-gray-200 dark:divide-gray-700">
+            {loading ? (
+              <div className="px-4 py-12 text-center text-gray-500 dark:text-gray-400">
+                Cargando pagos...
+              </div>
+            ) : getFilteredPayments().length === 0 ? (
+              <div className="px-4 py-12 text-center text-gray-500 dark:text-gray-400">
+                {searchTerm ? 'No se encontraron pagos' : 'No hay pagos registrados'}
+              </div>
+            ) : (
+              getFilteredPayments().map((payment) => (
+                <div key={payment.id} className="p-4 space-y-3">
+                  {/* Header */}
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">
+                        {payment.email}
+                      </p>
+                      <p className="text-xs text-gray-600 dark:text-gray-400 truncate mt-0.5">
+                        {payment.product}
+                      </p>
+                    </div>
+                    <StatusBadge status={payment.status} />
+                  </div>
+                  
+                  {/* Details */}
+                  <div className="grid grid-cols-2 gap-3 text-sm">
+                    <div>
+                      <span className="text-gray-500 dark:text-gray-400">Monto:</span>
+                      <span className="ml-1 font-semibold text-gray-900 dark:text-gray-100">
+                        ${payment.amount}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-gray-500 dark:text-gray-400">Reintentos:</span>
+                      <span className="ml-1 font-semibold text-gray-900 dark:text-gray-100">
+                        {payment.retries}/3
+                      </span>
+                    </div>
+                  </div>
+                  
+                  {/* Actions */}
+                  {payment.status === 'pending' && (
+                    <div className="flex gap-2 pt-2">
+                      <button
+                        onClick={() => handleRetry(payment.id)}
+                        disabled={retryingId === payment.id}
+                        className="flex-1 px-4 py-2.5 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700 disabled:opacity-50 active:scale-95 transition"
+                      >
+                        {retryingId === payment.id ? '⏳ Procesando...' : '🔄 Reintentar'}
+                      </button>
+                      <button
+                        onClick={() => setSelectedPayment(payment)}
+                        className="flex-1 px-4 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 active:scale-95 transition"
+                      >
+                        💳 Stripe
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ))
+            )}
+          </div>
         </div>
       </div>
 
@@ -622,15 +694,15 @@ export default function Dashboard() {
 }
 
 // Componentes auxiliares
-function StatCard({ title, value, icon, color }) {
+function StatCard({ title, value, icon, color, className = '' }) {
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border dark:border-gray-700 p-6 transition-colors duration-200">
+    <div className={`bg-white dark:bg-gray-800 rounded-lg shadow-sm border dark:border-gray-700 p-4 sm:p-6 transition-colors duration-200 ${className}`}>
       <div className="flex items-center justify-between">
-        <div>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">{title}</p>
-          <p className="text-2xl font-bold text-gray-900 dark:text-white">{value}</p>
+        <div className="min-w-0 flex-1">
+          <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-1 truncate">{title}</p>
+          <p className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white truncate">{value}</p>
         </div>
-        <div className={`${color} w-12 h-12 rounded-full flex items-center justify-center text-2xl`}>
+        <div className={`${color} w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center text-xl sm:text-2xl flex-shrink-0 ml-2`}>
           {icon}
         </div>
       </div>
