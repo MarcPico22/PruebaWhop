@@ -219,9 +219,13 @@ export default function Dashboard() {
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-3">
               <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent">
-                💰 Whop Retry
+                💰 Whop Recovery
               </h1>
-              <span className="text-sm text-gray-500 dark:text-gray-400">| {user.company_name}</span>
+              {user.company_name && (
+                <span className="text-sm font-medium text-gray-600 dark:text-gray-400 border-l pl-3">
+                  {user.company_name}
+                </span>
+              )}
               {subscription && (
                 <span className={`px-2.5 py-1 text-xs font-semibold rounded-full ${
                   subscription.plan === 'free' 
@@ -496,13 +500,6 @@ export default function Dashboard() {
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="flex-1 md:w-80 px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors duration-200"
               />
-              <button
-                onClick={handleCreateTestPayment}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors whitespace-nowrap"
-                title="Crear pago de prueba"
-              >
-                🧪 Test
-              </button>
               <button
                 onClick={handleExportCSV}
                 className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors whitespace-nowrap"

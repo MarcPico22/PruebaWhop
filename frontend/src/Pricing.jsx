@@ -10,6 +10,7 @@ function Pricing() {
   const [loading, setLoading] = useState(true);
   const [upgrading, setUpgrading] = useState(false);
   const [error, setError] = useState('');
+  const [billingPeriod, setBillingPeriod] = useState('monthly'); // 'monthly' o 'yearly'
 
   useEffect(() => {
     loadData();
@@ -46,10 +47,21 @@ function Pricing() {
       setError('');
       
       const token = localStorage.getItem('token');
+      
+      // Determinar el plan correcto basado en el período de facturación
+      let finalPlanId = planId;
+      if (billingPeriod === 'yearly' && planId !== 'FREE') {
+        // Convertir PRO → PRO_YEARLY, ENTERPRISE → ENTERPRISE_YEARLY
+        finalPlanId = `${planId}_YEARLY`;
+      } else if (billingPeriod === 'monthly' && planId !== 'FREE') {
+        // Asegurar que sea mensual
+        finalPlanId = `${planId}_MONTHLY`;
+      }
+      
       const response = await axios.post(
         `${API_URL}/api/create-checkout`,
         { 
-          planId,
+          planId: finalPlanId,
           successUrl: `${window.location.origin}/dashboard?upgrade=success`,
           cancelUrl: `${window.location.origin}/pricing?upgrade=cancelled`
         },
@@ -132,6 +144,63 @@ function Pricing() {
           <h1>Planes y Precios</h1>
           <p>Elige el plan perfecto para tu negocio</p>
           
+          {/* Toggle Mensual/Anual */}
+          <div className="billing-toggle" style={{ 
+            display: 'flex', 
+            justifyContent: 'center', 
+            alignItems: 'center', 
+            gap: '1rem', 
+            margin: '2rem 0' 
+          }}>
+            <span style={{ 
+              fontWeight: billingPeriod === 'monthly' ? 'bold' : 'normal',
+              color: billingPeriod === 'monthly' ? '#7c3aed' : '#6b7280'
+            }}>
+              Mensual
+            </span>
+            <button
+              onClick={() => setBillingPeriod(billingPeriod === 'monthly' ? 'yearly' : 'monthly')}
+              style={{
+                position: 'relative',
+                width: '60px',
+                height: '30px',
+                backgroundColor: billingPeriod === 'yearly' ? '#7c3aed' : '#d1d5db',
+                borderRadius: '15px',
+                border: 'none',
+                cursor: 'pointer',
+                transition: 'background-color 0.3s'
+              }}
+            >
+              <div style={{
+                position: 'absolute',
+                top: '3px',
+                left: billingPeriod === 'yearly' ? '33px' : '3px',
+                width: '24px',
+                height: '24px',
+                backgroundColor: 'white',
+                borderRadius: '50%',
+                transition: 'left 0.3s'
+              }}></div>
+            </button>
+            <span style={{ 
+              fontWeight: billingPeriod === 'yearly' ? 'bold' : 'normal',
+              color: billingPeriod === 'yearly' ? '#7c3aed' : '#6b7280'
+            }}>
+              Anual
+              <span style={{ 
+                marginLeft: '0.5rem',
+                padding: '0.25rem 0.5rem',
+                backgroundColor: '#dcfce7',
+                color: '#16a34a',
+                borderRadius: '0.25rem',
+                fontSize: '0.75rem',
+                fontWeight: 'bold'
+              }}>
+                Ahorra 15%
+              </span>
+            </span>
+          </div>
+          
           {currentSubscription && currentSubscription.plan && (
             <div className="current-plan-badge">
               <span>Plan actual: <strong>{currentSubscription.plan.toUpperCase()}</strong></span>
@@ -163,10 +232,31 @@ function Pricing() {
               <div className="plan-header">
                 <h2>{plan.name}</h2>
                 <div className="plan-price">
-                  <span className="currency">$</span>
-                  <span className="amount">{plan.price}</span>
-                  <span className="period">/mes</span>
+                  <span className="currency">€</span>
+                  <span className="amount">
+                    {plan.id === 'FREE' 
+                      ? '0' 
+                      : billingPeriod === 'yearly' 
+                        ? plan.id === 'PRO' ? '499' : '2099'
+                        : plan.id === 'PRO' ? '49' : '199'
+                    }
+                  </span>
+                  <span className="period">
+                    {plan.id === 'FREE' 
+                      ? '/mes' 
+                      : billingPeriod === 'yearly' ? '/año' : '/mes'
+                    }
+                  </span>
                 </div>
+                {billingPeriod === 'yearly' && plan.id !== 'FREE' && (
+                  <div className="monthly-equivalent" style={{ 
+                    fontSize: '0.875rem', 
+                    color: '#6b7280', 
+                    marginTop: '0.5rem' 
+                  }}>
+                    €{plan.id === 'PRO' ? '41.58' : '174.92'}/mes facturado anualmente
+                  </div>
+                )}
                 {plan.id === 'FREE' && (
                   <div className="trial-info">14 días de prueba gratis</div>
                 )}
