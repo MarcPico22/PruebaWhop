@@ -130,7 +130,22 @@ router.post('/api/auth/login', async (req, res) => {
  * GET /api/auth/me - Obtener usuario actual (protegida)
  */
 router.get('/api/auth/me', authenticateToken, (req, res) => {
-  res.json({ user: req.user });
+  try {
+    // Obtener datos completos del usuario desde la DB
+    const { getUserByEmail } = require('./db');
+    const user = getUserByEmail(req.user.email);
+    
+    if (!user) {
+      return res.status(404).json({ error: 'Usuario no encontrado' });
+    }
+    
+    // Retornar sin password
+    const { password, ...userWithoutPassword } = user;
+    res.json({ user: userWithoutPassword });
+  } catch (error) {
+    console.error('❌ Error obteniendo usuario:', error);
+    res.status(500).json({ error: 'Error obteniendo información del usuario' });
+  }
 });
 
 /**

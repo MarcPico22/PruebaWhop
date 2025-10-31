@@ -150,11 +150,16 @@ function Pricing() {
             justifyContent: 'center', 
             alignItems: 'center', 
             gap: '1rem', 
-            margin: '2rem 0' 
+            margin: '2rem 0',
+            padding: '1rem',
+            backgroundColor: 'white',
+            borderRadius: '12px',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
           }}>
             <span style={{ 
               fontWeight: billingPeriod === 'monthly' ? 'bold' : 'normal',
-              color: billingPeriod === 'monthly' ? '#7c3aed' : '#6b7280'
+              color: billingPeriod === 'monthly' ? '#7c3aed' : '#374151',
+              fontSize: '1rem'
             }}>
               Mensual
             </span>
@@ -184,15 +189,16 @@ function Pricing() {
             </button>
             <span style={{ 
               fontWeight: billingPeriod === 'yearly' ? 'bold' : 'normal',
-              color: billingPeriod === 'yearly' ? '#7c3aed' : '#6b7280'
+              color: billingPeriod === 'yearly' ? '#7c3aed' : '#374151',
+              fontSize: '1rem'
             }}>
               Anual
               <span style={{ 
                 marginLeft: '0.5rem',
-                padding: '0.25rem 0.5rem',
-                backgroundColor: '#dcfce7',
-                color: '#16a34a',
-                borderRadius: '0.25rem',
+                padding: '0.25rem 0.75rem',
+                backgroundColor: '#10b981',
+                color: 'white',
+                borderRadius: '9999px',
                 fontSize: '0.75rem',
                 fontWeight: 'bold'
               }}>
