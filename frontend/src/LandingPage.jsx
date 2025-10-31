@@ -19,7 +19,7 @@ function ROICalculator() {
       <div className="max-w-4xl mx-auto">
         <h2 className="text-4xl font-bold text-center text-gray-900 mb-4">
           Calcula cuánto dinero recuperarías
-        </h2>
+        </h2> {/* Hacer un pequeño cambio (agregar un comentario) */}
         <p className="text-center text-gray-600 mb-12">
           Descubre el impacto real que Whop Recovery tendría en tu negocio
         </p>
