@@ -2,6 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Optimizaciones Mobile */
+* {
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  -webkit-touch-callout: none;
+}
+
+html {
+  /* Prevenir zoom accidental en iOS */
+  touch-action: manipulation;
+}
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -10,4 +21,37 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background: #F9FAFB;
+  overflow-x: hidden; /* Prevenir scroll horizontal */
+}
+
+/* Mejoras para inputs en móviles */
+input,
+textarea,
+select {
+  font-size: 16px; /* Prevenir auto-zoom en iOS */
+  touch-action: manipulation;
+}
+
+/* Smooth scroll para móviles */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* Optimización de fuentes en pantallas pequeñas */
+@media (max-width: 640px) {
+  body {
+    font-size: 14px;
+  }
+}
+
+/* Safe area para iPhones con notch */
+@supports (padding-top: env(safe-area-inset-top)) {
+  body {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
 }
