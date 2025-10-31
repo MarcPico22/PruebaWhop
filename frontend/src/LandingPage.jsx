@@ -1,6 +1,121 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from './AuthContext';
+import Footer from './components/Footer';
+
+function ROICalculator() {
+  const [monthlyRevenue, setMonthlyRevenue] = useState(10000);
+  const [failureRate, setFailureRate] = useState(5);
+  
+  const lostRevenue = monthlyRevenue * (failureRate / 100);
+  const recoveredRevenue = lostRevenue * 0.85; // 85% recovery rate
+  const annualRecovered = recoveredRevenue * 12;
+  const proMonthlyPlan = 49;
+  const annualNetBenefit = annualRecovered - (proMonthlyPlan * 12);
+  const roi = ((annualRecovered - (proMonthlyPlan * 12)) / (proMonthlyPlan * 12)) * 100;
+
+  return (
+    <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-indigo-50 to-white">
+      <div className="max-w-4xl mx-auto">
+        <h2 className="text-4xl font-bold text-center text-gray-900 mb-4">
+          Calcula cuánto dinero recuperarías
+        </h2>
+        <p className="text-center text-gray-600 mb-12">
+          Descubre el impacto real que Whop Recovery tendría en tu negocio
+        </p>
+        
+        <div className="bg-white rounded-2xl shadow-xl p-8 border border-indigo-100">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Ingresos mensuales en Whop
+              </label>
+              <div className="relative">
+                <span className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500">€</span>
+                <input
+                  type="number"
+                  value={monthlyRevenue}
+                  onChange={(e) => setMonthlyRevenue(Math.max(0, parseInt(e.target.value) || 0))}
+                  className="w-full pl-8 pr-4 py-3 border-2 border-gray-300 rounded-lg focus:border-indigo-500 focus:outline-none"
+                />
+              </div>
+              <input
+                type="range"
+                min="1000"
+                max="100000"
+                step="1000"
+                value={monthlyRevenue}
+                onChange={(e) => setMonthlyRevenue(parseInt(e.target.value))}
+                className="w-full mt-2"
+              />
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Tasa estimada de fallos (típico: 3-7%)
+              </label>
+              <div className="relative">
+                <input
+                  type="number"
+                  value={failureRate}
+                  onChange={(e) => setFailureRate(Math.max(0, Math.min(20, parseInt(e.target.value) || 0)))}
+                  className="w-full pr-8 pl-4 py-3 border-2 border-gray-300 rounded-lg focus:border-indigo-500 focus:outline-none"
+                />
+                <span className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500">%</span>
+              </div>
+              <input
+                type="range"
+                min="1"
+                max="20"
+                step="0.5"
+                value={failureRate}
+                onChange={(e) => setFailureRate(parseFloat(e.target.value))}
+                className="w-full mt-2"
+              />
+            </div>
+          </div>
+          
+          <div className="border-t-2 border-gray-200 pt-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+              <div className="bg-red-50 rounded-xl p-6 border border-red-200">
+                <div className="text-sm text-red-600 font-medium mb-2">Pierdes cada mes</div>
+                <div className="text-3xl font-bold text-red-700">€{lostRevenue.toLocaleString('es-ES', {maximumFractionDigits: 0})}</div>
+              </div>
+              
+              <div className="bg-green-50 rounded-xl p-6 border border-green-200">
+                <div className="text-sm text-green-600 font-medium mb-2">Recuperarías al mes</div>
+                <div className="text-3xl font-bold text-green-700">€{recoveredRevenue.toLocaleString('es-ES', {maximumFractionDigits: 0})}</div>
+              </div>
+              
+              <div className="bg-indigo-50 rounded-xl p-6 border border-indigo-200">
+                <div className="text-sm text-indigo-600 font-medium mb-2">Beneficio neto anual</div>
+                <div className="text-3xl font-bold text-indigo-700">€{annualNetBenefit.toLocaleString('es-ES', {maximumFractionDigits: 0})}</div>
+              </div>
+            </div>
+            
+            <div className="mt-8 text-center">
+              <div className="inline-block bg-gradient-to-r from-yellow-100 to-yellow-50 border-2 border-yellow-300 rounded-xl px-6 py-4 mb-6">
+                <div className="text-sm text-yellow-800 font-medium mb-1">ROI Anual</div>
+                <div className="text-4xl font-bold text-yellow-900">{roi.toFixed(0)}%</div>
+              </div>
+              
+              <div className="text-gray-600 mb-6">
+                Con el plan PRO (€49/mes), recuperarías <strong className="text-indigo-600">€{annualRecovered.toLocaleString('es-ES', {maximumFractionDigits: 0})}</strong> al año
+              </div>
+              
+              <Link
+                to="/register"
+                className="inline-block px-8 py-4 text-lg font-semibold text-white bg-gradient-to-r from-indigo-600 to-purple-600 rounded-lg hover:from-indigo-700 hover:to-purple-700 transition shadow-lg"
+              >
+                Empezar a recuperar dinero ahora →
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
 
 export default function LandingPage() {
   const { user } = useAuth();
@@ -104,6 +219,9 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+
+      {/* ROI Calculator */}
+      <ROICalculator />
 
       {/* How It Works */}
       <section id="how-it-works" className="py-20 px-4 sm:px-6 lg:px-8">
@@ -317,66 +435,27 @@ export default function LandingPage() {
       </section>
 
       {/* CTA Final */}
-      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gray-900">
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-indigo-600">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-4xl font-bold text-white mb-6">
             ¿Listo para recuperar tus ingresos perdidos?
           </h2>
-          <p className="text-xl text-gray-300 mb-8">
+          <p className="text-xl text-indigo-100 mb-8">
             Únete a decenas de creadores que ya están recuperando miles de euros cada mes.
           </p>
           <Link
             to="/register"
-            className="inline-block px-8 py-4 text-lg font-medium text-gray-900 bg-white rounded-lg hover:bg-gray-100 transition shadow-lg"
+            className="inline-block px-8 py-4 text-lg font-semibold text-indigo-600 bg-white rounded-lg hover:bg-gray-50 transition shadow-xl"
           >
-            Empezar gratis ahora
+            Empezar gratis ahora →
           </Link>
-          <p className="mt-6 text-sm text-gray-400">
+          <p className="mt-6 text-sm text-indigo-200">
             Sin tarjeta de crédito · Configuración en 2 minutos · Soporte en español
           </p>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-gray-900 border-t border-gray-800 py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
-            <div>
-              <h4 className="text-white font-semibold mb-4">Producto</h4>
-              <ul className="space-y-2 text-gray-400">
-                <li><a href="#how-it-works" className="hover:text-white transition">Cómo funciona</a></li>
-                <li><a href="#" className="hover:text-white transition">Precios</a></li>
-                <li><Link to="/register" className="hover:text-white transition">Empezar gratis</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-white font-semibold mb-4">Soporte</h4>
-              <ul className="space-y-2 text-gray-400">
-                <li><a href="#" className="hover:text-white transition">Documentación</a></li>
-                <li><a href="#" className="hover:text-white transition">FAQ</a></li>
-                <li><a href="mailto:support@whoprecovery.com" className="hover:text-white transition">Contacto</a></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-white font-semibold mb-4">Legal</h4>
-              <ul className="space-y-2 text-gray-400">
-                <li><a href="#" className="hover:text-white transition">Términos</a></li>
-                <li><a href="#" className="hover:text-white transition">Privacidad</a></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="text-white font-semibold mb-4">Empresa</h4>
-              <ul className="space-y-2 text-gray-400">
-                <li><a href="#" className="hover:text-white transition">Sobre nosotros</a></li>
-                <li><a href="#" className="hover:text-white transition">Blog</a></li>
-              </ul>
-            </div>
-          </div>
-          <div className="border-t border-gray-800 pt-8 text-center text-gray-400">
-            <p>&copy; 2025 Whop Recovery. Todos los derechos reservados.</p>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

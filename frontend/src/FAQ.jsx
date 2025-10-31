@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import Footer from './components/Footer';
 
 function FAQ() {
   const [openIndex, setOpenIndex] = useState(null);
@@ -151,51 +152,7 @@ function FAQ() {
         </div>
       </div>
 
-      {/* Footer */}
-      <footer className="border-t border-purple-500/20 bg-gray-900/50 backdrop-blur-sm mt-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            <div>
-              <h3 className="text-xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent mb-4">
-                Whop Recovery
-              </h3>
-              <p className="text-gray-400 text-sm">
-                Recupera automáticamente los pagos fallidos de Whop.
-              </p>
-            </div>
-            
-            <div>
-              <h4 className="text-white font-semibold mb-4">Producto</h4>
-              <ul className="space-y-2 text-gray-400 text-sm">
-                <li><Link to="/pricing" className="hover:text-white transition-colors">Precios</Link></li>
-                <li><Link to="/faq" className="hover:text-white transition-colors">FAQ</Link></li>
-                <li><a href="#" className="hover:text-white transition-colors">Documentación</a></li>
-              </ul>
-            </div>
-            
-            <div>
-              <h4 className="text-white font-semibold mb-4">Compañía</h4>
-              <ul className="space-y-2 text-gray-400 text-sm">
-                <li><a href="#" className="hover:text-white transition-colors">Sobre nosotros</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Blog</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Contacto</a></li>
-              </ul>
-            </div>
-            
-            <div>
-              <h4 className="text-white font-semibold mb-4">Legal</h4>
-              <ul className="space-y-2 text-gray-400 text-sm">
-                <li><a href="#" className="hover:text-white transition-colors">Privacidad</a></li>
-                <li><a href="#" className="hover:text-white transition-colors">Términos</a></li>
-              </ul>
-            </div>
-          </div>
-          
-          <div className="border-t border-purple-500/20 mt-8 pt-8 text-center text-gray-400 text-sm">
-            <p>&copy; 2024 Whop Recovery. Todos los derechos reservados.</p>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }
