@@ -2,7 +2,8 @@ const {
   getPaymentsDueForRetry,
   updatePaymentStatus,
   getPaymentById,
-  getConfigValue
+  getConfigValue,
+  getUserByTenantId
 } = require('./db');
 const {
   sendRetryFailedEmail,
@@ -10,6 +11,7 @@ const {
   sendPaymentPermanentFailEmail
 } = require('./mailer');
 const { sendPaymentRecoveredNotification } = require('./notification-service');
+const { sendRecoverySuccessEmail } = require('./email');
 
 /**
  * Simula un intento de cobro (30% probabilidad de éxito)
@@ -33,6 +35,22 @@ async function processRetry(payment) {
     
     // Enviar notificación a la empresa
     await sendPaymentRecoveredNotification(payment, 'Reintento automático');
+    
+    // Enviar email al usuario de la plataforma (SendGrid)
+    try {
+      const user = getUserByTenantId(payment.tenant_id);
+      if (user) {
+        await sendRecoverySuccessEmail(
+          user.email, 
+          user.company_name, 
+          payment.amount, 
+          payment.customer_name || payment.email
+        );
+        console.log(`✅ Recovery success email sent to ${user.email}`);
+      }
+    } catch (emailError) {
+      console.error('❌ Error sending recovery email:', emailError);
+    }
     
     console.log(`✅ Pago ${payment.id} recuperado exitosamente`);
     return { success: true, status: 'recovered' };

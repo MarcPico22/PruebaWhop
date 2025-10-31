@@ -1,6 +1,10 @@
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
-const { updateSubscription } = require('./db');
+const { updateSubscription, getUserByTenantId } = require('./db');
 const { getPlan } = require('./plans');
+const { 
+  sendPaymentSuccessEmail, 
+  sendPaymentFailedEmail: sendPaymentFailedEmailSG 
+} = require('./email');
 
 /**
  * Crea un Stripe Customer para un tenant
@@ -193,12 +197,29 @@ async function handleBillingWebhook(event) {
       case 'invoice.payment_failed': {
         const invoice = event.data.object;
         const customerId = invoice.customer;
+        const subscription = invoice.subscription;
         
         console.log(`❌ Pago fallido para customer ${customerId}`);
         
-        // Buscar tenant por customer_id
-        // (necesitarías una función en db.js para esto)
-        // Por ahora, Stripe manejará el retry automático
+        // Buscar tenant por subscription
+        if (subscription) {
+          const sub = await stripe.subscriptions.retrieve(subscription);
+          const tenantId = sub.metadata.tenant_id;
+          
+          if (tenantId) {
+            const user = getUserByTenantId(tenantId);
+            if (user) {
+              // Enviar email de pago fallido
+              try {
+                const failureReason = invoice.last_payment_error?.message || 'Tu método de pago fue rechazado';
+                await sendPaymentFailedEmailSG(user.email, user.company_name, failureReason);
+                console.log(`✅ Payment failed email sent to ${user.email}`);
+              } catch (emailError) {
+                console.error('❌ Error sending payment failed email:', emailError);
+              }
+            }
+          }
+        }
         break;
       }
       
@@ -206,11 +227,28 @@ async function handleBillingWebhook(event) {
       case 'invoice.payment_succeeded': {
         const invoice = event.data.object;
         const subscription = invoice.subscription;
+        const amount = (invoice.amount_paid / 100).toFixed(2); // Convertir de centavos a euros
         
         if (subscription) {
           console.log(`✅ Pago exitoso para suscripción ${subscription}`);
-          // Reset de contador mensual
-          // (esto lo haremos con un cron job)
+          
+          // Obtener información de la suscripción
+          const sub = await stripe.subscriptions.retrieve(subscription);
+          const tenantId = sub.metadata.tenant_id;
+          const planId = sub.metadata.plan_id;
+          
+          if (tenantId) {
+            const user = getUserByTenantId(tenantId);
+            if (user) {
+              // Enviar email de confirmación de pago
+              try {
+                await sendPaymentSuccessEmail(user.email, user.company_name, amount, planId);
+                console.log(`✅ Payment success email sent to ${user.email}`);
+              } catch (emailError) {
+                console.error('❌ Error sending payment success email:', emailError);
+              }
+            }
+          }
         }
         break;
       }

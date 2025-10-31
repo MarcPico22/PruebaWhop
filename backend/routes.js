@@ -17,6 +17,12 @@ const {
   updateSubscription
 } = require('./db');
 const { sendPaymentFailedEmail } = require('./mailer');
+const { 
+  sendWelcomeEmail, 
+  sendPaymentSuccessEmail, 
+  sendPaymentFailedEmail: sendPaymentFailedEmailSG, 
+  sendRecoverySuccessEmail 
+} = require('./email');
 const { processRetry } = require('./retry-logic');
 const { register, login, authenticateToken } = require('./auth');
 const { 
@@ -70,6 +76,15 @@ router.post('/api/auth/register', async (req, res) => {
     }
     
     const user = await register(email, password, company_name);
+    
+    // Enviar email de bienvenida
+    try {
+      await sendWelcomeEmail(email, company_name);
+      console.log(`✅ Welcome email sent to ${email}`);
+    } catch (emailError) {
+      console.error('❌ Error sending welcome email:', emailError);
+      // No fallar el registro si el email falla
+    }
     
     res.status(201).json({ 
       success: true, 
