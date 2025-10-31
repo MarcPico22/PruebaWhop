@@ -1246,6 +1246,27 @@ router.get('/api/whop/status', authenticateToken, async (req, res) => {
 });
 
 /**
+ * GET /api/debug/users - Endpoint temporal para ver usuarios (ELIMINAR EN PRODUCCIÓN)
+ */
+router.get('/api/debug/users', (req, res) => {
+  try {
+    const { db } = require('./db');
+    const users = db.prepare('SELECT id, email, company_name, tenant_id, created_at FROM users ORDER BY created_at DESC').all();
+    
+    res.json({
+      total: users.length,
+      users: users.map(u => ({
+        ...u,
+        created_at: new Date(u.created_at * 1000).toISOString()
+      }))
+    });
+  } catch (error) {
+    console.error('❌ Error listing users:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
  * POST /api/test-email - Endpoint temporal para probar emails (ELIMINAR EN PRODUCCIÓN)
  */
 router.post('/api/test-email', async (req, res) => {
