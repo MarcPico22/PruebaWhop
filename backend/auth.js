@@ -45,12 +45,20 @@ async function login(email, password) {
   // Buscar usuario
   const user = getUserByEmail(email);
   if (!user) {
+    console.log(`❌ Login failed: User not found for email ${email}`);
     throw new Error('Credenciales inválidas');
   }
   
+  console.log(`🔍 Login attempt for ${email}`);
+  console.log(`   Stored password hash: ${user.password.substring(0, 20)}...`);
+  console.log(`   Provided password: ${password}`);
+  
   // Verificar contraseña
   const isValidPassword = await bcrypt.compare(password, user.password);
+  console.log(`   Password valid: ${isValidPassword}`);
+  
   if (!isValidPassword) {
+    console.log(`❌ Login failed: Invalid password for ${email}`);
     throw new Error('Credenciales inválidas');
   }
   

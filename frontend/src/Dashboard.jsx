@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from './AuthContext'
 import { useTheme } from './ThemeContext'
-import { Navigate } from 'react-router-dom'
+import { Navigate, useNavigate } from 'react-router-dom'
 import Settings from './Settings'
 import StripePayment from './StripePayment'
 import NotificationSettings from './NotificationSettings'
@@ -10,6 +10,7 @@ import { API_URL } from './config'
 export default function Dashboard() {
   const { user, logout, token } = useAuth()
   const { darkMode, toggleDarkMode } = useTheme()
+  const navigate = useNavigate()
   const [payments, setPayments] = useState([])
   const [stats, setStats] = useState(null)
   const [subscription, setSubscription] = useState(null)
@@ -256,7 +257,10 @@ export default function Dashboard() {
               </a>
               <span className="text-sm text-gray-600 dark:text-gray-300">{user.email}</span>
               <button
-                onClick={logout}
+                onClick={() => {
+                  logout();
+                  navigate('/');
+                }}
                 className="px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
               >
                 Cerrar sesión
