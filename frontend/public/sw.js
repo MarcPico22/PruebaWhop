@@ -14,14 +14,19 @@ self.addEventListener('fetch', (event) => {
   // No cachear API calls
   if (event.request.url.includes('/api/')) return;
   
+  // Ignorar chrome-extension:// y otros protocolos no-http
+  if (!event.request.url.startsWith('http')) return;
+  
   event.respondWith(
     fetch(event.request)
       .then((response) => {
         // Si la respuesta es válida, guardar en cache
-        if (response && response.status === 200) {
+        if (response && response.status === 200 && response.type !== 'error') {
           const responseToCache = response.clone();
           caches.open(CACHE_NAME).then((cache) => {
-            cache.put(event.request, responseToCache);
+            cache.put(event.request, responseToCache).catch(() => {
+              // Ignorar errores de cache silenciosamente
+            });
           });
         }
         return response;
