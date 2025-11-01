@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { trackPlanClick, trackCheckoutStart } from './analytics';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
@@ -79,11 +80,16 @@ function Pricing() {
       }
       
       let finalPlanId = planId;
+      let price = planId === 'PRO' ? (billingPeriod === 'yearly' ? 499 : 49) : (billingPeriod === 'yearly' ? 2099 : 199);
+      
       if (billingPeriod === 'yearly' && planId !== 'FREE') {
         finalPlanId = `${planId}_YEARLY`;
       } else if (billingPeriod === 'monthly' && planId !== 'FREE') {
         finalPlanId = `${planId}_MONTHLY`;
       }
+
+      // 📊 Track inicio de checkout
+      trackCheckoutStart(finalPlanId, planId, price, billingPeriod);
       
       const response = await axios.post(
         `${API_URL}/api/create-checkout`,
@@ -286,7 +292,11 @@ function PricingCard({
 
       {/* Button - Touch Optimized (min 48px height) */}
       <button
-        onClick={() => onUpgrade(planId)}
+        onClick={() => {
+          // 📊 Track click en plan
+          trackPlanClick(name, billingPeriod, price);
+          onUpgrade(planId);
+        }}
         disabled={isCurrentPlan || upgrading || disabled}
         className={`w-full py-4 px-6 rounded-xl text-base sm:text-lg font-bold transition-all active:scale-95 ${
           isCurrentPlan

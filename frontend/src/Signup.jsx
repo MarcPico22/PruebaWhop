@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useAuth } from './AuthContext';
 import { Navigate } from 'react-router-dom';
+import { trackSignup } from './analytics';
 
 export default function Signup() {
   const { register, user } = useAuth();
@@ -31,6 +32,10 @@ export default function Signup() {
 
     try {
       await register(formData.email, formData.password, formData.company_name);
+      
+      // 📊 Track signup exitoso
+      trackSignup('email');
+      
       // La redirección se hace automáticamente
     } catch (err) {
       setError(err.message);

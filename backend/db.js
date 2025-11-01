@@ -322,6 +322,15 @@ function getUserByTenantId(tenantId) {
 }
 
 /**
+ * Obtiene usuario por Stripe Customer ID
+ */
+function getUserByStripeCustomer(customerId) {
+  const subscription = db.prepare('SELECT * FROM subscriptions WHERE stripe_customer_id = ?').get(customerId);
+  if (!subscription) return null;
+  return getUserByTenantId(subscription.tenant_id);
+}
+
+/**
  * Obtiene la configuración de notificaciones de un tenant
  */
 function getNotificationSettings(tenantId) {
@@ -581,6 +590,7 @@ module.exports = {
   createUser,
   getUserByEmail,
   getUserByTenantId,
+  getUserByStripeCustomer,
   getNotificationSettings,
   updateNotificationSettings,
   getTenantIntegrations,

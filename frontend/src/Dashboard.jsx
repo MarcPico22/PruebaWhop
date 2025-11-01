@@ -482,10 +482,22 @@ export default function Dashboard() {
           </div>
         )}
 
-        {/* Toolbar */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border dark:border-gray-700 p-6 mb-6 transition-colors duration-200">
-          <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
-            <div className="flex gap-2">
+        {/* Toolbar - Mobile Optimized */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border dark:border-gray-700 p-3 sm:p-6 mb-6 transition-colors duration-200">
+          {/* Búsqueda - Full width en mobile */}
+          <div className="mb-3 sm:mb-4">
+            <input
+              type="text"
+              placeholder="🔍 Buscar..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full px-3 py-2.5 sm:px-4 sm:py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors duration-200 text-base"
+            />
+          </div>
+
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 items-stretch sm:items-center justify-between">
+            {/* Filtros - Scroll horizontal en mobile */}
+            <div className="flex gap-2 overflow-x-auto pb-2 sm:pb-0 scrollbar-hide">
               <FilterButton active={filter === 'all'} onClick={() => setFilter('all')}>
                 Todos
               </FilterButton>
@@ -500,30 +512,27 @@ export default function Dashboard() {
               </FilterButton>
             </div>
 
-            <div className="flex gap-2 w-full md:w-auto">
-              <input
-                type="text"
-                placeholder="🔍 Buscar por email, producto o ID..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="flex-1 md:w-80 px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors duration-200"
-              />
+            {/* Acciones - Grid en mobile */}
+            <div className="grid grid-cols-3 sm:flex gap-2">
               <button
                 onClick={handleExportCSV}
-                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors whitespace-nowrap"
+                className="px-3 sm:px-4 py-2.5 sm:py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 active:scale-95 transition-all text-sm sm:text-base whitespace-nowrap"
+                title="Exportar CSV"
               >
-                📥 CSV
+                <span className="hidden sm:inline">📥 CSV</span>
+                <span className="sm:hidden">📥</span>
               </button>
               <button
                 onClick={() => setShowNotifications(true)}
-                className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
-                title="Configurar notificaciones"
+                className="px-3 sm:px-4 py-2.5 sm:py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 active:scale-95 transition-all text-sm sm:text-base"
+                title="Notificaciones"
               >
                 📧
               </button>
               <button
                 onClick={() => setShowSettings(true)}
-                className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+                className="px-3 sm:px-4 py-2.5 sm:py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 active:scale-95 transition-all text-sm sm:text-base"
+                title="Configuración"
               >
                 ⚙️
               </button>
