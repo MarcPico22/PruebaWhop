@@ -32,18 +32,40 @@ async function createCustomer(email, tenantId, companyName) {
  */
 async function createCheckoutSession(tenantId, planId, customerEmail, successUrl, cancelUrl) {
   try {
-    const plan = getPlan(planId);
+    // Extraer plan base y periodo (PRO_YEARLY → pro, yearly)
+    let basePlanId = planId.toLowerCase();
+    let isYearly = false;
     
-    if (!plan.priceId) {
-      throw new Error(`Plan ${planId} no tiene priceId configurado`);
+    if (basePlanId.endsWith('_yearly')) {
+      basePlanId = basePlanId.replace('_yearly', '');
+      isYearly = true;
+    } else if (basePlanId.endsWith('_monthly')) {
+      basePlanId = basePlanId.replace('_monthly', '');
+      isYearly = false;
     }
+    
+    const plan = getPlan(basePlanId);
+    
+    // Seleccionar el priceId correcto según el periodo
+    let priceId;
+    if (isYearly) {
+      priceId = plan.priceIdYearly;
+    } else {
+      priceId = plan.priceIdMonthly || plan.priceId;
+    }
+    
+    if (!priceId) {
+      throw new Error(`Plan ${planId} no tiene priceId configurado para ${isYearly ? 'yearly' : 'monthly'}`);
+    }
+    
+    console.log(`💳 Creando checkout para ${basePlanId} (${isYearly ? 'anual' : 'mensual'}) con priceId: ${priceId}`);
     
     const session = await stripe.checkout.sessions.create({
       mode: 'subscription',
       payment_method_types: ['card'],
       line_items: [
         {
-          price: plan.priceId,
+          price: priceId,
           quantity: 1
         }
       ],
@@ -51,19 +73,21 @@ async function createCheckoutSession(tenantId, planId, customerEmail, successUrl
       client_reference_id: tenantId,
       metadata: {
         tenant_id: tenantId,
-        plan_id: planId
+        plan_id: basePlanId,
+        billing_period: isYearly ? 'yearly' : 'monthly'
       },
       success_url: successUrl,
       cancel_url: cancelUrl,
       subscription_data: {
         metadata: {
           tenant_id: tenantId,
-          plan_id: planId
+          plan_id: basePlanId,
+          billing_period: isYearly ? 'yearly' : 'monthly'
         }
       }
     });
     
-    console.log(`✅ Checkout Session creada: ${session.id} para plan ${planId}`);
+    console.log(`✅ Checkout Session creada: ${session.id} para plan ${basePlanId} (${isYearly ? 'anual' : 'mensual'})`);
     return session;
   } catch (error) {
     console.error('Error creando Checkout Session:', error);
