@@ -21,7 +21,8 @@ const {
   sendWelcomeEmail, 
   sendPaymentSuccessEmail, 
   sendPaymentFailedEmail: sendPaymentFailedEmailSG, 
-  sendRecoverySuccessEmail 
+  sendRecoverySuccessEmail,
+  scheduleOnboardingEmails
 } = require('./email');
 const { processRetry } = require('./retry-logic');
 const { register, login, authenticateToken } = require('./auth');
@@ -46,6 +47,11 @@ const {
   checkPlanLimitsWebhook,
   trackPaymentUsageWebhook
 } = require('./subscription-middleware');
+const {
+  checkAndUnlockAchievements,
+  getUserAchievements,
+  getBadgeProgress
+} = require('./achievements');
 const {
   syncFailedPayments,
   validateWhopApiKey,
@@ -77,12 +83,12 @@ router.post('/api/auth/register', async (req, res) => {
     
     const user = await register(email, password, company_name);
     
-    // Enviar email de bienvenida
+    // Enviar secuencia de emails de onboarding
     try {
-      await sendWelcomeEmail(email, company_name);
-      console.log(`✅ Welcome email sent to ${email}`);
+      scheduleOnboardingEmails(email, company_name);
+      console.log(`✅ Onboarding emails scheduled for ${email}`);
     } catch (emailError) {
-      console.error('❌ Error sending welcome email:', emailError);
+      console.error('❌ Error scheduling onboarding emails:', emailError);
       // No fallar el registro si el email falla
     }
     
@@ -754,6 +760,23 @@ router.post('/webhook/stripe', express.raw({ type: 'application/json' }), async 
       if (payment) {
         updatePaymentStatus(payment_id, 'recovered');
         
+        // Verificar y desbloquear achievements
+        try {
+          const user = req.db.prepare(`
+            SELECT id FROM users WHERE tenant_id = ?
+          `).get(tenant_id);
+          
+          if (user) {
+            const newBadges = checkAndUnlockAchievements(req.db, user.id, tenant_id);
+            if (newBadges.length > 0) {
+              console.log(`🏆 ${newBadges.length} badge(s) desbloqueado(s) para tenant ${tenant_id}`);
+            }
+          }
+        } catch (achievementError) {
+          console.error('❌ Error checking achievements:', achievementError);
+          // No fallar la actualización del pago si falla el achievement
+        }
+        
         // Enviar notificación a la empresa
         await sendPaymentRecoveredNotification(payment, 'Stripe Checkout');
         
@@ -1081,6 +1104,63 @@ router.post('/api/create-checkout', authenticateToken, async (req, res) => {
 });
 
 /**
+ * POST /api/test-checkout - SOLO PARA PRUEBAS
+ * Crear checkout con producto de €0.10 para verificar Stripe
+ * ELIMINAR DESPUÉS DE VERIFICAR
+ */
+router.post('/api/test-checkout', authenticateToken, async (req, res) => {
+  try {
+    const { email, tenantId } = req.user;
+    
+    // Usar el Price ID de test desde .env
+    const testPriceId = process.env.STRIPE_PRICE_TEST_PAYMENT;
+    
+    if (!testPriceId) {
+      return res.status(500).json({ 
+        error: 'STRIPE_PRICE_TEST_PAYMENT no configurado en .env' 
+      });
+    }
+    
+    const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+    const baseUrl = process.env.BASE_URL || 'http://localhost:5173';
+    
+    console.log('💳 Creando test checkout (€0.10) para:', email);
+    console.log('📦 Test Price ID:', testPriceId);
+    
+    const session = await stripe.checkout.sessions.create({
+      mode: 'payment', // Pago único, no suscripción
+      payment_method_types: ['card'],
+      line_items: [
+        {
+          price: testPriceId,
+          quantity: 1
+        }
+      ],
+      customer_email: email,
+      client_reference_id: tenantId,
+      metadata: {
+        tenant_id: tenantId,
+        test_payment: 'true'
+      },
+      success_url: `${baseUrl}/dashboard?test=success`,
+      cancel_url: `${baseUrl}/dashboard?test=canceled`
+    });
+    
+    console.log('✅ Test checkout creado:', session.id);
+    
+    res.json({
+      success: true,
+      url: session.url,
+      sessionId: session.id
+    });
+    
+  } catch (error) {
+    console.error('❌ Error creando test checkout:', error);
+    res.status(500).json({ error: error.message || 'Error creando test checkout' });
+  }
+});
+
+/**
  * POST /api/create-portal
  * Crea sesión del Customer Portal de Stripe
  */
@@ -1262,6 +1342,141 @@ router.get('/api/debug/users', (req, res) => {
     });
   } catch (error) {
     console.error('❌ Error listing users:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * GET /api/user/onboarding - Obtener estado de onboarding del usuario
+ */
+router.get('/api/user/onboarding', authenticateToken, (req, res) => {
+  try {
+    const userId = req.user.userId;
+    
+    const user = req.db.prepare(`
+      SELECT onboarding_step, onboarding_completed_at 
+      FROM users 
+      WHERE id = ?
+    `).get(userId);
+    
+    if (!user) {
+      return res.status(404).json({ error: 'Usuario no encontrado' });
+    }
+    
+    res.json({
+      onboarding_step: user.onboarding_step || 0,
+      completed: user.onboarding_step >= 4,
+      completed_at: user.onboarding_completed_at
+    });
+    
+  } catch (error) {
+    console.error('❌ Error obteniendo onboarding:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * PATCH /api/user/onboarding - Actualizar progreso de onboarding
+ */
+router.patch('/api/user/onboarding', authenticateToken, (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const { step } = req.body;
+    
+    if (typeof step !== 'number' || step < 0 || step > 4) {
+      return res.status(400).json({ error: 'Step debe ser un número entre 0 y 4' });
+    }
+    
+    const now = Math.floor(Date.now() / 1000);
+    
+    // Si completa el onboarding (step 4), guardar timestamp
+    if (step === 4) {
+      req.db.prepare(`
+        UPDATE users 
+        SET onboarding_step = ?, onboarding_completed_at = ?
+        WHERE id = ?
+      `).run(step, now, userId);
+    } else {
+      req.db.prepare(`
+        UPDATE users 
+        SET onboarding_step = ?
+        WHERE id = ?
+      `).run(step, userId);
+    }
+    
+    res.json({ 
+      success: true,
+      onboarding_step: step,
+      completed: step >= 4
+    });
+    
+  } catch (error) {
+    console.error('❌ Error actualizando onboarding:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * GET /api/achievements - Obtener achievements del usuario
+ */
+router.get('/api/achievements', authenticateToken, (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const achievements = getUserAchievements(req.db, userId);
+    
+    res.json({
+      achievements,
+      total: achievements.length
+    });
+    
+  } catch (error) {
+    console.error('❌ Error obteniendo achievements:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * GET /api/achievements/progress - Obtener progreso hacia badges
+ */
+router.get('/api/achievements/progress', authenticateToken, (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const tenantId = req.user.tenantId;
+    
+    const unlocked = getUserAchievements(req.db, userId);
+    const locked = getBadgeProgress(req.db, userId, tenantId);
+    
+    res.json({
+      unlocked,
+      locked,
+      total_unlocked: unlocked.length,
+      total_badges: unlocked.length + locked.length
+    });
+    
+  } catch (error) {
+    console.error('❌ Error obteniendo progreso:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * POST /api/achievements/check - Verificar y desbloquear achievements
+ */
+router.post('/api/achievements/check', authenticateToken, (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const tenantId = req.user.tenantId;
+    
+    const newBadges = checkAndUnlockAchievements(req.db, userId, tenantId);
+    
+    res.json({
+      success: true,
+      new_badges: newBadges,
+      count: newBadges.length
+    });
+    
+  } catch (error) {
+    console.error('❌ Error verificando achievements:', error);
     res.status(500).json({ error: error.message });
   }
 });

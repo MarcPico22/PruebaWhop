@@ -23,9 +23,9 @@ const PLANS = {
     id: 'pro',
     name: 'Pro',
     price: 49,
-    priceIdMonthly: process.env.STRIPE_PRICE_MONTHLY_PRO || 'price_pro_placeholder',
-    priceIdYearly: process.env.STRIPE_PRICE_YEARLY_PRO || 'price_pro_yearly_placeholder',
-    priceId: process.env.STRIPE_PRICE_MONTHLY_PRO || 'price_pro_placeholder', // Por defecto mensual
+    priceIdMonthly: process.env.STRIPE_PRICE_MONTHLY_PRO,
+    priceIdYearly: process.env.STRIPE_PRICE_YEARLY_PRO,
+    priceId: process.env.STRIPE_PRICE_MONTHLY_PRO, // Por defecto mensual
     paymentsLimit: 500,
     features: [
       'Hasta 500 pagos recuperados por mes',
@@ -43,9 +43,9 @@ const PLANS = {
     id: 'enterprise',
     name: 'Enterprise',
     price: 199,
-    priceIdMonthly: process.env.STRIPE_PRICE_MONTHLY_ENTERPRISE || 'price_enterprise_placeholder',
-    priceIdYearly: process.env.STRIPE_PRICE_YEARLY_ENTERPRISE || 'price_enterprise_yearly_placeholder',
-    priceId: process.env.STRIPE_PRICE_MONTHLY_ENTERPRISE || 'price_enterprise_placeholder', // Por defecto mensual
+    priceIdMonthly: process.env.STRIPE_PRICE_MONTHLY_ENTERPRISE,
+    priceIdYearly: process.env.STRIPE_PRICE_YEARLY_ENTERPRISE,
+    priceId: process.env.STRIPE_PRICE_MONTHLY_ENTERPRISE, // Por defecto mensual
     paymentsLimit: null, // Ilimitado
     features: [
       'Pagos recuperados ILIMITADOS',

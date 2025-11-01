@@ -6,6 +6,9 @@ import Settings from './Settings'
 import StripePayment from './StripePayment'
 import NotificationSettings from './NotificationSettings'
 import SentryTestButton from './SentryTestButton'
+import StripeTestButton from './StripeTestButton'
+import OnboardingModal from './OnboardingModal'
+import BadgeDisplay from './BadgeDisplay'
 import { API_URL } from './config'
 
 export default function Dashboard() {
@@ -215,6 +218,9 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
+      {/* Onboarding Modal */}
+      <OnboardingModal onComplete={() => console.log('Onboarding completado!')} />
+      
       {/* Navbar - Mobile Optimized */}
       <nav className="bg-white dark:bg-gray-800 shadow-sm border-b dark:border-gray-700 transition-colors duration-200 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
@@ -471,11 +477,16 @@ export default function Dashboard() {
           </div>
         )}
 
-        {/* Distribution Chart */}
+        {/* Badges Section */}
+        <div className="mb-6 sm:mb-8">
+          <BadgeDisplay />
+        </div>
+
+        {/* Distribution Chart - Mobile Optimized */}
         {stats && (
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border dark:border-gray-700 p-6 mb-8 transition-colors duration-200">
-            <h3 className="text-lg font-semibold mb-4 dark:text-white">Distribución de Pagos</h3>
-            <div className="flex gap-4 h-64">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border dark:border-gray-700 p-3 sm:p-6 mb-6 sm:mb-8 transition-colors duration-200">
+            <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 dark:text-white">Distribución de Pagos</h3>
+            <div className="flex gap-2 sm:gap-4 h-48 sm:h-64">
               <ChartBar label="Pendientes" value={stats.pending} total={stats.total} color="bg-yellow-500" />
               <ChartBar label="Recuperados" value={stats.recovered} total={stats.total} color="bg-green-500" />
               <ChartBar label="Fallidos" value={stats.failed} total={stats.total} color="bg-red-500" />
@@ -702,6 +713,9 @@ export default function Dashboard() {
 
       {/* Sentry Test Button (solo en desarrollo) */}
       <SentryTestButton />
+      
+      {/* Stripe Test Button (solo en desarrollo) */}
+      <StripeTestButton />
     </div>
   )
 }
@@ -734,10 +748,10 @@ function ChartBar({ label, value, total, color }) {
           style={{ height: `${percentage}%` }}
         />
       </div>
-      <div className="mt-2 text-center">
-        <div className="text-sm font-medium text-gray-900 dark:text-white">{value}</div>
-        <div className="text-xs text-gray-500 dark:text-gray-400">{label}</div>
-        <div className="text-xs text-gray-400 dark:text-gray-500">{percentage.toFixed(1)}%</div>
+      <div className="mt-1 sm:mt-2 text-center">
+        <div className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white">{value}</div>
+        <div className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 truncate px-1">{label}</div>
+        <div className="text-[10px] sm:text-xs text-gray-400 dark:text-gray-500">{percentage.toFixed(1)}%</div>
       </div>
     </div>
   )

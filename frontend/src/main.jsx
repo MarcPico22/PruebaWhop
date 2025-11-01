@@ -10,6 +10,8 @@ import Signup from './Signup.jsx'
 import Dashboard from './Dashboard.jsx'
 import Pricing from './Pricing.jsx'
 import FAQ from './FAQ.jsx'
+import Terminos from './Terminos.jsx'
+import Privacidad from './Privacidad.jsx'
 import './index.css'
 
 // Sentry Setup - SIEMPRE activo (dev y prod)
@@ -51,6 +53,8 @@ ReactDOM.createRoot(document.getElementById('root')).render(
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/pricing" element={<Pricing />} />
             <Route path="/faq" element={<FAQ />} />
+            <Route path="/terminos" element={<Terminos />} />
+            <Route path="/privacidad" element={<Privacidad />} />
           </Routes>
         </AuthProvider>
       </ThemeProvider>
