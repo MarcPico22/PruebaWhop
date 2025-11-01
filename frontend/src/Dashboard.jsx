@@ -5,6 +5,7 @@ import { Navigate, useNavigate } from 'react-router-dom'
 import Settings from './Settings'
 import StripePayment from './StripePayment'
 import NotificationSettings from './NotificationSettings'
+import SentryTestButton from './SentryTestButton'
 import { API_URL } from './config'
 
 export default function Dashboard() {
@@ -698,6 +699,9 @@ export default function Dashboard() {
           }}
         />
       )}
+
+      {/* Sentry Test Button (solo en desarrollo) */}
+      <SentryTestButton />
     </div>
   )
 }
