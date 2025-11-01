@@ -1,6 +1,7 @@
 const express = require('express');
 const { v4: uuidv4 } = require('uuid');
 const {
+  db,
   insertPayment,
   getPayments,
   getPaymentById,
@@ -762,12 +763,12 @@ router.post('/webhook/stripe', express.raw({ type: 'application/json' }), async 
         
         // Verificar y desbloquear achievements
         try {
-          const user = req.db.prepare(`
+          const user = db.prepare(`
             SELECT id FROM users WHERE tenant_id = ?
           `).get(tenant_id);
           
           if (user) {
-            const newBadges = checkAndUnlockAchievements(req.db, user.id, tenant_id);
+            const newBadges = checkAndUnlockAchievements(db, user.id, tenant_id);
             if (newBadges.length > 0) {
               console.log(`🏆 ${newBadges.length} badge(s) desbloqueado(s) para tenant ${tenant_id}`);
             }
@@ -1353,7 +1354,7 @@ router.get('/api/user/onboarding', authenticateToken, (req, res) => {
   try {
     const userId = req.user.userId;
     
-    const user = req.db.prepare(`
+    const user = db.prepare(`
       SELECT onboarding_step, onboarding_completed_at 
       FROM users 
       WHERE id = ?
@@ -1391,13 +1392,13 @@ router.patch('/api/user/onboarding', authenticateToken, (req, res) => {
     
     // Si completa el onboarding (step 4), guardar timestamp
     if (step === 4) {
-      req.db.prepare(`
+      db.prepare(`
         UPDATE users 
         SET onboarding_step = ?, onboarding_completed_at = ?
         WHERE id = ?
       `).run(step, now, userId);
     } else {
-      req.db.prepare(`
+      db.prepare(`
         UPDATE users 
         SET onboarding_step = ?
         WHERE id = ?
@@ -1422,7 +1423,7 @@ router.patch('/api/user/onboarding', authenticateToken, (req, res) => {
 router.get('/api/achievements', authenticateToken, (req, res) => {
   try {
     const userId = req.user.userId;
-    const achievements = getUserAchievements(req.db, userId);
+    const achievements = getUserAchievements(db, userId);
     
     res.json({
       achievements,
@@ -1443,8 +1444,8 @@ router.get('/api/achievements/progress', authenticateToken, (req, res) => {
     const userId = req.user.userId;
     const tenantId = req.user.tenantId;
     
-    const unlocked = getUserAchievements(req.db, userId);
-    const locked = getBadgeProgress(req.db, userId, tenantId);
+    const unlocked = getUserAchievements(db, userId);
+    const locked = getBadgeProgress(db, userId, tenantId);
     
     res.json({
       unlocked,
@@ -1467,7 +1468,7 @@ router.post('/api/achievements/check', authenticateToken, (req, res) => {
     const userId = req.user.userId;
     const tenantId = req.user.tenantId;
     
-    const newBadges = checkAndUnlockAchievements(req.db, userId, tenantId);
+    const newBadges = checkAndUnlockAchievements(db, userId, tenantId);
     
     res.json({
       success: true,

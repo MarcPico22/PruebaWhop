@@ -49,18 +49,38 @@ export default function OnboardingModal({ onComplete }) {
     const checkOnboardingStatus = async () => {
       try {
         const token = localStorage.getItem('token');
-        if (!token) return;
+        console.log('🔍 Checking onboarding status...');
+        console.log('Token:', token ? 'EXISTS' : 'MISSING');
+        
+        if (!token) {
+          console.log('❌ No token found, skipping onboarding check');
+          return;
+        }
 
+        console.log('📡 Fetching onboarding status from:', `${API_URL}/api/user/onboarding`);
         const response = await axios.get(`${API_URL}/api/user/onboarding`, {
           headers: { Authorization: `Bearer ${token}` }
         });
 
+        console.log('✅ Onboarding response:', response.data);
+        
         if (!response.data.completed) {
+          console.log('🎯 Onboarding NOT completed, showing modal');
           setCurrentStep(response.data.onboarding_step || 0);
           setIsOpen(true);
+        } else {
+          console.log('✔️ Onboarding already completed, skipping modal');
         }
       } catch (error) {
-        console.error('Error checking onboarding:', error);
+        console.error('❌ Error checking onboarding:', error);
+        console.error('Error details:', error.response?.data || error.message);
+        
+        // Si el endpoint no existe (404), mostrar modal por defecto
+        if (error.response?.status === 404) {
+          console.log('⚠️ Endpoint not found, showing modal by default');
+          setCurrentStep(0);
+          setIsOpen(true);
+        }
       }
     };
 
