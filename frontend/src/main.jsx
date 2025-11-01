@@ -30,6 +30,12 @@ if (import.meta.env.PROD && import.meta.env.VITE_SENTRY_DSN) {
     replaysOnErrorSampleRate: 1.0, // 100% de sesiones con errores
     environment: import.meta.env.MODE,
   });
+  console.log('✅ Sentry initialized');
+} else {
+  console.log('⚠️ Sentry NOT initialized', { 
+    isProd: import.meta.env.PROD, 
+    hasDSN: !!import.meta.env.VITE_SENTRY_DSN 
+  });
 }
 
 ReactDOM.createRoot(document.getElementById('root')).render(
