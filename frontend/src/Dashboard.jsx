@@ -9,6 +9,7 @@ import SentryTestButton from './SentryTestButton'
 import StripeTestButton from './StripeTestButton'
 import OnboardingModal from './OnboardingModal'
 import BadgeDisplay from './BadgeDisplay'
+import LanguageSelector from './LanguageSelector'
 import { API_URL } from './config'
 
 export default function Dashboard() {
@@ -223,6 +224,10 @@ export default function Dashboard() {
       <OnboardingModal 
         manualOpen={showOnboarding}
         onClose={() => setShowOnboarding(false)}
+        onOpenSettings={() => {
+          setShowOnboarding(false);
+          setShowSettings(true);
+        }}
         onComplete={() => {
           setShowOnboarding(false);
           console.log('Onboarding completado!');
@@ -274,6 +279,7 @@ export default function Dashboard() {
             
             {/* Actions - Mobile Optimized */}
             <div className="flex items-center space-x-1 sm:space-x-2">
+              <LanguageSelector />
               <button
                 onClick={toggleDarkMode}
                 className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors active:scale-95"

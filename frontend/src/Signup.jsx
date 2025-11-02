@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useAuth } from './AuthContext';
 import { Navigate } from 'react-router-dom';
 import { trackSignup } from './analytics';
+import LanguageSelector from './LanguageSelector';
 
 export default function Signup() {
   const { register, user } = useAuth();
@@ -46,6 +47,11 @@ export default function Signup() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-600 via-purple-700 to-indigo-800 flex items-center justify-center p-4 sm:p-6">
+      {/* Language Selector - Top Right */}
+      <div className="fixed top-4 right-4 z-50">
+        <LanguageSelector />
+      </div>
+      
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 sm:p-8">
         {/* Logo/Header */}
         <div className="text-center mb-6 sm:mb-8">

@@ -1,7 +1,16 @@
 const Database = require('better-sqlite3');
 const path = require('path');
+const fs = require('fs');
 
 const dbPath = process.env.DATABASE_URL || (process.env.RAILWAY_ENVIRONMENT ? '/data/database.sqlite' : './data.db');
+
+// Crear directorio si no existe
+const dbDir = path.dirname(dbPath);
+if (!fs.existsSync(dbDir)) {
+  console.log(`📁 Creando directorio: ${dbDir}`);
+  fs.mkdirSync(dbDir, { recursive: true });
+}
+
 const db = new Database(dbPath);
 
 /**

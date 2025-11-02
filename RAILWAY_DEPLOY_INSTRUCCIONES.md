@@ -122,9 +122,17 @@ ResponseError: Forbidden (code: 403)
 # En Railway Dashboard → Variables:
 
 SENDGRID_API_KEY=SG.TU_NUEVA_API_KEY_AQUI
-FROM_EMAIL=tu-email-verificado@tudominio.com
+FROM_EMAIL=marcps2001@gmail.com
 FROM_NAME=Whop Recovery
 ```
+
+**IMPORTANTE:** Asegúrate de que `FROM_EMAIL` coincida EXACTAMENTE con el email verificado en SendGrid.
+
+Para verificar tu email en SendGrid:
+1. Ve a https://app.sendgrid.com/settings/sender_auth/senders
+2. Busca `marcps2001@gmail.com` en la lista
+3. Si no está, añádelo y verifica el email
+4. Una vez verificado, actualiza `FROM_EMAIL` en Railway
 
 Después de actualizar, reinicia el servicio en Railway.
 

@@ -3,7 +3,7 @@ import axios from 'axios';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
-export default function OnboardingModal({ onComplete, manualOpen = false, onClose }) {
+export default function OnboardingModal({ onComplete, manualOpen = false, onClose, onOpenSettings }) {
   const [currentStep, setCurrentStep] = useState(0);
   const [isOpen, setIsOpen] = useState(manualOpen);
 
@@ -19,21 +19,20 @@ export default function OnboardingModal({ onComplete, manualOpen = false, onClos
       description: 'Para detectar automáticamente pagos fallidos, necesitas conectar tu API key de Whop.',
       icon: '🔗',
       action: 'Ir a Integraciones',
-      link: '/dashboard/settings'
+      openSettings: true
     },
     {
       title: 'Configura SendGrid',
       description: 'Los emails de recuperación se envían con SendGrid. Añade tu API key para empezar.',
       icon: '📧',
       action: 'Configurar Email',
-      link: '/dashboard/settings'
+      openSettings: true
     },
     {
       title: 'Crea tu primer reintento',
       description: 'Define cuándo y cómo reintentar los pagos fallidos. Recomendamos: 1h, 24h, 72h.',
       icon: '🔄',
-      action: 'Ver Dashboard',
-      link: '/dashboard'
+      action: 'Continuar'
     },
     {
       title: '¡Listo para recuperar! 🚀',
@@ -88,10 +87,11 @@ export default function OnboardingModal({ onComplete, manualOpen = false, onClos
   const handleActionClick = () => {
     const step = steps[currentStep];
     
-    if (step.link) {
-      // Navegar a la página
-      window.location.href = step.link;
-      // Cerrar modal pero no marcar como completado
+    if (step.openSettings) {
+      // Abrir settings modal
+      if (onOpenSettings) {
+        onOpenSettings();
+      }
       setIsOpen(false);
     } else if (step.isLast) {
       // Finalizar onboarding
