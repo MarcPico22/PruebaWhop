@@ -1,8 +1,74 @@
 # 📊 ESTADO ACTUAL DEL PROYECTO - Whop Recovery
 
-**Última actualización**: 2 de noviembre de 2025, 22:40  
-**Commit actual**: a428d5e  
-**Estado general**: **~98% completo** - i18n 100% COMPLETA, listo para BETA 🚀
+**Última actualización**: 2 de noviembre de 2025, 23:00  
+**Commit actual**: 123aca9  
+**Estado general**: **~98% completo** - i18n 100%, migraciones listas, esperando ejecución en Railway
+
+---
+
+## 🚨 ESTADO CRÍTICO DE PRODUCCIÓN
+
+### ⚠️ ERRORES ACTIVOS EN RAILWAY (2 errores)
+
+**Error 1: SqliteError: no such column: u.onboarding_step**
+```
+❌ Error obteniendo usuarios: SqliteError: no such column: u.onboarding_step
+    at Database.prepare (/app/node_modules/better-sqlite3/lib/methods/wrappers.js:5:21)
+    at /app/routes.js:1569:22
+```
+
+**Error 2: SqliteError: no such table: achievements**
+```
+❌ Backend crashes when accessing achievements
+```
+
+### ✅ SOLUCIÓN IMPLEMENTADA
+
+**Commit b386971:** Fallbacks temporales en código
+- GET /api/user/onboarding → Retorna defaults si columnas no existen
+- PATCH /api/user/onboarding → Ignora silenciosamente si columnas no existen
+- Admin users query → Usa hardcoded 0/NULL
+
+**Commit 123aca9:** Guía de migraciones completa
+- Archivo: `RAILWAY_MIGRATIONS_GUIDE.md`
+- 2 migrations SQL creadas y listas para ejecutar
+- Instrucciones paso a paso (3 opciones)
+
+### 🔧 MIGRACIONES PENDIENTES (5 minutos)
+
+**1. Onboarding columns** (`backend/migrations/add_onboarding_columns.sql`)
+```sql
+ALTER TABLE users ADD COLUMN onboarding_step INTEGER DEFAULT 0;
+ALTER TABLE users ADD COLUMN onboarding_completed_at INTEGER;
+UPDATE users SET onboarding_step = 0 WHERE onboarding_step IS NULL;
+```
+
+**2. Achievements table** (`backend/fix_achievements.sql`)
+```sql
+CREATE TABLE IF NOT EXISTS achievements (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INTEGER NOT NULL,
+  badge_type TEXT NOT NULL,
+  unlocked_at INTEGER NOT NULL,
+  UNIQUE(user_id, badge_type)
+);
+```
+
+### 🚀 CÓMO EJECUTAR (Elige una opción)
+
+**Opción A - Railway CLI** (Más rápido)
+```bash
+railway run sqlite3 /data/database.sqlite < backend/migrations/add_onboarding_columns.sql
+railway run sqlite3 /data/database.sqlite < backend/fix_achievements.sql
+```
+
+**Opción B - Railway Dashboard** (Más visual)
+1. Ir a railway.app → Proyecto → Backend → Terminal
+2. Copiar y pegar comandos SQL directamente
+3. Ver guía completa en `RAILWAY_MIGRATIONS_GUIDE.md`
+
+**⏱️ Tiempo:** 5 minutos total  
+**📄 Guía detallada:** `RAILWAY_MIGRATIONS_GUIDE.md`
 
 ---
 
