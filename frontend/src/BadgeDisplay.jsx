@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 import Confetti from 'react-confetti';
 import { useWindowSize } from 'react-use';
@@ -6,6 +7,7 @@ import { useWindowSize } from 'react-use';
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 export default function BadgeDisplay() {
+  const { t } = useTranslation();
   const [achievements, setAchievements] = useState({ unlocked: [], locked: [] });
   const [loading, setLoading] = useState(true);
   const [showConfetti, setShowConfetti] = useState(false);
@@ -95,7 +97,7 @@ export default function BadgeDisplay() {
           <div className="flex items-center space-x-4">
             <div className="text-5xl">{newBadge.icon}</div>
             <div>
-              <div className="font-bold text-lg">¡Badge Desbloqueado!</div>
+              <div className="font-bold text-lg">{t('badges.notification.title')}</div>
               <div className="text-sm opacity-90">{newBadge.name}</div>
             </div>
           </div>
@@ -107,24 +109,24 @@ export default function BadgeDisplay() {
         <div>
           <h2 className="text-2xl font-bold text-gray-900 flex items-center">
             <span className="text-3xl mr-3">🏆</span>
-            Mis Logros
+            {t('dashboard.achievements.title')}
           </h2>
           <p className="text-sm text-gray-600 mt-1">
-            {achievements.unlocked.length} de {allBadges.length} badges desbloqueados
+            {achievements.unlocked.length} {t('badges.progress.of')} {allBadges.length} {t('badges.progress.unlocked')}
           </p>
         </div>
         <button
           onClick={checkNewBadges}
           className="px-4 py-2 text-sm bg-indigo-50 text-indigo-700 rounded-lg hover:bg-indigo-100 transition-colors"
         >
-          🔄 Verificar Nuevos
+          🔄 {t('badges.buttons.checkNew')}
         </button>
       </div>
 
       {/* Progress Bar */}
       <div className="mb-6">
         <div className="flex justify-between text-sm text-gray-600 mb-2">
-          <span>Progreso</span>
+          <span>{t('badges.progress.label')}</span>
           <span>{Math.round((achievements.unlocked.length / allBadges.length) * 100)}%</span>
         </div>
         <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
@@ -150,7 +152,7 @@ export default function BadgeDisplay() {
             {/* Tooltip */}
             <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block z-10">
               <div className="bg-gray-900 text-white text-xs rounded-lg py-2 px-3 whitespace-nowrap">
-                Desbloqueado {new Date(badge.unlocked_at * 1000).toLocaleDateString()}
+                {t('badges.tooltip.unlocked')} {new Date(badge.unlocked_at * 1000).toLocaleDateString()}
                 <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-gray-900"></div>
               </div>
             </div>
@@ -185,7 +187,7 @@ export default function BadgeDisplay() {
             {/* Tooltip */}
             <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block z-10">
               <div className="bg-gray-900 text-white text-xs rounded-lg py-2 px-3 whitespace-nowrap">
-                🔒 Bloqueado - {badge.required - badge.current} más para desbloquear
+                🔒 {t('badges.tooltip.locked')} - {badge.required - badge.current} {t('badges.tooltip.moreToUnlock')}
                 <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-gray-900"></div>
               </div>
             </div>
@@ -197,7 +199,7 @@ export default function BadgeDisplay() {
       {allBadges.length === 0 && (
         <div className="text-center py-12 text-gray-500">
           <div className="text-6xl mb-4">🎖️</div>
-          <p>Aún no hay badges disponibles</p>
+          <p>{t('badges.empty')}</p>
         </div>
       )}
     </div>

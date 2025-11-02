@@ -271,9 +271,57 @@
     },
     "helpButton": "¿Necesitas ayuda?"
   },
+  "badges": {
+    "notification": {
+      "title": "¡Badge Desbloqueado!"
+    },
+    "progress": {
+      "of": "de",
+      "unlocked": "badges desbloqueados",
+      "label": "Progreso"
+    },
+    "buttons": {
+      "checkNew": "Verificar Nuevos"
+    },
+    "tooltip": {
+      "unlocked": "Desbloqueado",
+      "locked": "Bloqueado",
+      "moreToUnlock": "más para desbloquear"
+    },
+    "empty": "Aún no hay badges disponibles"
+  },
   "onboarding": {
     "step": "Paso {{current}} de {{total}}",
     "skip": "Saltar tutorial (puedes volver después)",
+    "checklist": {
+      "title": "Lo que vas a configurar:",
+      "whop": {
+        "title": "API de Whop",
+        "description": "Detectar pagos fallidos automáticamente"
+      },
+      "sendgrid": {
+        "title": "SendGrid",
+        "description": "Enviar emails de recuperación"
+      },
+      "retries": {
+        "title": "Reintentos",
+        "description": "Automatizar la recuperación"
+      }
+    },
+    "finalStats": {
+      "trial": {
+        "title": "Trial de 14 días",
+        "subtitle": "Gratis, sin tarjeta"
+      },
+      "payments": {
+        "title": "Hasta 50 pagos",
+        "subtitle": "Durante el trial"
+      },
+      "recovery": {
+        "title": "Recovery 24/7",
+        "subtitle": "Automático"
+      }
+    },
     "steps": {
       "welcome": {
         "title": "¡Bienvenido a Whop Recovery! 🎉",
@@ -302,7 +350,7 @@
       }
     },
     "navigation": {
-      "back": "Atrás",
+      "back": "Anterior",
       "next": "Siguiente"
     }
   },
@@ -344,13 +392,39 @@
     }
   },
   "settings": {
-    "title": "Configuración",
+    "title": "Configuración del Sistema",
     "subtitle": "Administra tu cuenta e integraciones",
     "tabs": {
       "general": "General",
       "integrations": "Integraciones",
       "notifications": "Notificaciones",
       "billing": "Facturación"
+    },
+    "retryIntervals": {
+      "label": "Intervalos de Reintento (en segundos, separados por comas)",
+      "retry": "Reintento",
+      "example": "Ejemplo: 60,300,900 = 1min, 5min, 15min"
+    },
+    "maxRetries": {
+      "label": "Máximo de Reintentos",
+      "reintento": "reintento",
+      "reintentos": "reintentos"
+    },
+    "info": {
+      "title": "Información",
+      "description": "Los cambios en la configuración se aplicarán inmediatamente a todos los pagos pendientes. Los intervalos se calculan desde el último intento fallido."
+    },
+    "buttons": {
+      "saving": "Guardando...",
+      "saveChanges": "Guardar Cambios"
+    },
+    "messages": {
+      "saveSuccess": "✅ Configuración guardada exitosamente"
+    },
+    "errors": {
+      "loadConfig": "Error cargando configuración",
+      "saveConfig": "❌ Error guardando configuración",
+      "connectionError": "❌ Error de conexión"
     },
     "whop": {
       "title": "Integración Whop",
@@ -396,6 +470,66 @@
       "day7": {
         "subject": "Tu Prueba Está Terminando Pronto",
         "title": "Prueba Finalizando"
+      }
+    }
+  },
+  "faq": {
+    "title": "Preguntas Frecuentes",
+    "subtitle": "Todo lo que necesitas saber sobre Whop Recovery",
+    "cta": {
+      "title": "¿Aún tienes dudas?",
+      "description": "Estamos aquí para ayudarte. Contáctanos y te responderemos en menos de 24 horas.",
+      "contactButton": "Contactar soporte",
+      "startButton": "Empezar gratis"
+    },
+    "questions": {
+      "howItWorks": {
+        "question": "¿Cómo funciona Whop Recovery?",
+        "answer": "Whop Recovery se conecta automáticamente a tu cuenta de Whop y monitoriza todos los pagos fallidos. Cuando detecta un fallo, reintenta el cobro de forma inteligente en los momentos óptimos (cuando es más probable que el pago tenga éxito). Todo esto ocurre en segundo plano, sin que tengas que hacer nada."
+      },
+      "pricing": {
+        "question": "¿Cuánto cuesta?",
+        "answer": "Ofrecemos tres planes: GRATIS (hasta 10 reintentos/mes), PRO (€49/mes o €499/año con reintentos ilimitados) y ENTERPRISE (€199/mes o €2.099/año con soporte prioritario y analytics avanzados). Solo pagas por los reintentos exitosos en el plan gratuito."
+      },
+      "recoveryRate": {
+        "question": "¿Qué tasa de recuperación puedo esperar?",
+        "answer": "Nuestros clientes recuperan de media el 85% de los pagos fallidos. Esto significa que si pierdes €1.000 al mes por pagos fallidos, podrías recuperar €850 automáticamente."
+      },
+      "security": {
+        "question": "¿Es seguro conectar mi cuenta de Whop?",
+        "answer": "Sí, totalmente seguro. Utilizamos OAuth 2.0 (el mismo sistema que usa Google y Facebook) y encriptación de grado bancario. Solo solicitamos los permisos mínimos necesarios y nunca almacenamos información sensible de pagos. Además, puedes revocar el acceso en cualquier momento desde tu panel de Whop."
+      },
+      "retryTiming": {
+        "question": "¿Cuándo se intentan los reintentos?",
+        "answer": "Nuestro sistema inteligente analiza patrones de comportamiento y realiza los reintentos en momentos óptimos: cuando el cliente tiene más probabilidades de tener fondos disponibles. Típicamente, hacemos 3-5 intentos espaciados a lo largo de 7-14 días, pero puedes personalizar esta configuración en tu dashboard."
+      },
+      "customerRelation": {
+        "question": "¿Afectará esto a mi relación con los clientes?",
+        "answer": "No. Los reintentos son discretos y profesionales. Whop maneja las notificaciones a los clientes de forma estándar (igual que cuando hacen un pago manual). Nosotros simplemente automatizamos el proceso de reintento que normalmente tendrías que hacer manualmente."
+      },
+      "cancellation": {
+        "question": "¿Puedo cancelar en cualquier momento?",
+        "answer": "Sí, puedes cancelar tu suscripción cuando quieras desde el dashboard. No hay contratos de permanencia ni penalizaciones. Si cancelas, seguirás teniendo acceso hasta el final de tu período de facturación actual."
+      },
+      "failedRetry": {
+        "question": "¿Qué pasa si un reintento falla?",
+        "answer": "Si un reintento falla, el sistema lo marca y programa el siguiente intento de forma inteligente. Puedes ver todos los intentos (exitosos y fallidos) en tu dashboard con análisis detallados. Después del número máximo de intentos configurados, el sistema deja de reintentar ese pago específico."
+      },
+      "technical": {
+        "question": "¿Necesito conocimientos técnicos?",
+        "answer": "No, para nada. La configuración es super simple: conectas tu cuenta de Whop con un click, y el sistema empieza a funcionar automáticamente. El dashboard es intuitivo y no requiere ningún conocimiento técnico."
+      },
+      "support": {
+        "question": "¿Ofrecen soporte?",
+        "answer": "Sí. Todos los planes incluyen soporte por email. El plan ENTERPRISE incluye soporte prioritario con tiempos de respuesta garantizados de menos de 4 horas. También tenemos documentación completa y tutoriales en vídeo."
+      },
+      "analytics": {
+        "question": "¿Puedo ver estadísticas de recuperación?",
+        "answer": "Absolutamente. Tu dashboard incluye analytics en tiempo real: tasa de recuperación, ingresos recuperados, tendencias, mejores momentos de reintento, y mucho más. El plan ENTERPRISE incluye reportes avanzados y exportación de datos."
+      },
+      "paymentMethods": {
+        "question": "¿Funciona con todos los métodos de pago de Whop?",
+        "answer": "Sí, Whop Recovery funciona con todos los métodos de pago soportados por Whop (tarjetas de crédito, débito, Apple Pay, Google Pay, etc.). El sistema se adapta automáticamente al método de pago de cada transacción."
       }
     }
   }

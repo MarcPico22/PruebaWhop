@@ -1,8 +1,10 @@
 import { useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import IntegrationsSettings from './components/IntegrationsSettings'
 import { API_URL } from './config'
 
 export default function Settings({ onClose, token }) {
+  const { t } = useTranslation()
   const [activeTab, setActiveTab] = useState('general')
   const [config, setConfig] = useState({
     retry_intervals: '',
@@ -38,7 +40,7 @@ export default function Settings({ onClose, token }) {
       setLoading(false)
     } catch (error) {
       console.error('Error cargando configuración:', error)
-      showMessage('Error cargando configuración', 'error')
+      showMessage(t('settings.errors.loadConfig'), 'error')
       setLoading(false)
     }
   }
@@ -59,15 +61,15 @@ export default function Settings({ onClose, token }) {
       const data = await response.json()
       
       if (data.success) {
-        showMessage('✅ Configuración guardada exitosamente', 'success')
+        showMessage(t('settings.messages.saveSuccess'), 'success')
         setTimeout(() => {
           onClose()
         }, 1500)
       } else {
-        showMessage('❌ Error guardando configuración', 'error')
+        showMessage(t('settings.errors.saveConfig'), 'error')
       }
     } catch (error) {
-      showMessage('❌ Error de conexión', 'error')
+      showMessage(t('settings.errors.connectionError'), 'error')
     } finally {
       setSaving(false)
     }
@@ -95,7 +97,7 @@ export default function Settings({ onClose, token }) {
         <div className="bg-gradient-to-r from-purple-600 to-indigo-600 p-6 rounded-t-2xl">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-bold text-white flex items-center gap-2">
-              ⚙️ Configuración del Sistema
+              ⚙️ {t('settings.title')}
             </h2>
             <button
               onClick={handleClose}
@@ -117,7 +119,7 @@ export default function Settings({ onClose, token }) {
                   : 'border-transparent text-gray-500 hover:text-gray-700'
               }`}
             >
-              🔧 General
+              🔧 {t('settings.tabs.general')}
             </button>
             <button
               onClick={() => setActiveTab('integrations')}
@@ -127,7 +129,7 @@ export default function Settings({ onClose, token }) {
                   : 'border-transparent text-gray-500 hover:text-gray-700'
               }`}
             >
-              🔌 Integraciones
+              🔌 {t('settings.tabs.integrations')}
             </button>
           </div>
         </div>
@@ -148,14 +150,14 @@ export default function Settings({ onClose, token }) {
 
               {loading ? (
                 <div className="text-center py-12 text-gray-500">
-                  Cargando configuración...
+                  {t('common.loading')}
                 </div>
               ) : (
                 <div className="space-y-6">
                   {/* Intervalos de Reintento */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      🔄 Intervalos de Reintento (en segundos, separados por comas)
+                      🔄 {t('settings.retryIntervals.label')}
                     </label>
                     <input
                       type="text"
@@ -167,30 +169,30 @@ export default function Settings({ onClose, token }) {
                     <div className="mt-2 flex flex-wrap gap-2">
                       {parseIntervals(config.retry_intervals).map((interval, i) => (
                         <span key={i} className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-medium">
-                          Reintento {i + 1}: {interval}
+                          {t('settings.retryIntervals.retry')} {i + 1}: {interval}
                         </span>
                       ))}
                     </div>
                     <p className="mt-2 text-sm text-gray-500">
-                      Ejemplo: 60,300,900 = 1min, 5min, 15min
+                      {t('settings.retryIntervals.example')}
                     </p>
                   </div>
 
                   {/* Máximo de Reintentos */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      🔢 Máximo de Reintentos
+                      🔢 {t('settings.maxRetries.label')}
                     </label>
                     <select
                       value={config.max_retries}
                       onChange={(e) => setConfig({ ...config, max_retries: e.target.value })}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                     >
-                      <option value="1">1 reintento</option>
-                      <option value="2">2 reintentos</option>
-                      <option value="3">3 reintentos</option>
-                      <option value="5">5 reintentos</option>
-                      <option value="10">10 reintentos</option>
+                      <option value="1">1 {t('settings.maxRetries.reintento')}</option>
+                      <option value="2">2 {t('settings.maxRetries.reintentos')}</option>
+                      <option value="3">3 {t('settings.maxRetries.reintentos')}</option>
+                      <option value="5">5 {t('settings.maxRetries.reintentos')}</option>
+                      <option value="10">10 {t('settings.maxRetries.reintentos')}</option>
                     </select>
                   </div>
 
@@ -199,10 +201,9 @@ export default function Settings({ onClose, token }) {
                     <div className="flex gap-3">
                       <div className="text-2xl">💡</div>
                       <div>
-                        <h4 className="font-medium text-blue-900 mb-1">Información</h4>
+                        <h4 className="font-medium text-blue-900 mb-1">{t('settings.info.title')}</h4>
                         <p className="text-sm text-blue-700">
-                          Los cambios en la configuración se aplicarán inmediatamente a todos los pagos pendientes.
-                          Los intervalos se calculan desde el último intento fallido.
+                          {t('settings.info.description')}
                         </p>
                       </div>
                     </div>
@@ -225,14 +226,14 @@ export default function Settings({ onClose, token }) {
               onClick={handleClose}
               className="px-6 py-2 text-gray-700 hover:bg-gray-200 rounded-lg transition-colors"
             >
-              Cancelar
+              {t('common.cancel')}
             </button>
             <button
               onClick={handleSave}
               disabled={saving || loading}
               className="px-6 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-lg hover:from-purple-700 hover:to-indigo-700 transition-all disabled:opacity-50"
             >
-              {saving ? 'Guardando...' : 'Guardar Cambios'}
+              {saving ? t('settings.buttons.saving') : t('settings.buttons.saveChanges')}
             </button>
           </div>
         )}

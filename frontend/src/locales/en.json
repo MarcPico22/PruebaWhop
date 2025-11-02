@@ -291,9 +291,57 @@
     },
     "helpButton": "Need help?"
   },
+  "badges": {
+    "notification": {
+      "title": "Badge Unlocked!"
+    },
+    "progress": {
+      "of": "of",
+      "unlocked": "badges unlocked",
+      "label": "Progress"
+    },
+    "buttons": {
+      "checkNew": "Check New"
+    },
+    "tooltip": {
+      "unlocked": "Unlocked",
+      "locked": "Locked",
+      "moreToUnlock": "more to unlock"
+    },
+    "empty": "No badges available yet"
+  },
   "onboarding": {
     "step": "Step {{current}} of {{total}}",
     "skip": "Skip tutorial (you can come back later)",
+    "checklist": {
+      "title": "What you'll configure:",
+      "whop": {
+        "title": "Whop API",
+        "description": "Automatically detect failed payments"
+      },
+      "sendgrid": {
+        "title": "SendGrid",
+        "description": "Send recovery emails"
+      },
+      "retries": {
+        "title": "Retries",
+        "description": "Automate recovery"
+      }
+    },
+    "finalStats": {
+      "trial": {
+        "title": "14-day Trial",
+        "subtitle": "Free, no card"
+      },
+      "payments": {
+        "title": "Up to 50 payments",
+        "subtitle": "During trial"
+      },
+      "recovery": {
+        "title": "Recovery 24/7",
+        "subtitle": "Automatic"
+      }
+    },
     "steps": {
       "welcome": {
         "title": "Welcome to Whop Recovery! 🎉",
@@ -364,13 +412,39 @@
     }
   },
   "settings": {
-    "title": "Settings",
+    "title": "System Configuration",
     "subtitle": "Manage your account and integrations",
     "tabs": {
       "general": "General",
       "integrations": "Integrations",
       "notifications": "Notifications",
       "billing": "Billing"
+    },
+    "retryIntervals": {
+      "label": "Retry Intervals (in seconds, comma separated)",
+      "retry": "Retry",
+      "example": "Example: 60,300,900 = 1min, 5min, 15min"
+    },
+    "maxRetries": {
+      "label": "Maximum Retries",
+      "reintento": "retry",
+      "reintentos": "retries"
+    },
+    "info": {
+      "title": "Information",
+      "description": "Configuration changes will be applied immediately to all pending payments. Intervals are calculated from the last failed attempt."
+    },
+    "buttons": {
+      "saving": "Saving...",
+      "saveChanges": "Save Changes"
+    },
+    "messages": {
+      "saveSuccess": "✅ Configuration saved successfully"
+    },
+    "errors": {
+      "loadConfig": "Error loading configuration",
+      "saveConfig": "❌ Error saving configuration",
+      "connectionError": "❌ Connection error"
     },
     "whop": {
       "title": "Whop Integration",
@@ -416,6 +490,66 @@
       "day7": {
         "subject": "Your Trial is Ending Soon",
         "title": "Trial Ending"
+      }
+    }
+  },
+  "faq": {
+    "title": "Frequently Asked Questions",
+    "subtitle": "Everything you need to know about Whop Recovery",
+    "cta": {
+      "title": "Still have questions?",
+      "description": "We're here to help. Contact us and we'll respond in less than 24 hours.",
+      "contactButton": "Contact Support",
+      "startButton": "Start Free"
+    },
+    "questions": {
+      "howItWorks": {
+        "question": "How does Whop Recovery work?",
+        "answer": "Whop Recovery automatically connects to your Whop account and monitors all failed payments. When it detects a failure, it intelligently retries the charge at optimal moments (when payment is most likely to succeed). All of this happens in the background, without you having to do anything."
+      },
+      "pricing": {
+        "question": "How much does it cost?",
+        "answer": "We offer three plans: FREE (up to 10 retries/month), PRO ($49/month or $499/year with unlimited retries) and ENTERPRISE ($199/month or $2,099/year with priority support and advanced analytics). You only pay for successful retries on the free plan."
+      },
+      "recoveryRate": {
+        "question": "What recovery rate can I expect?",
+        "answer": "Our customers recover an average of 85% of failed payments. This means if you lose $1,000 a month to failed payments, you could recover $850 automatically."
+      },
+      "security": {
+        "question": "Is it safe to connect my Whop account?",
+        "answer": "Yes, completely safe. We use OAuth 2.0 (the same system used by Google and Facebook) and bank-grade encryption. We only request the minimum necessary permissions and never store sensitive payment information. Additionally, you can revoke access at any time from your Whop panel."
+      },
+      "retryTiming": {
+        "question": "When are retries attempted?",
+        "answer": "Our intelligent system analyzes behavior patterns and performs retries at optimal times: when the customer is most likely to have funds available. Typically, we make 3-5 attempts spaced over 7-14 days, but you can customize this configuration in your dashboard."
+      },
+      "customerRelation": {
+        "question": "Will this affect my relationship with customers?",
+        "answer": "No. Retries are discreet and professional. Whop handles customer notifications in the standard way (just like when they make a manual payment). We simply automate the retry process you would normally have to do manually."
+      },
+      "cancellation": {
+        "question": "Can I cancel at any time?",
+        "answer": "Yes, you can cancel your subscription whenever you want from the dashboard. There are no long-term contracts or penalties. If you cancel, you'll still have access until the end of your current billing period."
+      },
+      "failedRetry": {
+        "question": "What happens if a retry fails?",
+        "answer": "If a retry fails, the system marks it and intelligently schedules the next attempt. You can see all attempts (successful and failed) in your dashboard with detailed analytics. After the maximum number of configured attempts, the system stops retrying that specific payment."
+      },
+      "technical": {
+        "question": "Do I need technical knowledge?",
+        "answer": "No, not at all. Setup is super simple: you connect your Whop account with one click, and the system starts working automatically. The dashboard is intuitive and requires no technical knowledge."
+      },
+      "support": {
+        "question": "Do you offer support?",
+        "answer": "Yes. All plans include email support. The ENTERPRISE plan includes priority support with guaranteed response times of less than 4 hours. We also have complete documentation and video tutorials."
+      },
+      "analytics": {
+        "question": "Can I see recovery statistics?",
+        "answer": "Absolutely. Your dashboard includes real-time analytics: recovery rate, recovered revenue, trends, best retry times, and much more. The ENTERPRISE plan includes advanced reports and data export."
+      },
+      "paymentMethods": {
+        "question": "Does it work with all Whop payment methods?",
+        "answer": "Yes, Whop Recovery works with all payment methods supported by Whop (credit cards, debit, Apple Pay, Google Pay, etc.). The system automatically adapts to each transaction's payment method."
       }
     }
   }

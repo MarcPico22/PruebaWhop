@@ -1,44 +1,46 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import axios from 'axios';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 export default function OnboardingModal({ onComplete, manualOpen = false, onClose, onOpenSettings }) {
+  const { t } = useTranslation();
   const [currentStep, setCurrentStep] = useState(0);
   const [isOpen, setIsOpen] = useState(manualOpen);
 
   const steps = [
     {
-      title: '¡Bienvenido a Whop Recovery! 🎉',
-      description: 'Vamos a configurar tu cuenta en 3 simples pasos para que puedas empezar a recuperar pagos automáticamente.',
+      title: t('onboarding.steps.welcome.title'),
+      description: t('onboarding.steps.welcome.description'),
       icon: '👋',
-      action: 'Empezar'
+      action: t('onboarding.steps.welcome.action')
     },
     {
-      title: 'Conecta tu API de Whop',
-      description: 'Para detectar automáticamente pagos fallidos, necesitas conectar tu API key de Whop.',
+      title: t('onboarding.steps.connectWhop.title'),
+      description: t('onboarding.steps.connectWhop.description'),
       icon: '🔗',
-      action: 'Ir a Integraciones',
+      action: t('onboarding.steps.connectWhop.action'),
       openSettings: true
     },
     {
-      title: 'Configura SendGrid',
-      description: 'Los emails de recuperación se envían con SendGrid. Añade tu API key para empezar.',
+      title: t('onboarding.steps.configureSendgrid.title'),
+      description: t('onboarding.steps.configureSendgrid.description'),
       icon: '📧',
-      action: 'Configurar Email',
+      action: t('onboarding.steps.configureSendgrid.action'),
       openSettings: true
     },
     {
-      title: 'Crea tu primer reintento',
-      description: 'Define cuándo y cómo reintentar los pagos fallidos. Recomendamos: 1h, 24h, 72h.',
+      title: t('onboarding.steps.createRetry.title'),
+      description: t('onboarding.steps.createRetry.description'),
       icon: '🔄',
-      action: 'Continuar'
+      action: t('onboarding.navigation.next')
     },
     {
-      title: '¡Listo para recuperar! 🚀',
-      description: 'Ya tienes todo configurado. Whop Recovery detectará automáticamente los pagos fallidos y los recuperará por ti.',
+      title: t('onboarding.steps.ready.title'),
+      description: t('onboarding.steps.ready.description'),
       icon: '✅',
-      action: 'Finalizar',
+      action: t('onboarding.steps.ready.action'),
       isLast: true
     }
   ];
@@ -148,7 +150,7 @@ export default function OnboardingModal({ onComplete, manualOpen = false, onClos
           <div className="text-center mb-6">
             <div className="text-6xl mb-4">{step.icon}</div>
             <div className="text-sm text-gray-500 font-medium">
-              Paso {currentStep + 1} de {steps.length}
+              {t('onboarding.step', { current: currentStep + 1, total: steps.length })}
             </div>
           </div>
 
@@ -161,27 +163,27 @@ export default function OnboardingModal({ onComplete, manualOpen = false, onClos
           {/* Checklist visual (solo en paso 1) */}
           {currentStep === 0 && (
             <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-lg p-6 mb-8">
-              <h3 className="font-semibold text-gray-900 mb-4">Lo que vas a configurar:</h3>
+              <h3 className="font-semibold text-gray-900 mb-4">{t('onboarding.checklist.title')}</h3>
               <ul className="space-y-3">
                 <li className="flex items-start">
                   <span className="text-2xl mr-3">🔗</span>
                   <div>
-                    <div className="font-medium text-gray-900">API de Whop</div>
-                    <div className="text-sm text-gray-600">Detectar pagos fallidos automáticamente</div>
+                    <div className="font-medium text-gray-900">{t('onboarding.checklist.whop.title')}</div>
+                    <div className="text-sm text-gray-600">{t('onboarding.checklist.whop.description')}</div>
                   </div>
                 </li>
                 <li className="flex items-start">
                   <span className="text-2xl mr-3">📧</span>
                   <div>
-                    <div className="font-medium text-gray-900">SendGrid</div>
-                    <div className="text-sm text-gray-600">Enviar emails de recuperación</div>
+                    <div className="font-medium text-gray-900">{t('onboarding.checklist.sendgrid.title')}</div>
+                    <div className="text-sm text-gray-600">{t('onboarding.checklist.sendgrid.description')}</div>
                   </div>
                 </li>
                 <li className="flex items-start">
                   <span className="text-2xl mr-3">🔄</span>
                   <div>
-                    <div className="font-medium text-gray-900">Reintentos</div>
-                    <div className="text-sm text-gray-600">Automatizar la recuperación</div>
+                    <div className="font-medium text-gray-900">{t('onboarding.checklist.retries.title')}</div>
+                    <div className="text-sm text-gray-600">{t('onboarding.checklist.retries.description')}</div>
                   </div>
                 </li>
               </ul>
@@ -193,18 +195,18 @@ export default function OnboardingModal({ onComplete, manualOpen = false, onClos
             <div className="grid grid-cols-3 gap-4 mb-8">
               <div className="bg-green-50 rounded-lg p-4 text-center">
                 <div className="text-3xl mb-2">🎉</div>
-                <div className="text-sm font-medium text-green-900">Trial de 14 días</div>
-                <div className="text-xs text-green-700">Gratis, sin tarjeta</div>
+                <div className="text-sm font-medium text-green-900">{t('onboarding.finalStats.trial.title')}</div>
+                <div className="text-xs text-green-700">{t('onboarding.finalStats.trial.subtitle')}</div>
               </div>
               <div className="bg-blue-50 rounded-lg p-4 text-center">
                 <div className="text-3xl mb-2">💰</div>
-                <div className="text-sm font-medium text-blue-900">Hasta 50 pagos</div>
-                <div className="text-xs text-blue-700">Durante el trial</div>
+                <div className="text-sm font-medium text-blue-900">{t('onboarding.finalStats.payments.title')}</div>
+                <div className="text-xs text-blue-700">{t('onboarding.finalStats.payments.subtitle')}</div>
               </div>
               <div className="bg-purple-50 rounded-lg p-4 text-center">
                 <div className="text-3xl mb-2">⚡</div>
-                <div className="text-sm font-medium text-purple-900">Recovery 24/7</div>
-                <div className="text-xs text-purple-700">Automático</div>
+                <div className="text-sm font-medium text-purple-900">{t('onboarding.finalStats.recovery.title')}</div>
+                <div className="text-xs text-purple-700">{t('onboarding.finalStats.recovery.subtitle')}</div>
               </div>
             </div>
           )}
@@ -220,7 +222,7 @@ export default function OnboardingModal({ onComplete, manualOpen = false, onClos
                   : 'text-gray-700 hover:bg-gray-100'
               }`}
             >
-              ← Anterior
+              ← {t('onboarding.navigation.back')}
             </button>
 
             <button
@@ -242,7 +244,7 @@ export default function OnboardingModal({ onComplete, manualOpen = false, onClos
                 }}
                 className="text-sm text-gray-500 hover:text-gray-700 underline"
               >
-                Saltar tutorial (puedes volver después)
+                {t('onboarding.skip')}
               </button>
             </div>
           )}
