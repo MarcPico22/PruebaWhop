@@ -645,7 +645,6 @@ export default function Dashboard() {
                             >
                               {t('dashboard.actions.viewDetails')}
                             </button>
-                            </button>
                           </div>
                         )}
                       </td>
