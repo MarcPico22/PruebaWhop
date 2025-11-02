@@ -29,6 +29,19 @@
       "cta": "Start Free Trial",
       "learnMore": "Learn More"
     },
+    "calculator": {
+      "title": "How much money are you losing?",
+      "subtitle": "7% of your revenue is lost to failed payments. Expired cards, insufficient funds, banking errors...",
+      "moneyNeverSee": "money you'll never see again.",
+      "monthlyRevenueLabel": "Your monthly Whop revenue",
+      "lossPerMonth": "You lose every month",
+      "lossPerYear": "You lose this year",
+      "couldRecover": "You could recover",
+      "realScenario": "Real scenario:",
+      "realScenarioText": "With {{revenue}} monthly, you lose {{loss}} each month. Whop Recovery would recover {{recovered}} of that.",
+      "automatically": "Automatically.",
+      "ctaButton": "Recover my money now!"
+    },
     "features": {
       "title": "Why Whop Recovery?",
       "subtitle": "The most advanced payment recovery tool for Whop creators",

@@ -126,48 +126,58 @@ function checkAndUnlockAchievements(db, userId, tenantId) {
  * Obtiene todos los achievements de un usuario
  */
 function getUserAchievements(db, userId) {
-  const achievements = db.prepare(`
-    SELECT * FROM achievements WHERE user_id = ? ORDER BY unlocked_at DESC
-  `).all(userId);
+  try {
+    const achievements = db.prepare(`
+      SELECT * FROM achievements WHERE user_id = ? ORDER BY unlocked_at DESC
+    `).all(userId);
 
-  // Enriquecer con información de badge
-  return achievements.map(a => {
-    const badgeInfo = Object.values(BADGE_TYPES).find(b => b.id === a.badge_type);
-    return {
-      ...a,
-      name: badgeInfo?.name || 'Unknown Badge',
-      description: badgeInfo?.description || '',
-      icon: badgeInfo?.icon || '🎖️'
-    };
-  });
+    // Enriquecer con información de badge
+    return achievements.map(a => {
+      const badgeInfo = Object.values(BADGE_TYPES).find(b => b.id === a.badge_type);
+      return {
+        ...a,
+        name: badgeInfo?.name || 'Unknown Badge',
+        description: badgeInfo?.description || '',
+        icon: badgeInfo?.icon || '🎖️'
+      };
+    });
+  } catch (error) {
+    console.error('Error obteniendo achievements:', error.message);
+    // Si la tabla no existe, retornar array vacío
+    if (error.message.includes('no such table')) {
+      return [];
+    }
+    throw error;
+  }
 }
 
 /**
  * Obtiene el progreso hacia badges no desbloqueados
  */
 function getBadgeProgress(db, userId, tenantId) {
-  const stats = getPaymentStats(db, tenantId);
-  const existingBadges = db.prepare(`
-    SELECT badge_type FROM achievements WHERE user_id = ?
-  `).all(userId);
-  const unlockedTypes = new Set(existingBadges.map(b => b.badge_type));
+  try {
+    const stats = getPaymentStats(db, tenantId);
+    const existingBadges = db.prepare(`
+      SELECT badge_type FROM achievements WHERE user_id = ?
+    `).all(userId);
+    const unlockedTypes = new Set(existingBadges.map(b => b.badge_type));
 
-  const progress = [];
+    const progress = [];
 
-  for (const [key, badge] of Object.entries(BADGE_TYPES)) {
-    if (unlockedTypes.has(badge.id)) continue;
+    for (const [key, badge] of Object.entries(BADGE_TYPES)) {
+      if (unlockedTypes.has(badge.id)) continue;
 
-    let currentProgress = 0;
-    let totalRequired = 0;
+      let currentProgress = 0;
+      let totalRequired = 0;
 
-    // Calcular progreso específico por badge
-    switch (badge.id) {
-      case 'first_recovery':
-        currentProgress = stats.recovered;
-        totalRequired = 1;
-        break;
-      case 'milestone_10':
-        currentProgress = stats.recovered;
+      // Calcular progreso específico por badge
+      switch (badge.id) {
+        case 'first_recovery':
+          currentProgress = stats.recovered;
+          totalRequired = 1;
+          break;
+        case 'milestone_10':
+          currentProgress = stats.recovered;
         totalRequired = 10;
         break;
       case 'milestone_50':
@@ -197,6 +207,14 @@ function getBadgeProgress(db, userId, tenantId) {
   }
 
   return progress;
+  } catch (error) {
+    console.error('Error obteniendo progreso de badges:', error.message);
+    // Si la tabla no existe, retornar array vacío
+    if (error.message.includes('no such table')) {
+      return [];
+    }
+    throw error;
+  }
 }
 
 module.exports = {

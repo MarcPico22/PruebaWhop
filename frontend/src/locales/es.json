@@ -29,6 +29,19 @@
       "cta": "Prueba Gratis",
       "learnMore": "Más Información"
     },
+    "calculator": {
+      "title": "¿Cuánto dinero estás perdiendo?",
+      "subtitle": "El 7% de tus ingresos se pierden por pagos fallidos. Tarjetas expiradas, fondos insuficientes, errores bancarios...",
+      "moneyNeverSee": "dinero que nunca volverás a ver.",
+      "monthlyRevenueLabel": "Tus ingresos mensuales en Whop",
+      "lossPerMonth": "Pierdes cada mes",
+      "lossPerYear": "Pierdes este año",
+      "couldRecover": "Podrías recuperar",
+      "realScenario": "Escenario real:",
+      "realScenarioText": "Con {{revenue}} mensuales, pierdes {{loss}} cada mes. Whop Recovery recuperaría {{recovered}} de eso.",
+      "automatically": "Automáticamente.",
+      "ctaButton": "¡Recupera mi dinero ahora!"
+    },
     "features": {
       "title": "¿Por qué Whop Recovery?",
       "subtitle": "La herramienta más avanzada de recuperación de pagos para creadores de Whop",

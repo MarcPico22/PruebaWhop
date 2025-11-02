@@ -569,6 +569,15 @@ export default function Dashboard() {
               >
                 📧
               </button>
+              {user.email === 'marcps2001@gmail.com' && (
+                <button
+                  onClick={() => navigate('/admin')}
+                  className="px-3 sm:px-4 py-2.5 sm:py-2 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-lg hover:from-amber-600 hover:to-orange-700 active:scale-95 transition-all text-sm sm:text-base font-semibold shadow-lg"
+                  title="Panel de Administración"
+                >
+                  👑 Admin
+                </button>
+              )}
               <button
                 onClick={() => setShowSettings(true)}
                 className="px-3 sm:px-4 py-2.5 sm:py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 active:scale-95 transition-all text-sm sm:text-base"
