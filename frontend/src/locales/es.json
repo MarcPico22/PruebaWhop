@@ -1,0 +1,315 @@
+{
+  "common": {
+    "loading": "Cargando...",
+    "error": "Error",
+    "success": "Éxito",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "close": "Cerrar",
+    "confirm": "Confirmar",
+    "yes": "Sí",
+    "no": "No"
+  },
+  "nav": {
+    "home": "Inicio",
+    "dashboard": "Dashboard",
+    "pricing": "Precios",
+    "faq": "FAQ",
+    "login": "Iniciar Sesión",
+    "signup": "Registrarse",
+    "logout": "Cerrar Sesión",
+    "settings": "Configuración"
+  },
+  "landing": {
+    "hero": {
+      "title": "Recupera Pagos Fallidos de Whop Automáticamente",
+      "subtitle": "Deja de perder ingresos. Sistema inteligente de reintentos que recupera hasta el 70% de pagos fallidos.",
+      "cta": "Prueba Gratis",
+      "learnMore": "Más Información"
+    },
+    "features": {
+      "title": "¿Por qué Whop Recovery?",
+      "subtitle": "La herramienta más avanzada de recuperación de pagos para creadores de Whop",
+      "autoRetry": {
+        "title": "Reintentos Automáticos",
+        "description": "Sistema con IA que detecta el mejor momento para reintentar pagos fallidos"
+      },
+      "emailNotifications": {
+        "title": "Notificaciones Inteligentes",
+        "description": "Emails personalizados que aumentan la tasa de recuperación 3x"
+      },
+      "analytics": {
+        "title": "Analíticas Avanzadas",
+        "description": "Trackea cada métrica: tasa de recuperación, ingresos recuperados, tendencias"
+      },
+      "integration": {
+        "title": "Integración Fácil",
+        "description": "Conecta tu cuenta de Whop en 60 segundos. Sin código requerido"
+      }
+    },
+    "stats": {
+      "title": "Resultados Comprobados",
+      "subtitle": "Creadores recuperando miles con Whop Recovery",
+      "recoveryRate": "Tasa de Recuperación",
+      "avgRevenue": "Ingresos Promedio Recuperados",
+      "satisfaction": "Satisfacción de Usuarios"
+    },
+    "pricing": {
+      "title": "Precios Simples y Transparentes",
+      "subtitle": "Empieza gratis. Escala a medida que creces.",
+      "free": {
+        "name": "Gratis",
+        "price": "$0",
+        "period": "/mes",
+        "description": "Perfecto para empezar",
+        "features": [
+          "Hasta 50 pagos/mes",
+          "Reintentos básicos (1h, 24h)",
+          "Notificaciones por email",
+          "Analíticas básicas"
+        ],
+        "cta": "Empezar Gratis"
+      },
+      "pro": {
+        "name": "Pro",
+        "price": "$29",
+        "period": "/mes",
+        "description": "Para creadores en crecimiento",
+        "features": [
+          "Pagos ilimitados",
+          "Reintentos avanzados (optimizados con IA)",
+          "Templates de email personalizados",
+          "Analíticas avanzadas",
+          "Soporte prioritario"
+        ],
+        "cta": "Prueba Gratis",
+        "popular": "Más Popular"
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "price": "Personalizado",
+        "period": "",
+        "description": "Para equipos grandes",
+        "features": [
+          "Todo en Pro",
+          "Account manager dedicado",
+          "Integraciones personalizadas",
+          "Garantía SLA",
+          "Soporte telefónico"
+        ],
+        "cta": "Contactar Ventas"
+      }
+    },
+    "cta": {
+      "title": "¿Listo para Recuperar tus Ingresos?",
+      "subtitle": "Únete a más de 1,000 creadores usando Whop Recovery",
+      "button": "Prueba Gratis"
+    },
+    "footer": {
+      "description": "La plataforma #1 de recuperación de pagos para creadores de Whop",
+      "product": "Producto",
+      "features": "Características",
+      "pricing": "Precios",
+      "changelog": "Novedades",
+      "support": "Soporte",
+      "docs": "Documentación",
+      "contact": "Contacto",
+      "legal": "Legal",
+      "privacy": "Política de Privacidad",
+      "terms": "Términos de Servicio",
+      "rights": "Todos los derechos reservados"
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Bienvenido de nuevo",
+    "stats": {
+      "totalPayments": "Total de Pagos",
+      "recovered": "Recuperados",
+      "pending": "Pendientes",
+      "failed": "Fallidos",
+      "recoveryRate": "Tasa de Recuperación",
+      "totalRevenue": "Ingresos Totales"
+    },
+    "filters": {
+      "all": "Todos",
+      "pending": "Pendientes",
+      "recovered": "Recuperados",
+      "failed": "Fallidos"
+    },
+    "search": "Buscar por email o nombre de cliente...",
+    "noPayments": "No se encontraron pagos",
+    "noPaymentsDesc": "Crea tu primer reintento o espera pagos fallidos de Whop",
+    "table": {
+      "customer": "Cliente",
+      "amount": "Monto",
+      "status": "Estado",
+      "attempts": "Intentos",
+      "nextRetry": "Próximo Reintento",
+      "actions": "Acciones"
+    },
+    "actions": {
+      "retry": "Reintentar Ahora",
+      "retrying": "Reintentando...",
+      "viewDetails": "Ver Detalles"
+    },
+    "status": {
+      "pending": "Pendiente",
+      "recovered": "Recuperado",
+      "failed": "Fallido"
+    },
+    "achievements": {
+      "title": "Mis Logros",
+      "subtitle": "Desbloquea badges mientras recuperas pagos",
+      "locked": "Bloqueado",
+      "unlocked": "Desbloqueado",
+      "checkNew": "Verificar Nuevos Logros",
+      "badges": {
+        "first_recovery": {
+          "name": "Primer Recuperado",
+          "description": "Recuperaste tu primer pago"
+        },
+        "milestone_10": {
+          "name": "10 Recuperados",
+          "description": "Recuperaste 10 pagos"
+        },
+        "perfect_rate": {
+          "name": "Tasa Perfecta",
+          "description": "100% de tasa de recuperación"
+        },
+        "milestone_50": {
+          "name": "50 Recuperados",
+          "description": "Recuperaste 50 pagos"
+        },
+        "speed_demon": {
+          "name": "Velocista",
+          "description": "Recuperaste un pago en menos de 1 hora"
+        }
+      }
+    },
+    "helpButton": "¿Necesitas ayuda?"
+  },
+  "onboarding": {
+    "step": "Paso {{current}} de {{total}}",
+    "skip": "Saltar tutorial (puedes volver después)",
+    "steps": {
+      "welcome": {
+        "title": "¡Bienvenido a Whop Recovery! 🎉",
+        "description": "Vamos a configurar tu cuenta en 3 simples pasos para que puedas empezar a recuperar pagos automáticamente.",
+        "action": "Empezar"
+      },
+      "connectWhop": {
+        "title": "Conecta tu API de Whop",
+        "description": "Para detectar automáticamente pagos fallidos, necesitas conectar tu API key de Whop.",
+        "action": "Ir a Integraciones"
+      },
+      "configureSendgrid": {
+        "title": "Configura SendGrid",
+        "description": "Los emails de recuperación se envían con SendGrid. Añade tu API key para empezar.",
+        "action": "Configurar Email"
+      },
+      "createRetry": {
+        "title": "Crea tu primer reintento",
+        "description": "Define cuándo y cómo reintentar los pagos fallidos. Recomendamos: 1h, 24h, 72h.",
+        "action": "Ver Dashboard"
+      },
+      "ready": {
+        "title": "¡Listo para recuperar! 🚀",
+        "description": "Ya tienes todo configurado. Whop Recovery detectará automáticamente los pagos fallidos y los recuperará por ti.",
+        "action": "Finalizar"
+      }
+    },
+    "navigation": {
+      "back": "Atrás",
+      "next": "Siguiente"
+    }
+  },
+  "login": {
+    "title": "Bienvenido de Nuevo",
+    "subtitle": "Inicia sesión en tu cuenta de Whop Recovery",
+    "email": "Email",
+    "password": "Contraseña",
+    "forgotPassword": "¿Olvidaste tu contraseña?",
+    "submit": "Iniciar Sesión",
+    "noAccount": "¿No tienes una cuenta?",
+    "signupLink": "Regístrate aquí",
+    "error": "Credenciales inválidas"
+  },
+  "signup": {
+    "title": "Crea tu Cuenta",
+    "subtitle": "Empieza a recuperar pagos fallidos hoy",
+    "companyName": "Nombre de la Empresa",
+    "email": "Email",
+    "password": "Contraseña",
+    "confirmPassword": "Confirmar Contraseña",
+    "termsAgree": "Acepto los",
+    "terms": "Términos de Servicio",
+    "and": "y",
+    "privacy": "Política de Privacidad",
+    "submit": "Crear Cuenta",
+    "hasAccount": "¿Ya tienes una cuenta?",
+    "loginLink": "Inicia sesión aquí",
+    "errors": {
+      "passwordMismatch": "Las contraseñas no coinciden",
+      "termsRequired": "Debes aceptar los términos y condiciones"
+    }
+  },
+  "settings": {
+    "title": "Configuración",
+    "subtitle": "Administra tu cuenta e integraciones",
+    "tabs": {
+      "general": "General",
+      "integrations": "Integraciones",
+      "notifications": "Notificaciones",
+      "billing": "Facturación"
+    },
+    "whop": {
+      "title": "Integración Whop",
+      "description": "Conecta tu cuenta de Whop para sincronizar automáticamente pagos fallidos",
+      "apiKey": "API Key de Whop",
+      "connected": "Conectado",
+      "notConnected": "No Conectado",
+      "save": "Guardar Cambios"
+    },
+    "sendgrid": {
+      "title": "Integración SendGrid",
+      "description": "Configura los ajustes de email para notificaciones de recuperación de pagos",
+      "apiKey": "API Key de SendGrid",
+      "fromEmail": "Email Remitente",
+      "fromName": "Nombre Remitente"
+    },
+    "retrySettings": {
+      "title": "Configuración de Reintentos",
+      "description": "Configura cómo y cuándo reintentar pagos fallidos",
+      "maxAttempts": "Intentos Máximos de Reintento",
+      "retryIntervals": "Intervalos de Reintento (horas)",
+      "example": "Ejemplo: 1, 24, 72"
+    }
+  },
+  "emails": {
+    "paymentRecovered": {
+      "subject": "🎉 Pago Recuperado - {{amount}}",
+      "title": "¡Buenas Noticias!",
+      "message": "Un pago fallido de {{amount}} ha sido recuperado exitosamente.",
+      "customer": "Cliente",
+      "viewDashboard": "Ver Dashboard"
+    },
+    "onboarding": {
+      "day0": {
+        "subject": "¡Bienvenido a Whop Recovery! 🚀",
+        "title": "¡Bienvenido a Whop Recovery!",
+        "message": "Estás a un paso de recuperar miles en pagos fallidos"
+      },
+      "day3": {
+        "subject": "Tips Pro para Maximizar tu Tasa de Recuperación",
+        "title": "Tips Rápidos"
+      },
+      "day7": {
+        "subject": "Tu Prueba Está Terminando Pronto",
+        "title": "Prueba Finalizando"
+      }
+    }
+  }
+}

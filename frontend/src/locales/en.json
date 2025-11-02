@@ -1,0 +1,315 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "close": "Close",
+    "confirm": "Confirm",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "nav": {
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "pricing": "Pricing",
+    "faq": "FAQ",
+    "login": "Login",
+    "signup": "Sign Up",
+    "logout": "Logout",
+    "settings": "Settings"
+  },
+  "landing": {
+    "hero": {
+      "title": "Recover Failed Whop Payments Automatically",
+      "subtitle": "Stop losing revenue. Intelligent retry system that recovers up to 70% of failed payments.",
+      "cta": "Start Free Trial",
+      "learnMore": "Learn More"
+    },
+    "features": {
+      "title": "Why Whop Recovery?",
+      "subtitle": "The most advanced payment recovery tool for Whop creators",
+      "autoRetry": {
+        "title": "Automatic Retries",
+        "description": "AI-powered system that detects the best time to retry failed payments"
+      },
+      "emailNotifications": {
+        "title": "Smart Email Notifications",
+        "description": "Personalized emails that increase recovery rate by 3x"
+      },
+      "analytics": {
+        "title": "Advanced Analytics",
+        "description": "Track every metric: recovery rate, revenue recovered, conversion trends"
+      },
+      "integration": {
+        "title": "Easy Integration",
+        "description": "Connect your Whop account in 60 seconds. No code required"
+      }
+    },
+    "stats": {
+      "title": "Proven Results",
+      "subtitle": "Creators recovering thousands with Whop Recovery",
+      "recoveryRate": "Recovery Rate",
+      "avgRevenue": "Avg. Revenue Recovered",
+      "satisfaction": "User Satisfaction"
+    },
+    "pricing": {
+      "title": "Simple, Transparent Pricing",
+      "subtitle": "Start free. Scale as you grow.",
+      "free": {
+        "name": "Free",
+        "price": "$0",
+        "period": "/month",
+        "description": "Perfect to get started",
+        "features": [
+          "Up to 50 payments/month",
+          "Basic retries (1h, 24h)",
+          "Email notifications",
+          "Basic analytics"
+        ],
+        "cta": "Start Free"
+      },
+      "pro": {
+        "name": "Pro",
+        "price": "$29",
+        "period": "/month",
+        "description": "For growing creators",
+        "features": [
+          "Unlimited payments",
+          "Advanced retries (AI-optimized)",
+          "Custom email templates",
+          "Advanced analytics",
+          "Priority support"
+        ],
+        "cta": "Start Free Trial",
+        "popular": "Most Popular"
+      },
+      "enterprise": {
+        "name": "Enterprise",
+        "price": "Custom",
+        "period": "",
+        "description": "For large teams",
+        "features": [
+          "Everything in Pro",
+          "Dedicated account manager",
+          "Custom integrations",
+          "SLA guarantee",
+          "Phone support"
+        ],
+        "cta": "Contact Sales"
+      }
+    },
+    "cta": {
+      "title": "Ready to Recover Your Revenue?",
+      "subtitle": "Join 1,000+ creators using Whop Recovery",
+      "button": "Start Free Trial"
+    },
+    "footer": {
+      "description": "The #1 payment recovery platform for Whop creators",
+      "product": "Product",
+      "features": "Features",
+      "pricing": "Pricing",
+      "changelog": "Changelog",
+      "support": "Support",
+      "docs": "Documentation",
+      "contact": "Contact",
+      "legal": "Legal",
+      "privacy": "Privacy Policy",
+      "terms": "Terms of Service",
+      "rights": "All rights reserved"
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welcome back",
+    "stats": {
+      "totalPayments": "Total Payments",
+      "recovered": "Recovered",
+      "pending": "Pending",
+      "failed": "Failed",
+      "recoveryRate": "Recovery Rate",
+      "totalRevenue": "Total Revenue"
+    },
+    "filters": {
+      "all": "All",
+      "pending": "Pending",
+      "recovered": "Recovered",
+      "failed": "Failed"
+    },
+    "search": "Search by email or customer name...",
+    "noPayments": "No payments found",
+    "noPaymentsDesc": "Create your first retry or wait for failed payments from Whop",
+    "table": {
+      "customer": "Customer",
+      "amount": "Amount",
+      "status": "Status",
+      "attempts": "Attempts",
+      "nextRetry": "Next Retry",
+      "actions": "Actions"
+    },
+    "actions": {
+      "retry": "Retry Now",
+      "retrying": "Retrying...",
+      "viewDetails": "View Details"
+    },
+    "status": {
+      "pending": "Pending",
+      "recovered": "Recovered",
+      "failed": "Failed"
+    },
+    "achievements": {
+      "title": "My Achievements",
+      "subtitle": "Unlock badges as you recover payments",
+      "locked": "Locked",
+      "unlocked": "Unlocked",
+      "checkNew": "Check New Achievements",
+      "badges": {
+        "first_recovery": {
+          "name": "First Recovery",
+          "description": "Recovered your first payment"
+        },
+        "milestone_10": {
+          "name": "10 Recoveries",
+          "description": "Recovered 10 payments"
+        },
+        "perfect_rate": {
+          "name": "Perfect Rate",
+          "description": "100% recovery rate"
+        },
+        "milestone_50": {
+          "name": "50 Recoveries",
+          "description": "Recovered 50 payments"
+        },
+        "speed_demon": {
+          "name": "Speed Demon",
+          "description": "Recovered a payment in under 1 hour"
+        }
+      }
+    },
+    "helpButton": "Need help?"
+  },
+  "onboarding": {
+    "step": "Step {{current}} of {{total}}",
+    "skip": "Skip tutorial (you can come back later)",
+    "steps": {
+      "welcome": {
+        "title": "Welcome to Whop Recovery! 🎉",
+        "description": "Let's set up your account in 3 simple steps to start recovering payments automatically.",
+        "action": "Get Started"
+      },
+      "connectWhop": {
+        "title": "Connect Your Whop API",
+        "description": "To automatically detect failed payments, you need to connect your Whop API key.",
+        "action": "Go to Integrations"
+      },
+      "configureSendgrid": {
+        "title": "Configure SendGrid",
+        "description": "Recovery emails are sent with SendGrid. Add your API key to get started.",
+        "action": "Configure Email"
+      },
+      "createRetry": {
+        "title": "Create Your First Retry",
+        "description": "Define when and how to retry failed payments. We recommend: 1h, 24h, 72h.",
+        "action": "View Dashboard"
+      },
+      "ready": {
+        "title": "Ready to Recover! 🚀",
+        "description": "You're all set! Whop Recovery will automatically detect failed payments and recover them for you.",
+        "action": "Finish"
+      }
+    },
+    "navigation": {
+      "back": "Back",
+      "next": "Next"
+    }
+  },
+  "login": {
+    "title": "Welcome Back",
+    "subtitle": "Log in to your Whop Recovery account",
+    "email": "Email",
+    "password": "Password",
+    "forgotPassword": "Forgot password?",
+    "submit": "Log In",
+    "noAccount": "Don't have an account?",
+    "signupLink": "Sign up here",
+    "error": "Invalid credentials"
+  },
+  "signup": {
+    "title": "Create Your Account",
+    "subtitle": "Start recovering failed payments today",
+    "companyName": "Company Name",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "termsAgree": "I agree to the",
+    "terms": "Terms of Service",
+    "and": "and",
+    "privacy": "Privacy Policy",
+    "submit": "Create Account",
+    "hasAccount": "Already have an account?",
+    "loginLink": "Log in here",
+    "errors": {
+      "passwordMismatch": "Passwords don't match",
+      "termsRequired": "You must accept the terms and conditions"
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Manage your account and integrations",
+    "tabs": {
+      "general": "General",
+      "integrations": "Integrations",
+      "notifications": "Notifications",
+      "billing": "Billing"
+    },
+    "whop": {
+      "title": "Whop Integration",
+      "description": "Connect your Whop account to automatically sync failed payments",
+      "apiKey": "Whop API Key",
+      "connected": "Connected",
+      "notConnected": "Not Connected",
+      "save": "Save Changes"
+    },
+    "sendgrid": {
+      "title": "SendGrid Integration",
+      "description": "Configure email settings for payment recovery notifications",
+      "apiKey": "SendGrid API Key",
+      "fromEmail": "From Email",
+      "fromName": "From Name"
+    },
+    "retrySettings": {
+      "title": "Retry Settings",
+      "description": "Configure how and when to retry failed payments",
+      "maxAttempts": "Maximum Retry Attempts",
+      "retryIntervals": "Retry Intervals (hours)",
+      "example": "Example: 1, 24, 72"
+    }
+  },
+  "emails": {
+    "paymentRecovered": {
+      "subject": "🎉 Payment Recovered - {{amount}}",
+      "title": "Great News!",
+      "message": "A failed payment of {{amount}} has been successfully recovered.",
+      "customer": "Customer",
+      "viewDashboard": "View Dashboard"
+    },
+    "onboarding": {
+      "day0": {
+        "subject": "Welcome to Whop Recovery! 🚀",
+        "title": "Welcome to Whop Recovery!",
+        "message": "You're one step away from recovering thousands in failed payments"
+      },
+      "day3": {
+        "subject": "Pro Tips to Maximize Your Recovery Rate",
+        "title": "Quick Tips"
+      },
+      "day7": {
+        "subject": "Your Trial is Ending Soon",
+        "title": "Trial Ending"
+      }
+    }
+  }
+}

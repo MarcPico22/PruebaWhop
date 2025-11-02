@@ -3,9 +3,9 @@ import axios from 'axios';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
-export default function OnboardingModal({ onComplete }) {
+export default function OnboardingModal({ onComplete, manualOpen = false, onClose }) {
   const [currentStep, setCurrentStep] = useState(0);
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(manualOpen);
 
   const steps = [
     {
@@ -45,47 +45,11 @@ export default function OnboardingModal({ onComplete }) {
   ];
 
   useEffect(() => {
-    // Verificar si el usuario ya completó el onboarding
-    const checkOnboardingStatus = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        console.log('🔍 Checking onboarding status...');
-        console.log('Token:', token ? 'EXISTS' : 'MISSING');
-        
-        if (!token) {
-          console.log('❌ No token found, skipping onboarding check');
-          return;
-        }
-
-        console.log('📡 Fetching onboarding status from:', `${API_URL}/api/user/onboarding`);
-        const response = await axios.get(`${API_URL}/api/user/onboarding`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-
-        console.log('✅ Onboarding response:', response.data);
-        
-        if (!response.data.completed) {
-          console.log('🎯 Onboarding NOT completed, showing modal');
-          setCurrentStep(response.data.onboarding_step || 0);
-          setIsOpen(true);
-        } else {
-          console.log('✔️ Onboarding already completed, skipping modal');
-        }
-      } catch (error) {
-        console.error('❌ Error checking onboarding:', error);
-        console.error('Error details:', error.response?.data || error.message);
-        
-        // Si el endpoint no existe (404), mostrar modal por defecto
-        if (error.response?.status === 404) {
-          console.log('⚠️ Endpoint not found, showing modal by default');
-          setCurrentStep(0);
-          setIsOpen(true);
-        }
-      }
-    };
-
-    checkOnboardingStatus();
-  }, []);
+    // Solo abrir automáticamente si se pasa manualOpen=true
+    if (manualOpen) {
+      setIsOpen(true);
+    }
+  }, [manualOpen]);
 
   const saveProgress = async (step) => {
     try {
@@ -250,6 +214,7 @@ export default function OnboardingModal({ onComplete }) {
                 onClick={() => {
                   saveProgress(4);
                   setIsOpen(false);
+                  if (onClose) onClose();
                 }}
                 className="text-sm text-gray-500 hover:text-gray-700 underline"
               >

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  
+  <!-- Homepage -->
+  <url>
+    <loc>https://www.whoprecovery.com/</loc>
+    <lastmod>2025-11-02</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.whoprecovery.com/?lang=en" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://www.whoprecovery.com/?lang=es" />
+  </url>
+  
+  <!-- Pricing -->
+  <url>
+    <loc>https://www.whoprecovery.com/pricing</loc>
+    <lastmod>2025-11-02</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.whoprecovery.com/pricing?lang=en" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://www.whoprecovery.com/pricing?lang=es" />
+  </url>
+  
+  <!-- FAQ -->
+  <url>
+    <loc>https://www.whoprecovery.com/faq</loc>
+    <lastmod>2025-11-02</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.whoprecovery.com/faq?lang=en" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://www.whoprecovery.com/faq?lang=es" />
+  </url>
+  
+  <!-- Login -->
+  <url>
+    <loc>https://www.whoprecovery.com/login</loc>
+    <lastmod>2025-11-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <!-- Signup -->
+  <url>
+    <loc>https://www.whoprecovery.com/register</loc>
+    <lastmod>2025-11-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  
+  <!-- Privacy Policy -->
+  <url>
+    <loc>https://www.whoprecovery.com/privacy</loc>
+    <lastmod>2025-11-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.4</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.whoprecovery.com/privacy" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://www.whoprecovery.com/privacidad" />
+  </url>
+  
+  <!-- Terms of Service -->
+  <url>
+    <loc>https://www.whoprecovery.com/terms</loc>
+    <lastmod>2025-11-02</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.4</priority>
+    <xhtml:link rel="alternate" hreflang="en" href="https://www.whoprecovery.com/terms" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://www.whoprecovery.com/terminos" />
+  </url>
+  
+</urlset>

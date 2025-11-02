@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import * as Sentry from "@sentry/react";
 import { AuthProvider } from './AuthContext.jsx'
 import { ThemeProvider } from './ThemeContext.jsx'
+import './i18n' // Import i18n configuration
 import LandingPage from './LandingPage.jsx'
 import Login from './Login.jsx'
 import Signup from './Signup.jsx'
@@ -55,6 +56,8 @@ ReactDOM.createRoot(document.getElementById('root')).render(
             <Route path="/faq" element={<FAQ />} />
             <Route path="/terminos" element={<Terminos />} />
             <Route path="/privacidad" element={<Privacidad />} />
+            <Route path="/terms" element={<Terminos />} />
+            <Route path="/privacy" element={<Privacidad />} />
           </Routes>
         </AuthProvider>
       </ThemeProvider>
