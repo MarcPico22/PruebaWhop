@@ -71,6 +71,40 @@
         "icon": "💰"
       }
     },
+    "benefitsSection": {
+      "title": "Everything you need",
+      "automatic": {
+        "title": "100% Automatic",
+        "description": "Set it up once. Never worry again."
+      },
+      "dashboard": {
+        "title": "Clear Dashboard",
+        "description": "See how much you recover. In real time."
+      },
+      "alerts": {
+        "title": "Useful Alerts",
+        "description": "We only notify you when it matters."
+      },
+      "security": {
+        "title": "Total Security",
+        "description": "Encrypted. Compatible with Stripe."
+      },
+      "analytics": {
+        "title": "Pro Analytics",
+        "description": "Understand why payments fail."
+      },
+      "customizable": {
+        "title": "Customizable",
+        "description": "Adapt intervals to your business."
+      }
+    },
+    "finalCta": {
+      "title": "Stop losing money today",
+      "subtitle": "Every day you wait, you lose more revenue.",
+      "subtitleBold": "Start recovering in 3 minutes.",
+      "cta": "Start free now →",
+      "terms": "No card · 14 days free · Cancel anytime"
+    },
     "features": {
       "title": "Why Whop Recovery?",
       "subtitle": "The most advanced payment recovery tool for Whop creators",
@@ -174,6 +208,9 @@
       "failed": "Failed",
       "recoveryRate": "Recovery Rate",
       "totalRevenue": "Total Revenue"
+    },
+    "chart": {
+      "title": "Payment Distribution"
     },
     "filters": {
       "all": "All",

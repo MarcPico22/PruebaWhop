@@ -155,6 +155,9 @@
       "recoveryRate": "Tasa de Recuperación",
       "totalRevenue": "Ingresos Totales"
     },
+    "chart": {
+      "title": "Distribución de Pagos"
+    },
     "filters": {
       "all": "Todos",
       "pending": "Pendientes",
@@ -177,7 +180,41 @@
       "retrying": "Reintentando...",
       "viewDetails": "Ver Detalles"
     },
-    "status": {
+    "benefitsSection": {
+      "title": "Todo lo que necesitas",
+      "automatic": {
+        "title": "Automático 100%",
+        "description": "Configura una vez. Nunca más te preocupes."
+      },
+      "dashboard": {
+        "title": "Dashboard claro",
+        "description": "Ve cuánto recuperas. En tiempo real."
+      },
+      "alerts": {
+        "title": "Alertas útiles",
+        "description": "Solo te avisamos cuando importa."
+      },
+      "security": {
+        "title": "Seguridad total",
+        "description": "Encriptado. Compatible con Stripe."
+      },
+      "analytics": {
+        "title": "Analytics pro",
+        "description": "Entiende por qué fallan los pagos."
+      },
+      "customizable": {
+        "title": "Personalizable",
+        "description": "Adapta intervalos a tu negocio."
+      }
+    },
+    "finalCta": {
+      "title": "Deja de perder dinero hoy",
+      "subtitle": "Cada día que esperas, pierdes más ingresos.",
+      "subtitleBold": "Empieza a recuperar en 3 minutos.",
+      "cta": "Empezar gratis ahora →",
+      "terms": "Sin tarjeta · 14 días gratis · Cancela cuando quieras"
+    },
+    "stats": {
       "pending": "Pendiente",
       "recovered": "Recuperado",
       "failed": "Fallido"

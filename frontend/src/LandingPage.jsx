@@ -230,23 +230,19 @@ export default function LandingPage() {
       <section className="py-16 sm:py-24 px-4 sm:px-6 lg:px-8 bg-gray-50">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-3xl sm:text-5xl font-black text-center text-gray-900 mb-12 sm:mb-20">
-            Todo lo que necesitas
+            {t('landing.benefitsSection.title')}
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-            {[
-              {icon: "⚡", title: "Automático 100%", desc: "Configura una vez. Nunca más te preocupes."},
-              {icon: "📊", title: "Dashboard claro", desc: "Ve cuánto recuperas. En tiempo real."},
-              {icon: "🔔", title: "Alertas útiles", desc: "Solo te avisamos cuando importa."},
-              {icon: "🔒", title: "Seguridad total", desc: "Encriptado. Compatible con Stripe."},
-              {icon: "📈", title: "Analytics pro", desc: "Entiende por qué fallan los pagos."},
-              {icon: "⚙️", title: "Personalizable", desc: "Adapta intervalos a tu negocio."}
-            ].map((f, i) => (
-              <div key={i} className="bg-white p-5 sm:p-6 rounded-xl shadow-sm border border-gray-200 hover:shadow-lg transition">
-                <div className="text-3xl sm:text-4xl mb-3 sm:mb-4">{f.icon}</div>
-                <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-1 sm:mb-2">{f.title}</h3>
-                <p className="text-sm sm:text-base text-gray-600">{f.desc}</p>
-              </div>
-            ))}
+            {['automatic', 'dashboard', 'alerts', 'security', 'analytics', 'customizable'].map((key, i) => {
+              const icons = ["⚡", "📊", "🔔", "🔒", "📈", "⚙️"];
+              return (
+                <div key={i} className="bg-white p-5 sm:p-6 rounded-xl shadow-sm border border-gray-200 hover:shadow-lg transition">
+                  <div className="text-3xl sm:text-4xl mb-3 sm:mb-4">{icons[i]}</div>
+                  <h3 className="text-base sm:text-lg font-bold text-gray-900 mb-1 sm:mb-2">{t(`landing.benefitsSection.${key}.title`)}</h3>
+                  <p className="text-sm sm:text-base text-gray-600">{t(`landing.benefitsSection.${key}.description`)}</p>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -255,20 +251,20 @@ export default function LandingPage() {
       <section className="py-16 sm:py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl sm:text-5xl font-black text-white mb-4 sm:mb-6">
-            Deja de perder dinero hoy
+            {t('landing.finalCta.title')}
           </h2>
           <p className="text-lg sm:text-2xl text-indigo-100 mb-8 sm:mb-10">
-            Cada día que esperas, pierdes más ingresos. <br className="hidden sm:block" />
-            <strong className="text-white">Empieza a recuperar en 3 minutos.</strong>
+            {t('landing.finalCta.subtitle')} <br className="hidden sm:block" />
+            <strong className="text-white">{t('landing.finalCta.subtitleBold')}</strong>
           </p>
           <Link
             to="/signup"
             className="inline-block px-8 sm:px-12 py-4 sm:py-6 text-lg sm:text-2xl font-black text-indigo-600 bg-white rounded-xl hover:bg-gray-50 transition shadow-2xl active:scale-95"
           >
-            Empezar gratis ahora →
+            {t('landing.finalCta.cta')}
           </Link>
           <p className="mt-4 sm:mt-6 text-sm sm:text-base text-indigo-200">
-            Sin tarjeta · 14 días gratis · Cancela cuando quieras
+            {t('landing.finalCta.terms')}
           </p>
         </div>
       </section>

@@ -11,8 +11,10 @@ import OnboardingModal from './OnboardingModal'
 import BadgeDisplay from './BadgeDisplay'
 import LanguageSelector from './LanguageSelector'
 import { API_URL } from './config'
+import { useTranslation } from 'react-i18next'
 
 export default function Dashboard() {
+  const { t } = useTranslation()
   const { user, logout, token } = useAuth()
   const { darkMode, toggleDarkMode } = useTheme()
   const navigate = useNavigate()
@@ -472,31 +474,31 @@ export default function Dashboard() {
         {stats && (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-6 mb-6 sm:mb-8">
             <StatCard 
-              title="Total" 
+              title={t('dashboard.stats.totalPayments')}
               value={stats.total} 
               icon="📊" 
               color="bg-blue-500"
             />
             <StatCard 
-              title="Pendientes" 
+              title={t('dashboard.stats.pending')}
               value={stats.pending} 
               icon="⏳" 
               color="bg-yellow-500"
             />
             <StatCard 
-              title="Recuperados" 
+              title={t('dashboard.stats.recovered')}
               value={stats.recovered} 
               icon="✅" 
               color="bg-green-500"
             />
             <StatCard 
-              title="Fallidos" 
+              title={t('dashboard.stats.failed')}
               value={stats.failed} 
               icon="❌" 
               color="bg-red-500"
             />
             <StatCard 
-              title="💰 Recuperado" 
+              title={`💰 ${t('dashboard.stats.recovered')}`}
               value={`$${stats.totalRecovered.toFixed(2)}`} 
               icon="💰" 
               color="bg-purple-500"
@@ -513,11 +515,11 @@ export default function Dashboard() {
         {/* Distribution Chart - Mobile Optimized */}
         {stats && (
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border dark:border-gray-700 p-3 sm:p-6 mb-6 sm:mb-8 transition-colors duration-200">
-            <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 dark:text-white">Distribución de Pagos</h3>
+            <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 dark:text-white">{t('dashboard.chart.title')}</h3>
             <div className="flex gap-2 sm:gap-4 h-48 sm:h-64">
-              <ChartBar label="Pendientes" value={stats.pending} total={stats.total} color="bg-yellow-500" />
-              <ChartBar label="Recuperados" value={stats.recovered} total={stats.total} color="bg-green-500" />
-              <ChartBar label="Fallidos" value={stats.failed} total={stats.total} color="bg-red-500" />
+              <ChartBar label={t('dashboard.stats.pending')} value={stats.pending} total={stats.total} color="bg-yellow-500" />
+              <ChartBar label={t('dashboard.stats.recovered')} value={stats.recovered} total={stats.total} color="bg-green-500" />
+              <ChartBar label={t('dashboard.stats.failed')} value={stats.failed} total={stats.total} color="bg-red-500" />
             </div>
           </div>
         )}
@@ -528,7 +530,7 @@ export default function Dashboard() {
           <div className="mb-3 sm:mb-4">
             <input
               type="text"
-              placeholder="🔍 Buscar..."
+              placeholder={`🔍 ${t('dashboard.search')}`}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full px-3 py-2.5 sm:px-4 sm:py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors duration-200 text-base"
@@ -539,16 +541,16 @@ export default function Dashboard() {
             {/* Filtros - Scroll horizontal en mobile */}
             <div className="flex gap-2 overflow-x-auto pb-2 sm:pb-0 scrollbar-hide">
               <FilterButton active={filter === 'all'} onClick={() => setFilter('all')}>
-                Todos
+                {t('dashboard.filters.all')}
               </FilterButton>
               <FilterButton active={filter === 'pending'} onClick={() => setFilter('pending')}>
-                Pendientes
+                {t('dashboard.filters.pending')}
               </FilterButton>
               <FilterButton active={filter === 'recovered'} onClick={() => setFilter('recovered')}>
-                Recuperados
+                {t('dashboard.filters.recovered')}
               </FilterButton>
               <FilterButton active={filter === 'failed-permanent'} onClick={() => setFilter('failed-permanent')}>
-                Fallidos
+                {t('dashboard.filters.failed')}
               </FilterButton>
             </div>
 
