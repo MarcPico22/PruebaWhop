@@ -1,10 +1,19 @@
 import { useTranslation } from 'react-i18next';
+import { trackEvent } from './useAnalytics';
 
 export default function LanguageSelector() {
   const { i18n } = useTranslation();
 
   const changeLanguage = (lng) => {
+    const previousLang = i18n.language;
     i18n.changeLanguage(lng);
+    
+    // Track language change
+    trackEvent('language_selected', {
+      new_language: lng,
+      previous_language: previousLang,
+      context: window.location.pathname
+    });
   };
 
   return (

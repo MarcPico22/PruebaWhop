@@ -48,6 +48,24 @@ export default function OnboardingModal({ onComplete, manualOpen = false, onClos
     if (manualOpen) {
       setIsOpen(true);
     }
+
+    // Listener para cuando se cierra el modal de settings
+    const handleSettingsClosed = () => {
+      const pausedStep = localStorage.getItem('onboarding_paused_step');
+      if (pausedStep) {
+        // Reabrir onboarding y avanzar al siguiente paso
+        const nextStep = parseInt(pausedStep) + 1;
+        setCurrentStep(nextStep);
+        setIsOpen(true);
+        localStorage.removeItem('onboarding_paused_step');
+      }
+    };
+
+    window.addEventListener('settings_modal_closed', handleSettingsClosed);
+
+    return () => {
+      window.removeEventListener('settings_modal_closed', handleSettingsClosed);
+    };
   }, [manualOpen]);
 
   const saveProgress = async (step) => {
@@ -88,11 +106,17 @@ export default function OnboardingModal({ onComplete, manualOpen = false, onClos
     const step = steps[currentStep];
     
     if (step.openSettings) {
+      // Guardar progreso actual antes de abrir settings
+      saveProgress(currentStep);
+      
       // Abrir settings modal
       if (onOpenSettings) {
         onOpenSettings();
       }
-      setIsOpen(false);
+      
+      // NO cerrar el modal onboarding, solo minimizarlo
+      // El usuario puede volver cuando cierre settings
+      localStorage.setItem('onboarding_paused_step', currentStep.toString());
     } else if (step.isLast) {
       // Finalizar onboarding
       handleNext();

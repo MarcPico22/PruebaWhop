@@ -1526,4 +1526,88 @@ router.post('/api/test-email', async (req, res) => {
   }
 });
 
+// ============================================
+// ADMIN PANEL ENDPOINTS
+// ============================================
+
+/**
+ * GET /api/admin/users
+ * Lista todos los usuarios (solo admin)
+ */
+router.get('/api/admin/users', authenticateToken, (req, res) => {
+  try {
+    // Solo permitir acceso al admin
+    if (req.user.email !== 'marcps2001@gmail.com') {
+      return res.status(403).json({ error: 'Acceso denegado' });
+    }
+
+    const { filter } = req.query;
+
+    let query = `
+      SELECT 
+        u.id,
+        u.email,
+        u.company_name,
+        u.created_at,
+        u.tenant_id,
+        u.onboarding_step,
+        u.onboarding_completed_at,
+        s.plan as subscription_plan,
+        (SELECT COUNT(*) FROM payments WHERE tenant_id = u.tenant_id) as total_payments,
+        (SELECT COUNT(*) FROM payments WHERE tenant_id = u.tenant_id AND status = 'recovered') as recovered_payments,
+        (SELECT COUNT(*) FROM achievements WHERE user_id = u.id) as badges_count
+      FROM users u
+      LEFT JOIN subscriptions s ON u.tenant_id = s.tenant_id
+    `;
+
+    if (filter && filter !== 'all') {
+      query += ` WHERE s.plan = ?`;
+      const users = db.prepare(query).all(filter);
+      return res.json({ users });
+    }
+
+    const users = db.prepare(query).all();
+    res.json({ users });
+
+  } catch (error) {
+    console.error('❌ Error obteniendo usuarios:', error);
+    res.status(500).json({ error: 'Error obteniendo usuarios' });
+  }
+});
+
+/**
+ * GET /api/admin/stats
+ * Estadísticas globales (solo admin)
+ */
+router.get('/api/admin/stats', authenticateToken, (req, res) => {
+  try {
+    // Solo permitir acceso al admin
+    if (req.user.email !== 'marcps2001@gmail.com') {
+      return res.status(403).json({ error: 'Acceso denegado' });
+    }
+
+    const totalUsers = db.prepare('SELECT COUNT(*) as count FROM users').get().count;
+    const totalRecovered = db.prepare('SELECT COUNT(*) as count FROM payments WHERE status = "recovered"').get().count;
+    const proUsers = db.prepare('SELECT COUNT(*) as count FROM subscriptions WHERE plan = "pro"').get().count;
+    
+    // Calcular MRR (Monthly Recurring Revenue)
+    const proCount = proUsers;
+    const enterpriseCount = db.prepare('SELECT COUNT(*) as count FROM subscriptions WHERE plan = "enterprise"').get().count;
+    const mrr = (proCount * 29) + (enterpriseCount * 99); // $29/mes Pro, $99/mes Enterprise
+
+    res.json({
+      totalUsers,
+      totalRecovered,
+      proUsers,
+      enterpriseUsers: enterpriseCount,
+      mrr
+    });
+
+  } catch (error) {
+    console.error('❌ Error obteniendo stats:', error);
+    res.status(500).json({ error: 'Error obteniendo stats' });
+  }
+});
+
 module.exports = router;
+

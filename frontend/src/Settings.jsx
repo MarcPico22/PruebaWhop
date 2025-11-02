@@ -17,6 +17,12 @@ export default function Settings({ onClose, token }) {
     fetchConfig()
   }, [])
 
+  // Emitir evento cuando se cierra el modal
+  const handleClose = () => {
+    window.dispatchEvent(new Event('settings_modal_closed'));
+    onClose();
+  };
+
   const fetchConfig = async () => {
     try {
       const response = await fetch(`${API_URL}/api/config`, {
@@ -92,7 +98,7 @@ export default function Settings({ onClose, token }) {
               ⚙️ Configuración del Sistema
             </h2>
             <button
-              onClick={onClose}
+              onClick={handleClose}
               className="text-white hover:bg-white/20 rounded-lg p-2 transition-colors"
             >
               ✕
@@ -216,7 +222,7 @@ export default function Settings({ onClose, token }) {
         {activeTab === 'general' && (
           <div className="bg-gray-50 px-6 py-4 rounded-b-2xl flex justify-end gap-3">
             <button
-              onClick={onClose}
+              onClick={handleClose}
               className="px-6 py-2 text-gray-700 hover:bg-gray-200 rounded-lg transition-colors"
             >
               Cancelar
