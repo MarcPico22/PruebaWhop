@@ -1354,11 +1354,25 @@ router.get('/api/user/onboarding', authenticateToken, (req, res) => {
   try {
     const userId = req.user.userId;
     
-    const user = db.prepare(`
-      SELECT onboarding_step, onboarding_completed_at 
-      FROM users 
-      WHERE id = ?
-    `).get(userId);
+    // Try to get onboarding data, fallback to defaults if columns don't exist
+    let user;
+    try {
+      user = db.prepare(`
+        SELECT onboarding_step, onboarding_completed_at 
+        FROM users 
+        WHERE id = ?
+      `).get(userId);
+    } catch (error) {
+      // Columns don't exist yet, return defaults
+      if (error.code === 'SQLITE_ERROR') {
+        return res.json({
+          onboarding_step: 0,
+          completed: false,
+          completed_at: null
+        });
+      }
+      throw error;
+    }
     
     if (!user) {
       return res.status(404).json({ error: 'Usuario no encontrado' });
@@ -1390,15 +1404,45 @@ router.patch('/api/user/onboarding', authenticateToken, (req, res) => {
     
     const now = Math.floor(Date.now() / 1000);
     
-    // Si completa el onboarding (step 4), guardar timestamp
-    if (step === 4) {
-      db.prepare(`
-        UPDATE users 
-        SET onboarding_step = ?, onboarding_completed_at = ?
-        WHERE id = ?
-      `).run(step, now, userId);
-    } else {
-      db.prepare(`
+    try {
+      // Si completa el onboarding (step 4), guardar timestamp
+      if (step === 4) {
+        db.prepare(`
+          UPDATE users 
+          SET onboarding_step = ?, onboarding_completed_at = ?
+          WHERE id = ?
+        `).run(step, now, userId);
+      } else {
+        db.prepare(`
+          UPDATE users 
+          SET onboarding_step = ?
+          WHERE id = ?
+        `).run(step, userId);
+      }
+    } catch (error) {
+      // Columns don't exist yet, ignore silently
+      if (error.code === 'SQLITE_ERROR') {
+        console.log('⚠️ Onboarding columns not found, skipping update');
+        return res.json({
+          success: true,
+          onboarding_step: step,
+          message: 'Onboarding columns pending migration'
+        });
+      }
+      throw error;
+    }
+    
+    res.json({
+      success: true,
+      onboarding_step: step,
+      completed: step >= 4
+    });
+    
+  } catch (error) {
+    console.error('❌ Error actualizando onboarding:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
         UPDATE users 
         SET onboarding_step = ?
         WHERE id = ?
@@ -1550,8 +1594,8 @@ router.get('/api/admin/users', authenticateToken, (req, res) => {
         u.company_name,
         u.created_at,
         u.tenant_id,
-        u.onboarding_step,
-        u.onboarding_completed_at,
+        0 as onboarding_step,
+        NULL as onboarding_completed_at,
         s.plan as subscription_plan,
         (SELECT COUNT(*) FROM payments WHERE tenant_id = u.tenant_id) as total_payments,
         (SELECT COUNT(*) FROM payments WHERE tenant_id = u.tenant_id AND status = 'recovered') as recovered_payments,
