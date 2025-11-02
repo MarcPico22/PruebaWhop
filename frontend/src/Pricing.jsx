@@ -2,41 +2,12 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { trackPlanClick, trackCheckoutStart } from './analytics';
+import { useTranslation } from 'react-i18next';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
-// Plan features actualizados
-const PLAN_FEATURES = {
-  FREE: [
-    "Hasta 50 pagos/mes",
-    "Reintentos automáticos",
-    "Dashboard básico",
-    "14 días de prueba",
-    "Soporte por email"
-  ],
-  PRO: [
-    "Hasta 500 pagos recuperados por mes",
-    "Todo de Free +",
-    "Reintentos ilimitados",
-    "Configuración avanzada",
-    "Notificaciones personalizadas",
-    "Analytics y reportes",
-    "Soporte por email (24h)",
-    "API access"
-  ],
-  ENTERPRISE: [
-    "Pagos recuperados ILIMITADOS",
-    "Todo de Pro +",
-    "Onboarding personalizado",
-    "Soporte prioritario (2h)",
-    "Webhooks personalizados",
-    "Múltiples usuarios",
-    "SLA garantizado",
-    "Consultoría estratégica"
-  ]
-};
-
 function Pricing() {
+  const { t } = useTranslation();
   const [billingPeriod, setBillingPeriod] = useState('monthly');
   const [currentSubscription, setCurrentSubscription] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -116,10 +87,10 @@ function Pricing() {
         {/* Header */}
         <div className="text-center mb-12 sm:mb-16">
           <h1 className="text-3xl sm:text-5xl font-black text-gray-900 mb-4">
-            Planes y Precios
+            {t('landing.pricing.title')}
           </h1>
           <p className="text-lg sm:text-xl text-gray-600 mb-8 sm:mb-12">
-            Elige el plan perfecto para tu negocio
+            {t('landing.pricing.subtitle')}
           </p>
           
           {/* Billing Toggle - Mobile Optimized */}
@@ -127,7 +98,7 @@ function Pricing() {
             <span className={`text-sm sm:text-base font-semibold transition-colors ${
               billingPeriod === 'monthly' ? 'text-purple-600' : 'text-gray-500'
             }`}>
-              Mensual
+              {t('pricing.billing.monthly')}
             </span>
             
             {/* Toggle Switch - Touch Optimized (48px) */}
@@ -147,10 +118,10 @@ function Pricing() {
               <span className={`text-sm sm:text-base font-semibold transition-colors ${
                 billingPeriod === 'yearly' ? 'text-purple-600' : 'text-gray-500'
               }`}>
-                Anual
+                {t('pricing.billing.yearly')}
               </span>
               <span className="px-2 sm:px-3 py-1 text-xs sm:text-sm font-bold bg-green-500 text-white rounded-full">
-                -15%
+                {t('pricing.billing.discount')}
               </span>
             </div>
           </div>
@@ -158,8 +129,8 @@ function Pricing() {
           {/* Current Plan Badge */}
           {currentSubscription && (
             <div className="mt-6 inline-block px-4 py-2 bg-indigo-100 text-indigo-800 rounded-full text-sm font-semibold">
-              Plan actual: {currentSubscription.plan.toUpperCase()}
-              {currentSubscription.trialDaysLeft > 0 && ` • Trial: ${currentSubscription.trialDaysLeft}d`}
+              {t('pricing.currentPlan')}: {currentSubscription.plan.toUpperCase()}
+              {currentSubscription.trialDaysLeft > 0 && ` • ${t('pricing.trial')}: ${currentSubscription.trialDaysLeft}d`}
             </div>
           )}
         </div>
@@ -222,7 +193,7 @@ function Pricing() {
             href="/dashboard"
             className="inline-block px-6 py-3 text-sm font-medium text-gray-700 hover:text-gray-900 transition"
           >
-            ← Volver al Dashboard
+            {t('pricing.backToDashboard')}
           </a>
         </div>
       </div>

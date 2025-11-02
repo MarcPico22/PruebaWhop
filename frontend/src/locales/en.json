@@ -198,6 +198,21 @@
       "rights": "All rights reserved"
     }
   },
+  "pricing": {
+    "billing": {
+      "monthly": "Monthly",
+      "yearly": "Yearly",
+      "discount": "-15%"
+    },
+    "currentPlan": "Current plan",
+    "trial": "Trial",
+    "backToDashboard": "← Back to Dashboard",
+    "upgrading": "Processing...",
+    "selectPlan": "Select Plan",
+    "currentPlanBadge": "Current Plan",
+    "perMonth": "/month",
+    "perYear": "/year"
+  },
   "dashboard": {
     "title": "Dashboard",
     "welcome": "Welcome back",

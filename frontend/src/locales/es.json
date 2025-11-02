@@ -144,6 +144,21 @@
       "rights": "Todos los derechos reservados"
     }
   },
+  "pricing": {
+    "billing": {
+      "monthly": "Mensual",
+      "yearly": "Anual",
+      "discount": "-15%"
+    },
+    "currentPlan": "Plan actual",
+    "trial": "Trial",
+    "backToDashboard": "← Volver al Dashboard",
+    "upgrading": "Procesando...",
+    "selectPlan": "Seleccionar Plan",
+    "currentPlanBadge": "Plan Actual",
+    "perMonth": "/mes",
+    "perYear": "/año"
+  },
   "dashboard": {
     "title": "Dashboard",
     "welcome": "Bienvenido de nuevo",

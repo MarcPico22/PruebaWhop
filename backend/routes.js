@@ -1555,7 +1555,7 @@ router.get('/api/admin/users', authenticateToken, (req, res) => {
         s.plan as subscription_plan,
         (SELECT COUNT(*) FROM payments WHERE tenant_id = u.tenant_id) as total_payments,
         (SELECT COUNT(*) FROM payments WHERE tenant_id = u.tenant_id AND status = 'recovered') as recovered_payments,
-        (SELECT COUNT(*) FROM achievements WHERE user_id = u.id) as badges_count
+        0 as badges_count
       FROM users u
       LEFT JOIN subscriptions s ON u.tenant_id = s.tenant_id
     `;
@@ -1588,11 +1588,11 @@ router.get('/api/admin/stats', authenticateToken, (req, res) => {
 
     const totalUsers = db.prepare('SELECT COUNT(*) as count FROM users').get().count;
     const totalRecovered = db.prepare('SELECT COUNT(*) as count FROM payments WHERE status = "recovered"').get().count;
-    const proUsers = db.prepare('SELECT COUNT(*) as count FROM subscriptions WHERE plan = "pro"').get().count;
+    const proUsers = db.prepare('SELECT COUNT(*) as count FROM subscriptions WHERE plan = "pro"').get().count || 0;
     
     // Calcular MRR (Monthly Recurring Revenue)
     const proCount = proUsers;
-    const enterpriseCount = db.prepare('SELECT COUNT(*) as count FROM subscriptions WHERE plan = "enterprise"').get().count;
+    const enterpriseCount = db.prepare('SELECT COUNT(*) as count FROM subscriptions WHERE plan = "enterprise"').get().count || 0;
     const mrr = (proCount * 29) + (enterpriseCount * 99); // $29/mes Pro, $99/mes Enterprise
 
     res.json({
