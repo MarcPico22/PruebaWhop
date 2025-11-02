@@ -1443,23 +1443,6 @@ router.patch('/api/user/onboarding', authenticateToken, (req, res) => {
     res.status(500).json({ error: error.message });
   }
 });
-        UPDATE users 
-        SET onboarding_step = ?
-        WHERE id = ?
-      `).run(step, userId);
-    }
-    
-    res.json({ 
-      success: true,
-      onboarding_step: step,
-      completed: step >= 4
-    });
-    
-  } catch (error) {
-    console.error('❌ Error actualizando onboarding:', error);
-    res.status(500).json({ error: error.message });
-  }
-});
 
 /**
  * GET /api/achievements - Obtener achievements del usuario
