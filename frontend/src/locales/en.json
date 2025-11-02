@@ -24,9 +24,11 @@
   },
   "landing": {
     "hero": {
-      "title": "Recover Failed Whop Payments Automatically",
-      "subtitle": "Stop losing revenue. Intelligent retry system that recovers up to 70% of failed payments.",
-      "cta": "Start Free Trial",
+      "badge": "💸 You're losing money right now",
+      "title": "Recover failed payments without lifting a finger",
+      "subtitle": "Thousands of euros are lost every month on Whop due to failed payments. We recover them automatically while you sleep.",
+      "cta": "Start for free",
+      "ctaSecondary": "See how it works",
       "learnMore": "Learn More"
     },
     "calculator": {
@@ -41,6 +43,33 @@
       "realScenarioText": "With {{revenue}} monthly, you lose {{loss}} each month. Whop Recovery would recover {{recovered}} of that.",
       "automatically": "Automatically.",
       "ctaButton": "Recover my money now!"
+    },
+    "heroStats": {
+      "recovery": "Recovery",
+      "thisMonth": "This month",
+      "average": "Average",
+      "trial": "Free 14 days",
+      "noCard": "No card",
+      "recoveryRate": "recovery rate"
+    },
+    "howItWorks": {
+      "title": "Three steps. Zero effort.",
+      "subtitle": "You don't need to be technical. You don't need code. Connect and forget.",
+      "step1": {
+        "title": "Connect Stripe",
+        "description": "Two clicks. Zero configuration. Ready in 30 seconds.",
+        "icon": "🔌"
+      },
+      "step2": {
+        "title": "We detect failures",
+        "description": "We identify every payment that didn't complete. Automatic.",
+        "icon": "🔍"
+      },
+      "step3": {
+        "title": "We recover money",
+        "description": "Smart retries. 85% success. You just collect.",
+        "icon": "💰"
+      }
     },
     "features": {
       "title": "Why Whop Recovery?",

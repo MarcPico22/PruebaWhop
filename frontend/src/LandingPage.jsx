@@ -143,22 +143,16 @@ export default function LandingPage() {
         <div className="max-w-5xl mx-auto text-center">
           <div className="inline-block mb-4 sm:mb-6 px-3 sm:px-4 py-1.5 sm:py-2 bg-red-100 border border-red-300 rounded-full">
             <span className="text-xs sm:text-sm font-semibold text-red-700">
-              💸 Estás perdiendo dinero ahora mismo
+              {t('landing.hero.badge')}
             </span>
           </div>
           
-          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black text-gray-900 mb-4 sm:mb-6 leading-tight">
-            Recupera pagos fallidos
-            <br className="hidden sm:block" />
-            <span className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-              sin mover un dedo
-            </span>
+          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-gray-900 mb-4 sm:mb-6 leading-tight">
+            {t('landing.hero.title')}
           </h1>
           
-          <p className="text-lg sm:text-2xl text-gray-600 mb-8 sm:mb-10 max-w-3xl mx-auto leading-relaxed">
-            Miles de euros se pierden cada mes en Whop por pagos que fallan.
-            <br className="hidden sm:block" />
-            Nosotros los recuperamos <strong>automáticamente</strong> mientras duermes.
+          <p className="text-base sm:text-xl lg:text-2xl text-gray-600 mb-8 sm:mb-10 max-w-3xl mx-auto leading-relaxed">
+            {t('landing.hero.subtitle')}
           </p>
           
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-6 sm:mb-8">
@@ -166,18 +160,18 @@ export default function LandingPage() {
               to="/signup"
               className="px-6 sm:px-10 py-3 sm:py-5 text-base sm:text-lg font-bold text-white bg-indigo-600 rounded-xl hover:bg-indigo-700 transition shadow-xl active:scale-95"
             >
-              Empezar gratis
+              {t('landing.hero.cta')}
             </Link>
             <a
               href="#how-it-works"
               className="px-6 sm:px-10 py-3 sm:py-5 text-base sm:text-lg font-semibold text-gray-700 bg-white border-2 border-gray-300 rounded-xl hover:border-gray-400 transition active:scale-95"
             >
-              Cómo funciona
+              {t('landing.hero.ctaSecondary')}
             </a>
           </div>
           
           <p className="text-xs sm:text-sm text-gray-500">
-            ✓ Gratis 14 días · ✓ Sin tarjeta · ✓ 85% de recuperación
+            ✓ {t('landing.heroStats.trial')} · ✓ {t('landing.heroStats.noCard')} · ✓ 85% {t('landing.heroStats.recoveryRate')}
           </p>
         </div>
       </section>
@@ -188,15 +182,15 @@ export default function LandingPage() {
           <div className="grid grid-cols-3 gap-4 sm:gap-8 text-center text-white">
             <div>
               <div className="text-3xl sm:text-5xl font-black mb-1 sm:mb-2">85%</div>
-              <div className="text-xs sm:text-base text-indigo-100 font-medium">Recuperación</div>
+              <div className="text-xs sm:text-base text-indigo-100 font-medium">{t('landing.heroStats.recovery')}</div>
             </div>
             <div>
               <div className="text-3xl sm:text-5xl font-black mb-1 sm:mb-2">€48K</div>
-              <div className="text-xs sm:text-base text-indigo-100 font-medium">Este mes</div>
+              <div className="text-xs sm:text-base text-indigo-100 font-medium">{t('landing.heroStats.thisMonth')}</div>
             </div>
             <div>
               <div className="text-3xl sm:text-5xl font-black mb-1 sm:mb-2">24h</div>
-              <div className="text-xs sm:text-base text-indigo-100 font-medium">Promedio</div>
+              <div className="text-xs sm:text-base text-indigo-100 font-medium">{t('landing.heroStats.average')}</div>
             </div>
           </div>
         </div>
@@ -210,41 +204,22 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12 sm:mb-16">
             <h2 className="text-3xl sm:text-5xl font-black text-gray-900 mb-3 sm:mb-4">
-              Tres pasos. Cero esfuerzo.
+              {t('landing.howItWorks.title')}
             </h2>
             <p className="text-base sm:text-xl text-gray-600 max-w-2xl mx-auto">
-              No necesitas ser técnico. No necesitas código. Conecta y olvídate.
+              {t('landing.howItWorks.subtitle')}
             </p>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-12">
-            {[
-              {
-                step: "1",
-                title: "Conecta Stripe",
-                desc: "Dos clics. Cero configuración. Listo en 30 segundos.",
-                icon: "🔌"
-              },
-              {
-                step: "2",
-                title: "Detectamos fallos",
-                desc: "Identificamos cada pago que no se completó. Automático.",
-                icon: "🔍"
-              },
-              {
-                step: "3",
-                title: "Recuperamos dinero",
-                desc: "Reintentos inteligentes. 85% de éxito. Tú solo cobras.",
-                icon: "💰"
-              }
-            ].map((item, i) => (
+            {['step1', 'step2', 'step3'].map((step, i) => (
               <div key={i} className="text-center p-6 sm:p-8 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-2xl border-2 border-indigo-100">
-                <div className="text-5xl sm:text-6xl mb-4">{item.icon}</div>
+                <div className="text-5xl sm:text-6xl mb-4">{t(`landing.howItWorks.${step}.icon`)}</div>
                 <div className="inline-block w-12 h-12 sm:w-16 sm:h-16 bg-indigo-600 rounded-full flex items-center justify-center mb-4 sm:mb-6">
-                  <span className="text-xl sm:text-3xl font-black text-white">{item.step}</span>
+                  <span className="text-xl sm:text-3xl font-black text-white">{i + 1}</span>
                 </div>
-                <h3 className="text-lg sm:text-2xl font-bold text-gray-900 mb-2 sm:mb-3">{item.title}</h3>
-                <p className="text-sm sm:text-base text-gray-600 leading-relaxed">{item.desc}</p>
+                <h3 className="text-lg sm:text-2xl font-bold text-gray-900 mb-2 sm:mb-3">{t(`landing.howItWorks.${step}.title`)}</h3>
+                <p className="text-sm sm:text-base text-gray-600 leading-relaxed">{t(`landing.howItWorks.${step}.description`)}</p>
               </div>
             ))}
           </div>

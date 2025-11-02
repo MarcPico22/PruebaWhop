@@ -24,9 +24,11 @@
   },
   "landing": {
     "hero": {
-      "title": "Recupera Pagos Fallidos de Whop Automáticamente",
-      "subtitle": "Deja de perder ingresos. Sistema inteligente de reintentos que recupera hasta el 70% de pagos fallidos.",
-      "cta": "Prueba Gratis",
+      "badge": "💸 Estás perdiendo dinero ahora mismo",
+      "title": "Recupera pagos fallidos sin mover un dedo",
+      "subtitle": "Miles de euros se pierden cada mes en Whop por pagos que fallan. Nosotros los recuperamos automáticamente mientras duermes.",
+      "cta": "Empezar gratis",
+      "ctaSecondary": "Ver cómo funciona",
       "learnMore": "Más Información"
     },
     "calculator": {
@@ -42,27 +44,34 @@
       "automatically": "Automáticamente.",
       "ctaButton": "¡Recupera mi dinero ahora!"
     },
-    "features": {
-      "title": "¿Por qué Whop Recovery?",
-      "subtitle": "La herramienta más avanzada de recuperación de pagos para creadores de Whop",
-      "autoRetry": {
-        "title": "Reintentos Automáticos",
-        "description": "Sistema con IA que detecta el mejor momento para reintentar pagos fallidos"
+    "heroStats": {
+      "recovery": "Recuperación",
+      "thisMonth": "Este mes",
+      "average": "Promedio",
+      "trial": "Gratis 14 días",
+      "noCard": "Sin tarjeta",
+      "recoveryRate": "de recuperación"
+    },
+    "howItWorks": {
+      "title": "Tres pasos. Cero esfuerzo.",
+      "subtitle": "No necesitas ser técnico. No necesitas código. Conecta y olvídate.",
+      "step1": {
+        "title": "Conecta Stripe",
+        "description": "Dos clics. Cero configuración. Listo en 30 segundos.",
+        "icon": "🔌"
       },
-      "emailNotifications": {
-        "title": "Notificaciones Inteligentes",
-        "description": "Emails personalizados que aumentan la tasa de recuperación 3x"
+      "step2": {
+        "title": "Detectamos fallos",
+        "description": "Identificamos cada pago que no se completó. Automático.",
+        "icon": "🔍"
       },
-      "analytics": {
-        "title": "Analíticas Avanzadas",
-        "description": "Trackea cada métrica: tasa de recuperación, ingresos recuperados, tendencias"
-      },
-      "integration": {
-        "title": "Integración Fácil",
-        "description": "Conecta tu cuenta de Whop en 60 segundos. Sin código requerido"
+      "step3": {
+        "title": "Recuperamos dinero",
+        "description": "Reintentos inteligentes. 85% de éxito. Tú solo cobras.",
+        "icon": "💰"
       }
     },
-    "stats": {
+    "features": {
       "title": "Resultados Comprobados",
       "subtitle": "Creadores recuperando miles con Whop Recovery",
       "recoveryRate": "Tasa de Recuperación",
