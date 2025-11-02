@@ -165,20 +165,31 @@
       "failed": "Fallidos"
     },
     "search": "Buscar por email o nombre de cliente...",
-    "noPayments": "No se encontraron pagos",
+    "loadingPayments": "Cargando pagos...",
+    "noSearchResults": "No se encontraron pagos que coincidan con la búsqueda",
+    "noPayments": "No hay pagos registrados",
     "noPaymentsDesc": "Crea tu primer reintento o espera pagos fallidos de Whop",
+    "status": {
+      "pending": "⏳ Pendiente",
+      "recovered": "✅ Recuperado",
+      "failed": "❌ Fallido"
+    },
     "table": {
+      "email": "Email",
+      "product": "Producto",
       "customer": "Cliente",
       "amount": "Monto",
       "status": "Estado",
+      "retries": "Reintentos",
       "attempts": "Intentos",
       "nextRetry": "Próximo Reintento",
       "actions": "Acciones"
     },
     "actions": {
-      "retry": "Reintentar Ahora",
-      "retrying": "Reintentando...",
-      "viewDetails": "Ver Detalles"
+      "retry": "🔄 Reintentar",
+      "processing": "⏳ Procesando...",
+      "viewDetails": "📋 Ver Detalles",
+      "retrying": "Reintentando..."
     },
     "benefitsSection": {
       "title": "Todo lo que necesitas",
@@ -213,11 +224,6 @@
       "subtitleBold": "Empieza a recuperar en 3 minutos.",
       "cta": "Empezar gratis ahora →",
       "terms": "Sin tarjeta · 14 días gratis · Cancela cuando quieras"
-    },
-    "stats": {
-      "pending": "Pendiente",
-      "recovered": "Recuperado",
-      "failed": "Fallido"
     },
     "achievements": {
       "title": "Mis Logros",
@@ -287,29 +293,36 @@
   },
   "login": {
     "title": "Bienvenido de Nuevo",
-    "subtitle": "Inicia sesión en tu cuenta de Whop Recovery",
-    "email": "Email",
-    "password": "Contraseña",
+    "subtitle": "Recupera tus pagos fallidos",
+    "emailLabel": "Email",
+    "emailPlaceholder": "tu@email.com",
+    "passwordLabel": "Contraseña",
+    "rememberMe": "Recordarme",
+    "submitButton": "Iniciar Sesión",
+    "loadingButton": "Iniciando sesión...",
+    "noAccount": "¿No tienes cuenta?",
+    "signup": "Regístrate gratis",
     "forgotPassword": "¿Olvidaste tu contraseña?",
-    "submit": "Iniciar Sesión",
-    "noAccount": "¿No tienes una cuenta?",
-    "signupLink": "Regístrate aquí",
     "error": "Credenciales inválidas"
   },
   "signup": {
     "title": "Crea tu Cuenta",
-    "subtitle": "Empieza a recuperar pagos fallidos hoy",
-    "companyName": "Nombre de la Empresa",
-    "email": "Email",
-    "password": "Contraseña",
+    "subtitle": "Crea tu cuenta gratis",
+    "companyName": "Nombre de tu empresa",
+    "companyPlaceholder": "Mi Empresa SL",
+    "emailLabel": "Email",
+    "emailPlaceholder": "tu@email.com",
+    "passwordLabel": "Contraseña (mínimo 6 caracteres)",
+    "passwordError": "La contraseña debe tener al menos 6 caracteres",
+    "submitButton": "Crear Cuenta",
+    "loadingButton": "Creando cuenta...",
+    "hasAccount": "¿Ya tienes cuenta?",
+    "login": "Inicia sesión",
     "confirmPassword": "Confirmar Contraseña",
     "termsAgree": "Acepto los",
     "terms": "Términos de Servicio",
     "and": "y",
     "privacy": "Política de Privacidad",
-    "submit": "Crear Cuenta",
-    "hasAccount": "¿Ya tienes una cuenta?",
-    "loginLink": "Inicia sesión aquí",
     "errors": {
       "passwordMismatch": "Las contraseñas no coinciden",
       "termsRequired": "Debes aceptar los términos y condiciones"

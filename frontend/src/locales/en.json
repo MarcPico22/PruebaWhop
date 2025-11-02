@@ -219,25 +219,31 @@
       "failed": "Failed"
     },
     "search": "Search by email or customer name...",
-    "noPayments": "No payments found",
+    "loadingPayments": "Loading payments...",
+    "noSearchResults": "No payments matching your search",
+    "noPayments": "No payments registered",
     "noPaymentsDesc": "Create your first retry or wait for failed payments from Whop",
+    "status": {
+      "pending": "⏳ Pending",
+      "recovered": "✅ Recovered",
+      "failed": "❌ Failed"
+    },
     "table": {
+      "email": "Email",
+      "product": "Product",
       "customer": "Customer",
       "amount": "Amount",
       "status": "Status",
+      "retries": "Retries",
       "attempts": "Attempts",
       "nextRetry": "Next Retry",
       "actions": "Actions"
     },
     "actions": {
-      "retry": "Retry Now",
-      "retrying": "Retrying...",
-      "viewDetails": "View Details"
-    },
-    "status": {
-      "pending": "Pending",
-      "recovered": "Recovered",
-      "failed": "Failed"
+      "retry": "🔄 Retry",
+      "processing": "⏳ Processing...",
+      "viewDetails": "📋 View Details",
+      "retrying": "Retrying..."
     },
     "achievements": {
       "title": "My Achievements",
@@ -307,29 +313,36 @@
   },
   "login": {
     "title": "Welcome Back",
-    "subtitle": "Log in to your Whop Recovery account",
-    "email": "Email",
-    "password": "Password",
-    "forgotPassword": "Forgot password?",
-    "submit": "Log In",
+    "subtitle": "Recover your failed payments",
+    "emailLabel": "Email",
+    "emailPlaceholder": "your@email.com",
+    "passwordLabel": "Password",
+    "rememberMe": "Remember me",
+    "submitButton": "Log In",
+    "loadingButton": "Logging in...",
     "noAccount": "Don't have an account?",
-    "signupLink": "Sign up here",
+    "signup": "Sign up free",
+    "forgotPassword": "Forgot password?",
     "error": "Invalid credentials"
   },
   "signup": {
     "title": "Create Your Account",
-    "subtitle": "Start recovering failed payments today",
-    "companyName": "Company Name",
-    "email": "Email",
-    "password": "Password",
+    "subtitle": "Create your free account",
+    "companyName": "Company name",
+    "companyPlaceholder": "My Company LLC",
+    "emailLabel": "Email",
+    "emailPlaceholder": "your@email.com",
+    "passwordLabel": "Password (minimum 6 characters)",
+    "passwordError": "Password must be at least 6 characters",
+    "submitButton": "Create Account",
+    "loadingButton": "Creating account...",
+    "hasAccount": "Already have an account?",
+    "login": "Log in",
     "confirmPassword": "Confirm Password",
     "termsAgree": "I agree to the",
     "terms": "Terms of Service",
     "and": "and",
     "privacy": "Privacy Policy",
-    "submit": "Create Account",
-    "hasAccount": "Already have an account?",
-    "loginLink": "Log in here",
     "errors": {
       "passwordMismatch": "Passwords don't match",
       "termsRequired": "You must accept the terms and conditions"

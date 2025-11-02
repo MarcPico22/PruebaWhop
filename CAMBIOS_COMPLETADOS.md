@@ -257,7 +257,7 @@ Archivos: 14 changed, 1190 insertions, 51 deletions
 
 ### Prioridad BAJA:
 7. A/B testing del botón de ayuda (posición, color)
-8. Analytics de cambio de idioma (trackear qué idioma prefieren)
+<8. Analytics de cambio de idioma (trackear qué idioma prefieren)>
 9. Optimizar imágenes para SEO (og-image.jpg, twitter-image.png)
 
 ---

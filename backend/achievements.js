@@ -73,15 +73,16 @@ function getPaymentStats(db, tenantId) {
  * Verifica y desbloquea achievements para un usuario
  */
 function checkAndUnlockAchievements(db, userId, tenantId) {
-  const stats = getPaymentStats(db, tenantId);
-  const newBadges = [];
+  try {
+    const stats = getPaymentStats(db, tenantId);
+    const newBadges = [];
 
-  // Obtener badges ya desbloqueados
-  const existingBadges = db.prepare(`
-    SELECT badge_type FROM achievements WHERE user_id = ?
-  `).all(userId);
+    // Obtener badges ya desbloqueados
+    const existingBadges = db.prepare(`
+      SELECT badge_type FROM achievements WHERE user_id = ?
+    `).all(userId);
 
-  const unlockedTypes = new Set(existingBadges.map(b => b.badge_type));
+    const unlockedTypes = new Set(existingBadges.map(b => b.badge_type));
 
   // Verificar cada tipo de badge
   for (const [key, badge] of Object.entries(BADGE_TYPES)) {
@@ -120,6 +121,14 @@ function checkAndUnlockAchievements(db, userId, tenantId) {
   }
 
   return newBadges;
+  } catch (error) {
+    console.error('Error en checkAndUnlockAchievements:', error.message);
+    if (error.message.includes('no such table')) {
+      console.warn('⚠️  Tabla achievements no existe. Retornando array vacío.');
+      return [];
+    }
+    throw error;
+  }
 }
 
 /**

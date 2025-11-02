@@ -598,25 +598,25 @@ export default function Dashboard() {
             <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
               <thead className="bg-gray-50 dark:bg-gray-900">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Email</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Producto</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Monto</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Estado</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Reintentos</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Acciones</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{t('dashboard.table.email')}</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{t('dashboard.table.product')}</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{t('dashboard.table.amount')}</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{t('dashboard.table.status')}</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{t('dashboard.table.retries')}</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{t('dashboard.table.actions')}</th>
                 </tr>
               </thead>
               <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                 {loading ? (
                   <tr>
                     <td colSpan="6" className="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
-                      Cargando pagos...
+                      {t('dashboard.loadingPayments')}
                     </td>
                   </tr>
                 ) : getFilteredPayments().length === 0 ? (
                   <tr>
                     <td colSpan="6" className="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
-                      {searchTerm ? 'No se encontraron pagos que coincidan con la búsqueda' : 'No hay pagos registrados'}
+                      {searchTerm ? t('dashboard.noSearchResults') : t('dashboard.noPayments')}
                     </td>
                   </tr>
                 ) : (
@@ -637,13 +637,14 @@ export default function Dashboard() {
                               disabled={retryingId === payment.id}
                               className="px-3 py-1 bg-purple-600 text-white rounded hover:bg-purple-700 disabled:opacity-50 text-sm"
                             >
-                              {retryingId === payment.id ? '⏳ Procesando...' : '🔄 Reintentar'}
+                              {retryingId === payment.id ? t('dashboard.actions.processing') : t('dashboard.actions.retry')}
                             </button>
                             <button
                               onClick={() => setSelectedPayment(payment)}
                               className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm"
                             >
-                              💳 Stripe
+                              {t('dashboard.actions.viewDetails')}
+                            </button>
                             </button>
                           </div>
                         )}
@@ -812,6 +813,8 @@ function FilterButton({ active, onClick, children }) {
 }
 
 function StatusBadge({ status }) {
+  const { t } = useTranslation();
+  
   const styles = {
     pending: 'bg-yellow-100 text-yellow-800',
     recovered: 'bg-green-100 text-green-800',
@@ -819,9 +822,9 @@ function StatusBadge({ status }) {
   }
 
   const labels = {
-    pending: '⏳ Pendiente',
-    recovered: '✅ Recuperado',
-    'failed-permanent': '❌ Fallido'
+    pending: t('dashboard.status.pending'),
+    recovered: t('dashboard.status.recovered'),
+    'failed-permanent': t('dashboard.status.failed')
   }
 
   return (

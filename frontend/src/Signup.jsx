@@ -3,8 +3,10 @@ import { useAuth } from './AuthContext';
 import { Navigate } from 'react-router-dom';
 import { trackSignup } from './analytics';
 import LanguageSelector from './LanguageSelector';
+import { useTranslation } from 'react-i18next';
 
 export default function Signup() {
+  const { t } = useTranslation();
   const { register, user } = useAuth();
   const [formData, setFormData] = useState({ 
     email: '', 
@@ -26,7 +28,7 @@ export default function Signup() {
 
     // Validación básica
     if (formData.password.length < 6) {
-      setError('La contraseña debe tener al menos 6 caracteres');
+      setError(t('signup.passwordError'));
       setLoading(false);
       return;
     }
@@ -56,7 +58,7 @@ export default function Signup() {
         {/* Logo/Header */}
         <div className="text-center mb-6 sm:mb-8">
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">💰 Whop Recovery</h1>
-          <p className="text-sm sm:text-base text-gray-600">Crea tu cuenta gratis</p>
+          <p className="text-sm sm:text-base text-gray-600">{t('signup.subtitle')}</p>
         </div>
 
         {/* Error Message */}
@@ -70,7 +72,7 @@ export default function Signup() {
         <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
           <div>
             <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
-              Nombre de tu empresa
+              {t('signup.companyName')}
             </label>
             <input
               type="text"
@@ -78,14 +80,14 @@ export default function Signup() {
               value={formData.company_name}
               onChange={(e) => setFormData({ ...formData, company_name: e.target.value })}
               className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-base"
-              placeholder="Mi Empresa SL"
+              placeholder={t('signup.companyPlaceholder')}
               autoComplete="organization"
             />
           </div>
 
           <div>
             <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
-              Email
+              {t('signup.emailLabel')}
             </label>
             <input
               type="email"
@@ -93,14 +95,14 @@ export default function Signup() {
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-base"
-              placeholder="tu@email.com"
+              placeholder={t('signup.emailPlaceholder')}
               autoComplete="email"
             />
           </div>
 
           <div>
             <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
-              Contraseña (mínimo 6 caracteres)
+              {t('signup.passwordLabel')}
             </label>
             <input
               type="password"
@@ -118,16 +120,16 @@ export default function Signup() {
             disabled={loading}
             className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-2.5 sm:py-3 rounded-lg font-medium text-sm sm:text-base hover:from-purple-700 hover:to-indigo-700 transition-all disabled:opacity-50 active:scale-95"
           >
-            {loading ? 'Creando cuenta...' : 'Crear Cuenta'}
+            {loading ? t('signup.loadingButton') : t('signup.submitButton')}
           </button>
         </form>
 
         {/* Divider */}
         <div className="mt-4 sm:mt-6 text-center">
           <p className="text-sm sm:text-base text-gray-600">
-            ¿Ya tienes cuenta?{' '}
+            {t('signup.hasAccount')}{' '}
             <a href="/login" className="text-purple-600 hover:text-purple-700 font-medium">
-              Inicia sesión
+              {t('signup.login')}
             </a>
           </p>
         </div>

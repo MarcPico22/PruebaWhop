@@ -2,8 +2,10 @@ import { useState } from 'react';
 import { useAuth } from './AuthContext';
 import { Navigate } from 'react-router-dom';
 import LanguageSelector from './LanguageSelector';
+import { useTranslation } from 'react-i18next';
 
 export default function Login() {
+  const { t } = useTranslation();
   const { login, user } = useAuth();
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
@@ -40,7 +42,7 @@ export default function Login() {
         {/* Logo/Header */}
         <div className="text-center mb-6 sm:mb-8">
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">💰 Whop Recovery</h1>
-          <p className="text-sm sm:text-base text-gray-600">Recupera tus pagos fallidos</p>
+          <p className="text-sm sm:text-base text-gray-600">{t('login.subtitle')}</p>
         </div>
 
         {/* Error Message */}
@@ -54,7 +56,7 @@ export default function Login() {
         <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
           <div>
             <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
-              Email
+              {t('login.emailLabel')}
             </label>
             <input
               type="email"
@@ -62,14 +64,14 @@ export default function Login() {
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               className="w-full px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-base"
-              placeholder="tu@email.com"
+              placeholder={t('login.emailPlaceholder')}
               autoComplete="email"
             />
           </div>
 
           <div>
             <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1 sm:mb-2">
-              Contraseña
+              {t('login.passwordLabel')}
             </label>
             <input
               type="password"
@@ -87,16 +89,16 @@ export default function Login() {
             disabled={loading}
             className="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-2.5 sm:py-3 rounded-lg font-medium text-sm sm:text-base hover:from-purple-700 hover:to-indigo-700 transition-all disabled:opacity-50 active:scale-95"
           >
-            {loading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
+            {loading ? t('login.loadingButton') : t('login.submitButton')}
           </button>
         </form>
 
         {/* Divider */}
         <div className="mt-4 sm:mt-6 text-center">
           <p className="text-sm sm:text-base text-gray-600">
-            ¿No tienes cuenta?{' '}
+            {t('login.noAccount')}{' '}
             <a href="/signup" className="text-purple-600 hover:text-purple-700 font-medium">
-              Regístrate gratis
+              {t('login.signup')}
             </a>
           </p>
         </div>
