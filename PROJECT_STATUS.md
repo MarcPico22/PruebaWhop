@@ -82,7 +82,7 @@
 - ✅ JWT authentication
 - ✅ Multi-tenant isolation
 - ✅ Stripe billing
-- ✅ SendGrid emails
+- ✅ MailerSend emails
 - ✅ Whop integration
 - ✅ Payment retry system
 - ✅ Webhooks (Stripe, Whop)
@@ -128,7 +128,7 @@ whop-recovery/
 │   ├── auth.js           # JWT auth
 │   ├── stripe-service.js # Billing
 │   ├── whop-service.js   # Whop API
-│   ├── email.js          # SendGrid
+│   ├── email.js          # MailerSend
 │   ├── achievements.js   # Gamification
 │   └── run-migrations.js # DB migrations ✨
 │
@@ -169,7 +169,7 @@ whop-recovery/
 - better-sqlite3
 - JWT (jsonwebtoken)
 - Stripe API
-- SendGrid API
+- MailerSend API
 - Whop API
 - bcryptjs (passwords)
 
@@ -222,7 +222,7 @@ PORT=3000
 JWT_SECRET=your_secret
 ENCRYPTION_SECRET=your_secret
 STRIPE_SECRET_KEY=sk_live_xxx
-SENDGRID_API_KEY=SG.xxx
+MailerSend_API_KEY=SG.xxx
 WHOP_API_KEY=xxx
 DATABASE_URL=/data/database.sqlite  # Railway
 ```

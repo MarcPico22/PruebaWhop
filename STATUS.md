@@ -202,7 +202,7 @@ railway run sqlite3 /data/database.sqlite < backend/fix_achievements.sql
 
 9. **OnboardingModal.jsx** - 30+ keys ✨ NUEVO (Commit a428d5e)
    - 5 pasos completos traducidos
-   - Checklist: Whop API, SendGrid, Reintentos
+   - Checklist: Whop API, MailerSend, Reintentos
    - Stats finales: Trial 14 días, 50 pagos, Recovery 24/7
 
 10. **FAQ.jsx** - 50+ keys ✨ NUEVO (Commit a428d5e)
@@ -237,7 +237,7 @@ railway run sqlite3 /data/database.sqlite < backend/fix_achievements.sql
 - ✅ Payment retries automáticos
 - ✅ Onboarding flow (5 pasos) 100% traducido
 - ✅ Gamification system (5 badges) 100% traducido
-- ✅ SendGrid email integration
+- ✅ MailerSend email integration
 - ✅ Stripe payment integration
 - ✅ Admin panel básico (users, stats)
 - ✅ Settings con integraciones 100% traducido
@@ -340,7 +340,7 @@ railway run node run-migrations.js
 - ✅ Dashboard analytics en tiempo real
 - ✅ Onboarding flow (5 pasos)
 - ✅ Achievements/Badges system
-- ✅ Email notifications (SendGrid)
+- ✅ Email notifications (MailerSend)
 - ✅ Stripe integration
 - ✅ Multi-idioma (ES/EN) - 100%
 - ✅ Dark mode
@@ -522,7 +522,7 @@ Solo faltan 35 minutos de testing + Railway migration para estar 100% listo.
 - Email drip campaigns
 
 ### BAJA (Roadmap futuro)
-- Integraciones adicionales (más allá de Whop/SendGrid)
+- Integraciones adicionales (más allá de Whop/MailerSend)
 - API pública para developers
 - White-label solution
 

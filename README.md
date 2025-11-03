@@ -37,7 +37,7 @@
 
 ### 🔗 Integrations
 - **💳 Stripe** - Billing, subscriptions, and webhooks
-- **📧 SendGrid** - Transactional email notifications
+- **📧 MailerSend** - Transactional email notifications
 - **🛍️ Whop API** - Automatic payment sync every 5 minutes
 - **📈 Google Analytics 4** - User behavior tracking
 - **🐛 Sentry** - Error tracking and monitoring
@@ -118,7 +118,7 @@ npm run dev  # http://localhost:5173
 - **Database**: SQLite (with PostgreSQL migration guide)
 - **Authentication**: JWT + bcrypt
 - **Payments**: Stripe API
-- **Emails**: SendGrid API
+- **Emails**: MailerSend API
 - **External API**: Whop API
 
 ### Frontend
@@ -184,8 +184,8 @@ STRIPE_PRICE_YEARLY_PRO=price_xxx
 STRIPE_PRICE_MONTHLY_ENTERPRISE=price_xxx
 STRIPE_PRICE_YEARLY_ENTERPRISE=price_xxx
 
-# === SENDGRID ===
-SENDGRID_API_KEY=SG.xxx
+# === MailerSend ===
+MailerSend_API_KEY=SG.xxx
 FROM_EMAIL=noreply@whoprecovery.com
 SUPPORT_EMAIL=support@whoprecovery.com
 

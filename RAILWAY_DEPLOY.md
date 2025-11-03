@@ -33,8 +33,8 @@ STRIPE_PRICE_YEARLY_PRO=price_xxx
 STRIPE_PRICE_MONTHLY_ENTERPRISE=price_xxx
 STRIPE_PRICE_YEARLY_ENTERPRISE=price_xxx
 
-# === SENDGRID ===
-SENDGRID_API_KEY=SG.xxx
+# === MailerSend ===
+MailerSend_API_KEY=SG.xxx
 FROM_EMAIL=noreply@whoprecovery.com
 SUPPORT_EMAIL=support@whoprecovery.com
 

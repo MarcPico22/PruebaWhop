@@ -78,11 +78,11 @@ function initDatabase() {
       stripe_secret_key TEXT,
       stripe_publishable_key TEXT,
       stripe_webhook_secret TEXT,
-      sendgrid_api_key TEXT,
+      mailersend_api_key TEXT,
       from_email TEXT,
       whop_api_key TEXT,
       is_stripe_connected INTEGER NOT NULL DEFAULT 0,
-      is_sendgrid_connected INTEGER NOT NULL DEFAULT 0,
+      is_mailersend_connected INTEGER NOT NULL DEFAULT 0,
       is_whop_connected INTEGER NOT NULL DEFAULT 0,
       updated_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now'))
     )
@@ -420,7 +420,7 @@ function getTenantIntegrations(tenantId) {
       INSERT INTO tenant_integrations (
         tenant_id,
         is_stripe_connected,
-        is_sendgrid_connected,
+        is_mailersend_connected,
         updated_at
       ) VALUES (?, 0, 0, ?)
     `).run(tenantId, now);
@@ -443,10 +443,10 @@ function updateTenantIntegrations(tenantId, data) {
     stripe_secret_key: data.stripe_secret_key !== undefined ? data.stripe_secret_key : current.stripe_secret_key,
     stripe_publishable_key: data.stripe_publishable_key !== undefined ? data.stripe_publishable_key : current.stripe_publishable_key,
     stripe_webhook_secret: data.stripe_webhook_secret !== undefined ? data.stripe_webhook_secret : current.stripe_webhook_secret,
-    sendgrid_api_key: data.sendgrid_api_key !== undefined ? data.sendgrid_api_key : current.sendgrid_api_key,
+    mailersend_api_key: data.mailersend_api_key !== undefined ? data.mailersend_api_key : current.mailersend_api_key,
     from_email: data.from_email !== undefined ? data.from_email : current.from_email,
     is_stripe_connected: data.is_stripe_connected !== undefined ? (data.is_stripe_connected ? 1 : 0) : current.is_stripe_connected,
-    is_sendgrid_connected: data.is_sendgrid_connected !== undefined ? (data.is_sendgrid_connected ? 1 : 0) : current.is_sendgrid_connected,
+    is_mailersend_connected: data.is_mailersend_connected !== undefined ? (data.is_mailersend_connected ? 1 : 0) : current.is_mailersend_connected,
     updated_at: now
   };
   
@@ -455,20 +455,20 @@ function updateTenantIntegrations(tenantId, data) {
     SET stripe_secret_key = ?,
         stripe_publishable_key = ?,
         stripe_webhook_secret = ?,
-        sendgrid_api_key = ?,
+        mailersend_api_key = ?,
         from_email = ?,
         is_stripe_connected = ?,
-        is_sendgrid_connected = ?,
+        is_mailersend_connected = ?,
         updated_at = ?
     WHERE tenant_id = ?
   `).run(
     updates.stripe_secret_key,
     updates.stripe_publishable_key,
     updates.stripe_webhook_secret,
-    updates.sendgrid_api_key,
+    updates.mailersend_api_key,
     updates.from_email,
     updates.is_stripe_connected,
-    updates.is_sendgrid_connected,
+    updates.is_mailersend_connected,
     updates.updated_at,
     tenantId
   );

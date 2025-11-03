@@ -36,9 +36,9 @@ STRIPE_PRICE_MONTHLY_ENTERPRISE=price_YOUR_MONTHLY_ENTERPRISE_PRICE_ID
 STRIPE_PRICE_YEARLY_ENTERPRISE=price_YOUR_YEARLY_ENTERPRISE_PRICE_ID
 
 # ====================
-# SENDGRID - EMAILS
+# MailerSend - EMAILS
 # ====================
-SENDGRID_API_KEY=SG.YOUR_SENDGRID_API_KEY_HERE
+MailerSend_API_KEY=SG.YOUR_MailerSend_API_KEY_HERE
 FROM_EMAIL=your-email@example.com
 SUPPORT_EMAIL=support@example.com
 
@@ -119,7 +119,7 @@ El webhook secret `whsec_7ZLwWovhP3wWAqSSG5xjvhN4YXoLfGsh` es del webhook que YA
 - Asegúrate de estar en el mismo modo (Test/Live) que la API Key
 
 ### Error: "API key does not start with SG."
-- Necesitas configurar `SENDGRID_API_KEY` válida
+- Necesitas configurar `MailerSend_API_KEY` válida
 - Temporalmente no afecta la funcionalidad (emails no se enviarán)
 
 ### Error: "Database not found"

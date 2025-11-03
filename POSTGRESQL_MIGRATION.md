@@ -217,11 +217,11 @@ async function initDatabase() {
         stripe_secret_key TEXT,
         stripe_publishable_key TEXT,
         stripe_webhook_secret TEXT,
-        sendgrid_api_key TEXT,
+        MailerSend_api_key TEXT,
         from_email TEXT,
         whop_api_key TEXT,
         is_stripe_connected INTEGER NOT NULL DEFAULT 0,
-        is_sendgrid_connected INTEGER NOT NULL DEFAULT 0,
+        is_MailerSend_connected INTEGER NOT NULL DEFAULT 0,
         is_whop_connected INTEGER NOT NULL DEFAULT 0,
         updated_at BIGINT NOT NULL DEFAULT EXTRACT(EPOCH FROM NOW())
       )
