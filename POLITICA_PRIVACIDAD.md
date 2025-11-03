@@ -123,7 +123,7 @@ Compartimos datos solo con proveedores esenciales:
 | Proveedor | Propósito | Ubicación |
 |-----------|-----------|-----------|
 | **Stripe** | Procesar pagos de suscripciones | UE/EE.UU. |
-| **SendGrid** | Enviar emails transaccionales | UE/EE.UU. |
+| **MailerSend** | Enviar emails transaccionales | UE/EE.UU. |
 | **Railway** | Hosting del backend | EE.UU. |
 | **Vercel** | Hosting del frontend | EE.UU. |
 
@@ -328,7 +328,7 @@ Nos comprometemos a:
 
 ✅ **Recopilamos**: Email, empresa, API keys (encriptadas), datos de transacciones  
 ✅ **Usamos**: Solo para dar el servicio y mejorarlo  
-✅ **Compartimos**: Solo con proveedores esenciales (Stripe, SendGrid)  
+✅ **Compartimos**: Solo con proveedores esenciales (Stripe, MailerSend)  
 ✅ **Protegemos**: Encriptación, HTTPS, backups  
 ✅ **Tus derechos**: Acceso, corrección, eliminación, exportación  
 ✅ **Contacto**: marcp2001@gmail.com  

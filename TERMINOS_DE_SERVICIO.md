@@ -121,7 +121,7 @@ El Servicio se proporciona "TAL CUAL". No garantizamos:
 - Pérdida de ingresos o beneficios
 - Daños indirectos o consecuenciales
 - Pérdida de datos (realiza tus propios backups)
-- Fallos de terceros (Stripe, Whop, SendGrid, etc.)
+- Fallos de terceros (Stripe, Whop, MailerSend, etc.)
 
 **RESPONSABILIDAD MÁXIMA:** El importe pagado en los últimos 3 meses.
 
