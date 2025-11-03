@@ -9,12 +9,117 @@ const path = require('path');
 
 console.log('🚀 Ejecutando migraciones SQL...\n');
 
-const dbPath = process.env.DATABASE_URL || './data.db';
+// En Railway usa /data/database.sqlite, localmente ./data.db
+const dbPath = process.env.RAILWAY_ENVIRONMENT 
+  ? '/data/database.sqlite' 
+  : (process.env.DATABASE_URL || './data.db');
+
+// Crear directorio si no existe (para Railway)
+const dbDir = path.dirname(dbPath);
+if (!fs.existsSync(dbDir)) {
+  console.log(`📁 Creando directorio: ${dbDir}`);
+  fs.mkdirSync(dbDir, { recursive: true });
+}
 
 try {
   // Conectar a la base de datos
   const db = new Database(dbPath);
   console.log(`✅ Conectado a: ${dbPath}\n`);
+
+  // PASO 0: Inicializar base de datos (crear tablas base si no existen)
+  console.log('📝 Paso 0: Inicializar base de datos');
+  
+  // Crear tabla users
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS users (
+      id TEXT PRIMARY KEY,
+      email TEXT NOT NULL UNIQUE,
+      password TEXT NOT NULL,
+      company_name TEXT NOT NULL,
+      tenant_id TEXT NOT NULL UNIQUE,
+      created_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now'))
+    );
+  `);
+  
+  // Crear tabla payments
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS payments (
+      id TEXT PRIMARY KEY,
+      email TEXT NOT NULL,
+      product TEXT NOT NULL,
+      amount REAL NOT NULL,
+      status TEXT NOT NULL DEFAULT 'pending',
+      retries INTEGER NOT NULL DEFAULT 0,
+      token TEXT NOT NULL UNIQUE,
+      retry_link TEXT,
+      last_attempt INTEGER,
+      next_attempt INTEGER,
+      created_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
+      tenant_id TEXT
+    );
+  `);
+  
+  // Crear tabla config
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS config (
+      key TEXT NOT NULL,
+      tenant_id TEXT NOT NULL,
+      value TEXT NOT NULL,
+      updated_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
+      PRIMARY KEY (key, tenant_id)
+    );
+  `);
+  
+  // Crear tabla notification_settings
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS notification_settings (
+      tenant_id TEXT PRIMARY KEY,
+      notification_email TEXT,
+      email_on_recovery INTEGER NOT NULL DEFAULT 1,
+      email_on_failure INTEGER NOT NULL DEFAULT 0,
+      daily_summary INTEGER NOT NULL DEFAULT 0,
+      weekly_summary INTEGER NOT NULL DEFAULT 0,
+      alert_threshold INTEGER NOT NULL DEFAULT 10,
+      send_alerts INTEGER NOT NULL DEFAULT 1,
+      updated_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now'))
+    );
+  `);
+  
+  // Crear tabla tenant_integrations
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS tenant_integrations (
+      tenant_id TEXT PRIMARY KEY,
+      stripe_secret_key TEXT,
+      stripe_publishable_key TEXT,
+      stripe_webhook_secret TEXT,
+      sendgrid_api_key TEXT,
+      from_email TEXT,
+      whop_api_key TEXT,
+      is_stripe_connected INTEGER NOT NULL DEFAULT 0,
+      is_sendgrid_connected INTEGER NOT NULL DEFAULT 0,
+      is_whop_connected INTEGER NOT NULL DEFAULT 0,
+      updated_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now'))
+    );
+  `);
+  
+  // Crear tabla subscriptions
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS subscriptions (
+      tenant_id TEXT PRIMARY KEY,
+      plan TEXT NOT NULL DEFAULT 'free',
+      stripe_customer_id TEXT,
+      stripe_subscription_id TEXT,
+      status TEXT NOT NULL DEFAULT 'trial',
+      trial_ends_at INTEGER,
+      current_period_end INTEGER,
+      payments_limit INTEGER NOT NULL DEFAULT 50,
+      payments_used INTEGER NOT NULL DEFAULT 0,
+      created_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
+      updated_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now'))
+    );
+  `);
+  
+  console.log('   ✅ Tablas base creadas/verificadas\n');
 
   // Migración 1: Onboarding columns
   console.log('📝 Migración 1/2: Onboarding columns');
