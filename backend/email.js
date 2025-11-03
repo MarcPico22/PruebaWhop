@@ -1,9 +1,14 @@
-const sgMail = require('@sendgrid/mail');
+const { MailerSend, EmailParams, Sender, Recipient } = require('mailersend');
 
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+// Inicializar MailerSend
+const mailerSend = new MailerSend({
+  apiKey: process.env.MAILERSEND_API_KEY || 'mlsn.11cc30e3226e6ace9de8977af0f828a7ede366974ae0428958a23ceb706d6085',
+});
 
-const FROM_EMAIL = process.env.FROM_EMAIL || 'noreply@whoprecovery.com';
-const SUPPORT_EMAIL = process.env.SUPPORT_EMAIL || 'support@whoprecovery.com';
+// Configuración
+const FROM_EMAIL = process.env.FROM_EMAIL || 'noreply@test-q3enl6kqrd842vwr.mlsender.net';
+const FROM_NAME = process.env.FROM_NAME || 'Whop Recovery';
+const SUPPORT_EMAIL = process.env.SUPPORT_EMAIL || 'support@test-q3enl6kqrd842vwr.mlsender.net';
 const BASE_URL = process.env.BASE_URL || 'https://www.whoprecovery.com';
 
 // Template base para todos los emails
@@ -106,7 +111,7 @@ const getEmailTemplate = (content) => `
 <body>
   <div class="container">
     <div class="header">
-      <div class="logo">€</div>
+      <div class="logo">💶</div>
       <h1>Whop Recovery</h1>
     </div>
     <div class="content">
@@ -132,7 +137,31 @@ const getEmailTemplate = (content) => `
 </html>
 `;
 
-//1. Email de confirmación de registro
+/**
+ * Helper function to send emails with MailerSend
+ */
+async function sendEmail({ to, toName, subject, html, text }) {
+  try {
+    const sentFrom = new Sender(FROM_EMAIL, FROM_NAME);
+    const recipients = [new Recipient(to, toName || '')];
+    
+    const emailParams = new EmailParams()
+      .setFrom(sentFrom)
+      .setTo(recipients)
+      .setSubject(subject)
+      .setHtml(html)
+      .setText(text);
+    
+    const result = await mailerSend.email.send(emailParams);
+    console.log(`✅ Email sent to ${to}: ${subject}`);
+    return { success: true, result };
+  } catch (error) {
+    console.error(`❌ Error sending email to ${to}:`, error);
+    return { success: false, error };
+  }
+}
+
+// 1. Email de confirmación de registro
 async function sendWelcomeEmail(userEmail, userName) {
   const content = `
     <p>Hola${userName ? ' <strong>' + userName + '</strong>' : ''},</p>
@@ -166,12 +195,7 @@ async function sendWelcomeEmail(userEmail, userName) {
     <p>Saludos,<br><strong>El equipo de Whop Recovery</strong></p>
   `;
 
-  const msg = {
-    to: userEmail,
-    from: FROM_EMAIL,
-    subject: '¡Bienvenido a Whop Recovery! 🎉',
-    html: getEmailTemplate(content),
-    text: `
+  const text = `
 ¡Bienvenido a Whop Recovery!
 
 Hola${userName ? ' ' + userName : ''},
@@ -188,7 +212,7 @@ Próximos pasos:
 2. Configura tus preferencias de reintentos
 3. ¡Empieza a recuperar dinero automáticamente!
 
-Ir al Dashboard: https://www.whoprecovery.com/dashboard
+Ir al Dashboard: ${BASE_URL}/dashboard
 
 Si tienes alguna pregunta, contacta a ${SUPPORT_EMAIL}
 
@@ -196,81 +220,50 @@ Si tienes alguna pregunta, contacta a ${SUPPORT_EMAIL}
 
 Saludos,
 El equipo de Whop Recovery
-    `
-  };
+  `.trim();
 
-  try {
-    await sgMail.send(msg);
-    console.log(`✅ Welcome email sent to ${userEmail}`);
-    return { success: true };
-  } catch (error) {
-    console.error('❌ Error sending welcome email:', error);
-    return { success: false, error };
-  }
+  return await sendEmail({
+    to: userEmail,
+    toName: userName,
+    subject: '¡Bienvenido a Whop Recovery! 🎉',
+    html: getEmailTemplate(content),
+    text
+  });
 }
 
 // 2. Email de notificación de pago exitoso
 async function sendPaymentSuccessEmail(userEmail, userName, amount, plan) {
-  const msg = {
-    to: userEmail,
-    from: FROM_EMAIL,
-    subject: '✅ Pago confirmado - Whop Recovery',
-    html: `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <style>
-          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-          .header { background: #10b981; color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
-          .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
-          .receipt { background: white; padding: 20px; border-radius: 8px; margin: 20px 0; }
-          .total { font-size: 24px; font-weight: bold; color: #10b981; text-align: center; margin: 20px 0; }
-          .footer { text-align: center; margin-top: 30px; color: #666; font-size: 12px; }
-        </style>
-      </head>
-      <body>
-        <div class="container">
-          <div class="header">
-            <h1>✅ ¡Pago confirmado!</h1>
-          </div>
-          <div class="content">
-            <p>Hola${userName ? ' ' + userName : ''},</p>
-            
-            <p>Tu pago se ha procesado correctamente. ¡Gracias por confiar en Whop Recovery!</p>
-            
-            <div class="receipt">
-              <h3>📄 Detalles del pago:</h3>
-              <p><strong>Plan:</strong> ${plan.toUpperCase()}</p>
-              <p><strong>Monto:</strong> €${amount}</p>
-              <p><strong>Fecha:</strong> ${new Date().toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
-              <p><strong>Estado:</strong> Pagado ✅</p>
-            </div>
-            
-            <div class="total">
-              Total: €${amount}
-            </div>
-            
-            <p>Tu suscripción está activa y Whop Recovery ya está trabajando para recuperar tus pagos fallidos automáticamente.</p>
-            
-            <p>Puedes ver tus estadísticas y configuración en el dashboard:</p>
-            <p style="text-align: center;">
-              <a href="https://www.whoprecovery.com/dashboard" style="display: inline-block; padding: 12px 30px; background: #10b981; color: white; text-decoration: none; border-radius: 5px;">Ver Dashboard →</a>
-            </p>
-            
-            <p>Si tienes alguna pregunta sobre tu factura, contáctanos en <a href="mailto:${SUPPORT_EMAIL}">${SUPPORT_EMAIL}</a></p>
-            
-            <p>Saludos,<br>El equipo de Whop Recovery</p>
-          </div>
-          <div class="footer">
-            <p>Whop Recovery - Recupera automáticamente tus pagos fallidos</p>
-            <p><a href="https://www.whoprecovery.com">whoprecovery.com</a></p>
-          </div>
-        </div>
-      </body>
-      </html>
-    `,
-    text: `
+  const content = `
+    <h2>✅ ¡Pago confirmado!</h2>
+    
+    <p>Hola${userName ? ' <strong>' + userName + '</strong>' : ''},</p>
+    
+    <p>Tu pago se ha procesado correctamente. ¡Gracias por confiar en Whop Recovery!</p>
+    
+    <div class="stats">
+      <h3 style="margin-top: 0;">📄 Detalles del pago:</h3>
+      <p><strong>Plan:</strong> ${plan.toUpperCase()}</p>
+      <p><strong>Monto:</strong> €${amount}</p>
+      <p><strong>Fecha:</strong> ${new Date().toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+      <p><strong>Estado:</strong> Pagado ✅</p>
+    </div>
+    
+    <div style="text-align: center; font-size: 24px; font-weight: bold; color: #10b981; margin: 30px 0;">
+      Total: €${amount}
+    </div>
+    
+    <p>Tu suscripción está activa y Whop Recovery ya está trabajando para recuperar tus pagos fallidos automáticamente.</p>
+    
+    <p style="text-align: center;">
+      <a href="${BASE_URL}/dashboard" class="button">Ver Dashboard →</a>
+    </p>
+    
+    <p>Si tienes alguna pregunta sobre tu factura, contáctanos en <a href="mailto:${SUPPORT_EMAIL}">${SUPPORT_EMAIL}</a></p>
+    
+    <p>Saludos,<br><strong>El equipo de Whop Recovery</strong></p>
+  `;
+
+  const text = `
 ¡Pago confirmado!
 
 Hola${userName ? ' ' + userName : ''},
@@ -285,85 +278,55 @@ Detalles del pago:
 
 Total: €${amount}
 
-Ver Dashboard: https://www.whoprecovery.com/dashboard
+Ver Dashboard: ${BASE_URL}/dashboard
 
 Contacto: ${SUPPORT_EMAIL}
 
 Saludos,
 El equipo de Whop Recovery
-    `
-  };
+  `.trim();
 
-  try {
-    await sgMail.send(msg);
-    console.log(`✅ Payment success email sent to ${userEmail}`);
-    return { success: true };
-  } catch (error) {
-    console.error('❌ Error sending payment email:', error);
-    return { success: false, error };
-  }
+  return await sendEmail({
+    to: userEmail,
+    toName: userName,
+    subject: '✅ Pago confirmado - Whop Recovery',
+    html: getEmailTemplate(content),
+    text
+  });
 }
 
-// 3. Email de pago fallido (para recuperación de carrito)
+// 3. Email de pago fallido
 async function sendPaymentFailedEmail(userEmail, userName, reason) {
-  const msg = {
-    to: userEmail,
-    from: FROM_EMAIL,
-    subject: '⚠️ Problema con tu pago - Whop Recovery',
-    html: `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <style>
-          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-          .header { background: #f59e0b; color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
-          .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
-          .alert { background: #fef3c7; padding: 15px; border-left: 4px solid #f59e0b; margin: 20px 0; }
-          .button { display: inline-block; padding: 12px 30px; background: #f59e0b; color: white; text-decoration: none; border-radius: 5px; margin: 20px 0; }
-          .footer { text-align: center; margin-top: 30px; color: #666; font-size: 12px; }
-        </style>
-      </head>
-      <body>
-        <div class="container">
-          <div class="header">
-            <h1>⚠️ Problema con tu pago</h1>
-          </div>
-          <div class="content">
-            <p>Hola${userName ? ' ' + userName : ''},</p>
-            
-            <p>Hemos intentado procesar tu pago pero no pudimos completarlo.</p>
-            
-            <div class="alert">
-              <strong>Motivo:</strong> ${reason || 'Tu método de pago fue rechazado'}
-            </div>
-            
-            <h3>🔧 Cómo solucionarlo:</h3>
-            <ol>
-              <li>Verifica que tu tarjeta tenga fondos suficientes</li>
-              <li>Comprueba que los datos de la tarjeta sean correctos</li>
-              <li>Intenta con otro método de pago</li>
-            </ol>
-            
-            <p style="text-align: center;">
-              <a href="https://www.whoprecovery.com/dashboard/billing" class="button">Actualizar método de pago →</a>
-            </p>
-            
-            <p><strong>No te preocupes:</strong> Tu cuenta sigue activa por 3 días más mientras resuelves el problema. No perderás ningún dato.</p>
-            
-            <p>Si necesitas ayuda, estamos aquí: <a href="mailto:${SUPPORT_EMAIL}">${SUPPORT_EMAIL}</a></p>
-            
-            <p>Saludos,<br>El equipo de Whop Recovery</p>
-          </div>
-          <div class="footer">
-            <p>Whop Recovery - Recupera automáticamente tus pagos fallidos</p>
-            <p><a href="https://www.whoprecovery.com">whoprecovery.com</a></p>
-          </div>
-        </div>
-      </body>
-      </html>
-    `,
-    text: `
+  const content = `
+    <h2>⚠️ Problema con tu pago</h2>
+    
+    <p>Hola${userName ? ' <strong>' + userName + '</strong>' : ''},</p>
+    
+    <p>Hemos intentado procesar tu pago pero no pudimos completarlo.</p>
+    
+    <div style="background: #fef3c7; padding: 15px; border-left: 4px solid #f59e0b; margin: 20px 0; border-radius: 4px;">
+      <strong>Motivo:</strong> ${reason || 'Tu método de pago fue rechazado'}
+    </div>
+    
+    <h3>🔧 Cómo solucionarlo:</h3>
+    <ol>
+      <li>Verifica que tu tarjeta tenga fondos suficientes</li>
+      <li>Comprueba que los datos de la tarjeta sean correctos</li>
+      <li>Intenta con otro método de pago</li>
+    </ol>
+    
+    <p style="text-align: center;">
+      <a href="${BASE_URL}/dashboard/billing" class="button" style="background: #f59e0b;">Actualizar método de pago →</a>
+    </p>
+    
+    <p><strong>No te preocupes:</strong> Tu cuenta sigue activa por 3 días más mientras resuelves el problema. No perderás ningún dato.</p>
+    
+    <p>Si necesitas ayuda, estamos aquí: <a href="mailto:${SUPPORT_EMAIL}">${SUPPORT_EMAIL}</a></p>
+    
+    <p>Saludos,<br><strong>El equipo de Whop Recovery</strong></p>
+  `;
+
+  const text = `
 Problema con tu pago
 
 Hola${userName ? ' ' + userName : ''},
@@ -377,7 +340,7 @@ Cómo solucionarlo:
 2. Comprueba que los datos sean correctos
 3. Intenta con otro método de pago
 
-Actualizar método de pago: https://www.whoprecovery.com/dashboard/billing
+Actualizar método de pago: ${BASE_URL}/dashboard/billing
 
 No te preocupes: Tu cuenta sigue activa por 3 días más.
 
@@ -385,77 +348,48 @@ Contacto: ${SUPPORT_EMAIL}
 
 Saludos,
 El equipo de Whop Recovery
-    `
-  };
+  `.trim();
 
-  try {
-    await sgMail.send(msg);
-    console.log(`✅ Payment failed email sent to ${userEmail}`);
-    return { success: true };
-  } catch (error) {
-    console.error('❌ Error sending payment failed email:', error);
-    return { success: false, error };
-  }
+  return await sendEmail({
+    to: userEmail,
+    toName: userName,
+    subject: '⚠️ Problema con tu pago - Whop Recovery',
+    html: getEmailTemplate(content),
+    text
+  });
 }
 
 // 4. Email de recuperación exitosa
 async function sendRecoverySuccessEmail(userEmail, userName, amount, customerName) {
-  const msg = {
-    to: userEmail,
-    from: FROM_EMAIL,
-    subject: '💰 ¡Pago recuperado! - Whop Recovery',
-    html: `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <style>
-          body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-          .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-          .header { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
-          .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 10px 10px; }
-          .success { background: #d1fae5; padding: 20px; border-radius: 8px; margin: 20px 0; text-align: center; }
-          .amount { font-size: 36px; font-weight: bold; color: #10b981; }
-          .button { display: inline-block; padding: 12px 30px; background: #10b981; color: white; text-decoration: none; border-radius: 5px; margin: 20px 0; }
-          .footer { text-align: center; margin-top: 30px; color: #666; font-size: 12px; }
-        </style>
-      </head>
-      <body>
-        <div class="container">
-          <div class="header">
-            <h1>💰 ¡Pago recuperado!</h1>
-          </div>
-          <div class="content">
-            <p>Hola${userName ? ' ' + userName : ''},</p>
-            
-            <p>¡Buenas noticias! Hemos recuperado exitosamente un pago que había fallado.</p>
-            
-            <div class="success">
-              <p><strong>Cliente:</strong> ${customerName}</p>
-              <div class="amount">€${amount}</div>
-              <p>Recuperado automáticamente ✅</p>
-            </div>
-            
-            <p>Este pago se había marcado como fallido, pero nuestro sistema de reintentos inteligentes lo procesó exitosamente.</p>
-            
-            <p><strong>Esto es exactamente para lo que Whop Recovery está diseñado</strong> - recuperar ingresos que de otra forma perderías, sin que tengas que hacer nada.</p>
-            
-            <p style="text-align: center;">
-              <a href="https://www.whoprecovery.com/dashboard" class="button">Ver detalles en Dashboard →</a>
-            </p>
-            
-            <p>¿Quieres ver cuánto has recuperado en total? Entra al dashboard y revisa tus estadísticas.</p>
-            
-            <p>Saludos,<br>El equipo de Whop Recovery</p>
-          </div>
-          <div class="footer">
-            <p>Whop Recovery - Recupera automáticamente tus pagos fallidos</p>
-            <p><a href="https://www.whoprecovery.com">whoprecovery.com</a></p>
-          </div>
-        </div>
-      </body>
-      </html>
-    `,
-    text: `
+  const content = `
+    <h2>💰 ¡Pago recuperado!</h2>
+    
+    <p>Hola${userName ? ' <strong>' + userName + '</strong>' : ''},</p>
+    
+    <p>¡Buenas noticias! Hemos recuperado exitosamente un pago que había fallado.</p>
+    
+    <div class="stats" style="background: #d1fae5; border-left-color: #10b981;">
+      <p style="text-align: center; margin: 0;"><strong>Cliente:</strong> ${customerName}</p>
+      <div style="font-size: 36px; font-weight: bold; color: #10b981; text-align: center; margin: 20px 0;">
+        €${amount}
+      </div>
+      <p style="text-align: center; margin: 0;">Recuperado automáticamente ✅</p>
+    </div>
+    
+    <p>Este pago se había marcado como fallido, pero nuestro sistema de reintentos inteligentes lo procesó exitosamente.</p>
+    
+    <p><strong>Esto es exactamente para lo que Whop Recovery está diseñado</strong> - recuperar ingresos que de otra forma perderías, sin que tengas que hacer nada.</p>
+    
+    <p style="text-align: center;">
+      <a href="${BASE_URL}/dashboard" class="button" style="background: #10b981;">Ver detalles en Dashboard →</a>
+    </p>
+    
+    <p>¿Quieres ver cuánto has recuperado en total? Entra al dashboard y revisa tus estadísticas.</p>
+    
+    <p>Saludos,<br><strong>El equipo de Whop Recovery</strong></p>
+  `;
+
+  const text = `
 ¡Pago recuperado!
 
 Hola${userName ? ' ' + userName : ''},
@@ -466,59 +400,52 @@ Cliente: ${customerName}
 Monto: €${amount}
 Estado: Recuperado ✅
 
-Ver detalles: https://www.whoprecovery.com/dashboard
+Ver detalles: ${BASE_URL}/dashboard
 
 Saludos,
 El equipo de Whop Recovery
-    `
-  };
+  `.trim();
 
-  try {
-    await sgMail.send(msg);
-    console.log(`✅ Recovery success email sent to ${userEmail}`);
-    return { success: true };
-  } catch (error) {
-    console.error('❌ Error sending recovery email:', error);
-    return { success: false, error };
-  }
+  return await sendEmail({
+    to: userEmail,
+    toName: userName,
+    subject: '💰 ¡Pago recuperado! - Whop Recovery',
+    html: getEmailTemplate(content),
+    text
+  });
 }
 
-/**
- * Send onboarding email sequence
- */
+// 5. Onboarding Day 0
 async function sendOnboardingDay0Email(userEmail, userName) {
-  const msg = {
-    to: userEmail,
-    from: FROM_EMAIL,
-    subject: '¡Bienvenido a Whop Recovery! 🎉',
-    html: getEmailTemplate(`
-      <h2>¡Hola${userName ? ' ' + userName : ''}! 👋</h2>
-      
-      <p>Bienvenido a <strong>Whop Recovery</strong>. Estamos encantados de tenerte con nosotros.</p>
-      
-      <p>Durante los próximos <strong>14 días de prueba gratuita</strong>, podrás recuperar automáticamente hasta <strong>50 pagos fallidos</strong>.</p>
-      
-      <div class="stats">
-        <h3 style="margin-top: 0;">📋 Checklist de Configuración</h3>
-        <p>Para empezar a recuperar pagos, necesitas completar estos 3 pasos:</p>
-        <ol>
-          <li><strong>Conecta tu API de Whop</strong> - Para detectar pagos fallidos</li>
-          <li><strong>Configura SendGrid</strong> - Para enviar emails de recuperación</li>
-          <li><strong>Crea tu primer reintento</strong> - Automatiza la recuperación</li>
-        </ol>
-      </div>
-      
-      <p style="text-align: center;">
-        <a href="${BASE_URL}/dashboard" class="button">Completar configuración →</a>
-      </p>
-      
-      <p><strong>💡 Tip:</strong> La mayoría de nuestros usuarios recuperan su primer pago en las primeras 24 horas.</p>
-      
-      <p>Si necesitas ayuda, responde a este email. Estamos aquí para ayudarte.</p>
-      
-      <p>Saludos,<br>El equipo de Whop Recovery</p>
-    `),
-    text: `
+  const content = `
+    <h2>¡Hola${userName ? ' ' + userName : ''}! 👋</h2>
+    
+    <p>Bienvenido a <strong>Whop Recovery</strong>. Estamos encantados de tenerte con nosotros.</p>
+    
+    <p>Durante los próximos <strong>14 días de prueba gratuita</strong>, podrás recuperar automáticamente hasta <strong>50 pagos fallidos</strong>.</p>
+    
+    <div class="stats">
+      <h3 style="margin-top: 0;">📋 Checklist de Configuración</h3>
+      <p>Para empezar a recuperar pagos, necesitas completar estos 3 pasos:</p>
+      <ol>
+        <li><strong>Conecta tu API de Whop</strong> - Para detectar pagos fallidos</li>
+        <li><strong>Configura MailerSend</strong> - Para enviar emails de recuperación</li>
+        <li><strong>Crea tu primer reintento</strong> - Automatiza la recuperación</li>
+      </ol>
+    </div>
+    
+    <p style="text-align: center;">
+      <a href="${BASE_URL}/dashboard" class="button">Completar configuración →</a>
+    </p>
+    
+    <p><strong>💡 Tip:</strong> La mayoría de nuestros usuarios recuperan su primer pago en las primeras 24 horas.</p>
+    
+    <p>Si necesitas ayuda, responde a este email. Estamos aquí para ayudarte.</p>
+    
+    <p>Saludos,<br><strong>El equipo de Whop Recovery</strong></p>
+  `;
+
+  const text = `
 ¡Bienvenido a Whop Recovery!
 
 Hola${userName ? ' ' + userName : ''},
@@ -527,61 +454,57 @@ Durante los próximos 14 días de prueba gratuita, podrás recuperar automática
 
 Checklist de Configuración:
 1. Conecta tu API de Whop
-2. Configura SendGrid
+2. Configura MailerSend
 3. Crea tu primer reintento
 
 Completa la configuración: ${BASE_URL}/dashboard
 
 Saludos,
 El equipo de Whop Recovery
-    `
-  };
+  `.trim();
 
-  try {
-    await sgMail.send(msg);
-    console.log(`✅ Onboarding Day 0 email sent to ${userEmail}`);
-    return { success: true };
-  } catch (error) {
-    console.error('❌ Error sending onboarding email:', error);
-    return { success: false, error };
-  }
+  return await sendEmail({
+    to: userEmail,
+    toName: userName,
+    subject: '¡Bienvenido a Whop Recovery! 🎉',
+    html: getEmailTemplate(content),
+    text
+  });
 }
 
+// 6. Onboarding Day 3
 async function sendOnboardingDay3Email(userEmail, userName) {
-  const msg = {
-    to: userEmail,
-    from: FROM_EMAIL,
-    subject: '💪 Tips para recuperar más pagos - Día 3',
-    html: getEmailTemplate(`
-      <h2>Hola${userName ? ' ' + userName : ''},</h2>
-      
-      <p>Han pasado 3 días desde que te uniste a Whop Recovery. ¿Cómo va todo?</p>
-      
-      <div class="stats">
-        <h3 style="margin-top: 0;">🎯 Caso de Éxito</h3>
-        <p><strong>TradingPro Community</strong> recuperó <strong>€2,847</strong> en su primer mes usando Whop Recovery.</p>
-        <p style="font-size: 14px; color: #6B7280; margin-top: 10px;">
-          "Antes perdíamos 20-30% de renovaciones por tarjetas caducadas. Ahora recuperamos casi todas." - Marco R.
-        </p>
-      </div>
-      
-      <p><strong>💡 3 Tips para maximizar recuperaciones:</strong></p>
-      
-      <ol>
-        <li><strong>Reintentos múltiples</strong> - Configura 3 intentos: 1h, 24h, 72h después del fallo</li>
-        <li><strong>Emails personalizados</strong> - Mensajes amigables tienen 2x más conversión</li>
-        <li><strong>Horarios óptimos</strong> - Reintentar entre 10am-2pm tiene mejores resultados</li>
-      </ol>
-      
-      <p style="text-align: center;">
-        <a href="${BASE_URL}/dashboard" class="button">Ver mi dashboard →</a>
+  const content = `
+    <h2>Hola${userName ? ' ' + userName : ''},</h2>
+    
+    <p>Han pasado 3 días desde que te uniste a Whop Recovery. ¿Cómo va todo?</p>
+    
+    <div class="stats">
+      <h3 style="margin-top: 0;">🎯 Caso de Éxito</h3>
+      <p><strong>TradingPro Community</strong> recuperó <strong>€2,847</strong> en su primer mes usando Whop Recovery.</p>
+      <p style="font-size: 14px; color: #6B7280; margin-top: 10px;">
+        "Antes perdíamos 20-30% de renovaciones por tarjetas caducadas. Ahora recuperamos casi todas." - Marco R.
       </p>
-      
-      <p>¿Tienes alguna pregunta? Responde a este email, estamos aquí para ayudar.</p>
-      
-      <p>Saludos,<br>El equipo de Whop Recovery</p>
-    `),
-    text: `
+    </div>
+    
+    <p><strong>💡 3 Tips para maximizar recuperaciones:</strong></p>
+    
+    <ol>
+      <li><strong>Reintentos múltiples</strong> - Configura 3 intentos: 1h, 24h, 72h después del fallo</li>
+      <li><strong>Emails personalizados</strong> - Mensajes amigables tienen 2x más conversión</li>
+      <li><strong>Horarios óptimos</strong> - Reintentar entre 10am-2pm tiene mejores resultados</li>
+    </ol>
+    
+    <p style="text-align: center;">
+      <a href="${BASE_URL}/dashboard" class="button">Ver mi dashboard →</a>
+    </p>
+    
+    <p>¿Tienes alguna pregunta? Responde a este email, estamos aquí para ayudar.</p>
+    
+    <p>Saludos,<br><strong>El equipo de Whop Recovery</strong></p>
+  `;
+
+  const text = `
 Tips para recuperar más pagos - Día 3
 
 Hola${userName ? ' ' + userName : ''},
@@ -598,58 +521,54 @@ Ver dashboard: ${BASE_URL}/dashboard
 
 Saludos,
 El equipo de Whop Recovery
-    `
-  };
+  `.trim();
 
-  try {
-    await sgMail.send(msg);
-    console.log(`✅ Onboarding Day 3 email sent to ${userEmail}`);
-    return { success: true };
-  } catch (error) {
-    console.error('❌ Error sending day 3 email:', error);
-    return { success: false, error };
-  }
+  return await sendEmail({
+    to: userEmail,
+    toName: userName,
+    subject: '💪 Tips para recuperar más pagos - Día 3',
+    html: getEmailTemplate(content),
+    text
+  });
 }
 
+// 7. Onboarding Day 7
 async function sendOnboardingDay7Email(userEmail, userName, hasRecoveredPayments = false) {
-  const msg = {
-    to: userEmail,
-    from: FROM_EMAIL,
-    subject: '⏰ Tu trial termina en 7 días',
-    html: getEmailTemplate(`
-      <h2>Hola${userName ? ' ' + userName : ''},</h2>
-      
-      <p>Tu trial de 14 días con Whop Recovery termina en <strong>7 días</strong>.</p>
-      
-      ${hasRecoveredPayments ? `
-        <div class="stats">
-          <p style="font-size: 18px; margin: 0; color: #059669;">
-            ✅ Ya has recuperado pagos con Whop Recovery
-          </p>
-        </div>
-        
-        <p>¡Genial! Has visto el valor de recuperar pagos automáticamente.</p>
-        
-        <p><strong>Para seguir recuperando después del trial:</strong></p>
-        <ul>
-          <li>🟢 <strong>Plan PRO</strong> - €49/mes - 500 pagos/mes</li>
-          <li>🔵 <strong>Plan ENTERPRISE</strong> - €199/mes - Ilimitado</li>
-        </ul>
-      ` : `
-        <p>Notamos que aún no has configurado completamente Whop Recovery.</p>
-        
-        <p><strong>Recuerda:</strong> Necesitas conectar tu API de Whop y configurar SendGrid para empezar a recuperar pagos.</p>
-        
-        <p style="text-align: center;">
-          <a href="${BASE_URL}/dashboard/settings" class="button">Completar configuración →</a>
+  const content = `
+    <h2>Hola${userName ? ' ' + userName : ''},</h2>
+    
+    <p>Tu trial de 14 días con Whop Recovery termina en <strong>7 días</strong>.</p>
+    
+    ${hasRecoveredPayments ? `
+      <div class="stats" style="background: #d1fae5; border-left-color: #10b981;">
+        <p style="font-size: 18px; margin: 0; color: #059669;">
+          ✅ Ya has recuperado pagos con Whop Recovery
         </p>
-      `}
+      </div>
       
-      <p>¿Necesitas ayuda con algo? Responde a este email o agenda una llamada de 15min: <a href="mailto:${SUPPORT_EMAIL}">${SUPPORT_EMAIL}</a></p>
+      <p>¡Genial! Has visto el valor de recuperar pagos automáticamente.</p>
       
-      <p>Saludos,<br>El equipo de Whop Recovery</p>
-    `),
-    text: `
+      <p><strong>Para seguir recuperando después del trial:</strong></p>
+      <ul>
+        <li>🟢 <strong>Plan PRO</strong> - €49/mes - 500 pagos/mes</li>
+        <li>🔵 <strong>Plan ENTERPRISE</strong> - €199/mes - Ilimitado</li>
+      </ul>
+    ` : `
+      <p>Notamos que aún no has configurado completamente Whop Recovery.</p>
+      
+      <p><strong>Recuerda:</strong> Necesitas conectar tu API de Whop y configurar MailerSend para empezar a recuperar pagos.</p>
+      
+      <p style="text-align: center;">
+        <a href="${BASE_URL}/dashboard/settings" class="button">Completar configuración →</a>
+      </p>
+    `}
+    
+    <p>¿Necesitas ayuda con algo? Responde a este email o agenda una llamada de 15min: <a href="mailto:${SUPPORT_EMAIL}">${SUPPORT_EMAIL}</a></p>
+    
+    <p>Saludos,<br><strong>El equipo de Whop Recovery</strong></p>
+  `;
+
+  const text = `
 Tu trial termina en 7 días
 
 Hola${userName ? ' ' + userName : ''},
@@ -665,32 +584,31 @@ Necesitas ayuda? ${SUPPORT_EMAIL}
 
 Saludos,
 El equipo de Whop Recovery
-    `
-  };
+  `.trim();
 
-  try {
-    await sgMail.send(msg);
-    console.log(`✅ Onboarding Day 7 email sent to ${userEmail}`);
-    return { success: true };
-  } catch (error) {
-    console.error('❌ Error sending day 7 email:', error);
-    return { success: false, error };
-  }
+  return await sendEmail({
+    to: userEmail,
+    toName: userName,
+    subject: '⏰ Tu trial termina en 7 días',
+    html: getEmailTemplate(content),
+    text
+  });
 }
 
 /**
  * Schedule onboarding emails (call this when user registers)
+ * NOTE: In production, use a proper job queue (Bull, BullMQ, etc.)
  */
 function scheduleOnboardingEmails(userEmail, userName) {
   // Day 0: Immediate welcome
   sendOnboardingDay0Email(userEmail, userName);
   
-  // Day 3: Tips (scheduled)
+  // Day 3: Tips (scheduled - in production use a job queue)
   setTimeout(() => {
     sendOnboardingDay3Email(userEmail, userName);
   }, 3 * 24 * 60 * 60 * 1000); // 3 días
   
-  // Day 7: Trial reminder (scheduled)
+  // Day 7: Trial reminder (scheduled - in production use a job queue)
   setTimeout(() => {
     sendOnboardingDay7Email(userEmail, userName);
   }, 7 * 24 * 60 * 60 * 1000); // 7 días
@@ -706,5 +624,7 @@ module.exports = {
   sendOnboardingDay0Email,
   sendOnboardingDay3Email,
   sendOnboardingDay7Email,
-  scheduleOnboardingEmails
+  scheduleOnboardingEmails,
+  // Exportar instancia por si se necesita acceso directo
+  mailerSend
 };
