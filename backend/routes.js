@@ -1636,5 +1636,55 @@ router.get('/api/admin/stats', authenticateToken, (req, res) => {
   }
 });
 
+/**
+ * DELETE /api/admin/users/:userId
+ * Eliminar usuario (solo admin)
+ */
+router.delete('/api/admin/users/:userId', authenticateToken, (req, res) => {
+  try {
+    // Solo permitir acceso al admin
+    if (req.user.email !== 'marcps2001@gmail.com') {
+      return res.status(403).json({ error: 'Acceso denegado' });
+    }
+
+    const { userId } = req.params;
+
+    // Verificar que el usuario existe
+    const user = db.prepare('SELECT * FROM users WHERE id = ?').get(userId);
+    
+    if (!user) {
+      return res.status(404).json({ error: 'Usuario no encontrado' });
+    }
+
+    // No permitir borrar al admin
+    if (user.email === 'marcps2001@gmail.com') {
+      return res.status(403).json({ error: 'No puedes eliminar tu propia cuenta de administrador' });
+    }
+
+    const tenantId = user.tenant_id;
+
+    // Eliminar datos relacionados con el tenant (en orden de dependencias)
+    db.prepare('DELETE FROM achievements WHERE user_id = ?').run(userId);
+    db.prepare('DELETE FROM notification_settings WHERE tenant_id = ?').run(tenantId);
+    db.prepare('DELETE FROM tenant_integrations WHERE tenant_id = ?').run(tenantId);
+    db.prepare('DELETE FROM config WHERE tenant_id = ?').run(tenantId);
+    db.prepare('DELETE FROM payments WHERE tenant_id = ?').run(tenantId);
+    db.prepare('DELETE FROM subscriptions WHERE tenant_id = ?').run(tenantId);
+    
+    // Finalmente, eliminar el usuario
+    db.prepare('DELETE FROM users WHERE id = ?').run(userId);
+
+    console.log(`✅ Usuario ${user.email} eliminado por admin`);
+
+    res.json({ 
+      success: true, 
+      message: `Usuario ${user.email} eliminado correctamente` 
+    });
+  } catch (error) {
+    console.error('❌ Error eliminando usuario:', error);
+    res.status(500).json({ error: 'Error eliminando usuario' });
+  }
+});
+
 module.exports = router;
 
