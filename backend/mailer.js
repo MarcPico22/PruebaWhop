@@ -1,17 +1,17 @@
-const sgMail = require('@sendgrid/mail');
+const { MailerSend, EmailParams, Sender, Recipient } = require('mailersend');
 const { getTenantIntegrations } = require('./db');
 const { decrypt } = require('./encryption');
 
 /**
- * Obtiene la configuración de SendGrid del tenant
+ * Obtiene la configuración de MailerSend del tenant
  */
-function getSendGridConfig(tenantId) {
+function getMailerSendConfig(tenantId) {
   if (!tenantId) {
-    // Fallback a demo config
-    const demoKey = process.env.DEMO_SENDGRID_API_KEY;
-    const demoEmail = process.env.DEMO_FROM_EMAIL || 'no-reply@demo.local';
+    // Fallback a demo config o env global
+    const demoKey = process.env.DEMO_MAILERSEND_API_KEY || process.env.MAILERSEND_API_KEY;
+    const demoEmail = process.env.DEMO_FROM_EMAIL || process.env.FROM_EMAIL || 'no-reply@demo.local';
     
-    if (demoKey && demoKey.startsWith('SG.')) {
+    if (demoKey && demoKey.startsWith('mlsn.')) {
       return { apiKey: demoKey, fromEmail: demoEmail, isDemo: true };
     }
     
@@ -20,27 +20,27 @@ function getSendGridConfig(tenantId) {
   
   const integrations = getTenantIntegrations(tenantId);
   
-  if (!integrations.sendgrid_api_key) {
-    // Fallback a demo
-    const demoKey = process.env.DEMO_SENDGRID_API_KEY;
-    const fromEmail = integrations.from_email || process.env.DEMO_FROM_EMAIL || 'no-reply@demo.local';
+  if (!integrations.mailersend_api_key) {
+    // Fallback a demo o env global
+    const demoKey = process.env.DEMO_MAILERSEND_API_KEY || process.env.MAILERSEND_API_KEY;
+    const fromEmail = integrations.from_email || process.env.FROM_EMAIL || 'no-reply@demo.local';
     
-    if (demoKey && demoKey.startsWith('SG.')) {
-      console.warn(`⚠️ Usando SendGrid DEMO key para tenant ${tenantId}`);
+    if (demoKey && demoKey.startsWith('mlsn.')) {
+      console.warn(`⚠️ Usando MailerSend DEMO/GLOBAL key para tenant ${tenantId}`);
       return { apiKey: demoKey, fromEmail, isDemo: true };
     }
     
     return { apiKey: null, fromEmail, isDemo: true };
   }
   
-  const apiKey = decrypt(integrations.sendgrid_api_key);
-  const fromEmail = integrations.from_email || 'no-reply@empresa.com';
+  const apiKey = decrypt(integrations.mailersend_api_key);
+  const fromEmail = integrations.from_email || process.env.FROM_EMAIL || 'no-reply@empresa.com';
   
   return { apiKey, fromEmail, isDemo: false };
 }
 
 /**
- * Envía email (o loguea si no hay SendGrid configurado)
+ * Envía email (o loguea si no hay MailerSend configurado)
  * @param {string} to - Email destinatario
  * @param {string} subject - Asunto
  * @param {string} text - Contenido texto plano
@@ -48,19 +48,11 @@ function getSendGridConfig(tenantId) {
  * @param {string} tenantId - ID del tenant (opcional)
  */
 async function sendEmail(to, subject, text, html, tenantId = null) {
-  const config = getSendGridConfig(tenantId);
-  
-  const msg = {
-    to,
-    from: config.fromEmail,
-    subject,
-    text: text || html.replace(/<[^>]*>/g, ''), // Fallback a HTML sin tags
-    html: html || text
-  };
+  const config = getMailerSendConfig(tenantId);
   
   // Si no hay API key, solo loguear
   if (!config.apiKey || !config.apiKey.trim()) {
-    console.log('\n📧 EMAIL (simulado, no hay SendGrid configurado):');
+    console.log('\n📧 EMAIL (simulado, no hay MailerSend configurado):');
     console.log(`   Tenant: ${tenantId || 'N/A'}`);
     console.log(`   Para: ${to}`);
     console.log(`   De: ${config.fromEmail}`);
@@ -70,12 +62,23 @@ async function sendEmail(to, subject, text, html, tenantId = null) {
   }
   
   try {
-    // Configurar SendGrid con la key del tenant
-    const sgInstance = require('@sendgrid/mail');
-    sgInstance.setApiKey(config.apiKey);
+    // Inicializar MailerSend con la key del tenant
+    const mailerSend = new MailerSend({
+      apiKey: config.apiKey,
+    });
     
-    await sgInstance.send(msg);
-    console.log(`✅ Email enviado a ${to}${config.isDemo ? ' (DEMO)' : ''}`);
+    const sentFrom = new Sender(config.fromEmail, process.env.FROM_NAME || 'Whop Recovery');
+    const recipients = [new Recipient(to)];
+    
+    const emailParams = new EmailParams()
+      .setFrom(sentFrom)
+      .setTo(recipients)
+      .setSubject(subject)
+      .setHtml(html || text)
+      .setText(text || html.replace(/<[^>]*>/g, ''));
+    
+    await mailerSend.email.send(emailParams);
+    console.log(`✅ Email enviado a ${to}${config.isDemo ? ' (DEMO/GLOBAL)' : ''}`);
     return { sent: true, isDemo: config.isDemo };
   } catch (error) {
     console.error('❌ Error enviando email:', error.message);
@@ -186,5 +189,5 @@ module.exports = {
   sendRetryFailedEmail,
   sendPaymentRecoveredEmail,
   sendPaymentPermanentFailEmail,
-  getSendGridConfig
+  getMailerSendConfig
 };
