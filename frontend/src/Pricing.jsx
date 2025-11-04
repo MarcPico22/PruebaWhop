@@ -6,6 +6,41 @@ import { useTranslation } from 'react-i18next';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
+// Plan features definitions
+const PLAN_FEATURES = {
+  FREE: [
+    { text: '14 días de prueba gratuita', included: true },
+    { text: 'Hasta 50 pagos/mes', included: true },
+    { text: 'Reintentos automáticos', included: true },
+    { text: 'Email notifications', included: true },
+    { text: 'Dashboard básico', included: true },
+    { text: 'Soporte por email', included: false },
+    { text: 'API access', included: false }
+  ],
+  PRO: [
+    { text: 'Hasta 500 pagos/mes', included: true },
+    { text: 'Reintentos ilimitados', included: true },
+    { text: 'Email notifications', included: true },
+    { text: 'Dashboard avanzado', included: true },
+    { text: 'Analytics en tiempo real', included: true },
+    { text: 'Soporte prioritario', included: true },
+    { text: 'API access', included: true },
+    { text: 'Webhooks personalizados', included: true }
+  ],
+  ENTERPRISE: [
+    { text: 'Pagos ilimitados', included: true },
+    { text: 'Reintentos ilimitados', included: true },
+    { text: 'Email notifications', included: true },
+    { text: 'Dashboard enterprise', included: true },
+    { text: 'Analytics avanzado + exportación', included: true },
+    { text: 'Soporte 24/7', included: true },
+    { text: 'API access completo', included: true },
+    { text: 'Webhooks personalizados', included: true },
+    { text: 'White-label', included: true },
+    { text: 'Onboarding dedicado', included: true }
+  ]
+};
+
 function Pricing() {
   const { t } = useTranslation();
   const [billingPeriod, setBillingPeriod] = useState('monthly');
