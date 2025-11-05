@@ -290,8 +290,12 @@ function PricingCard({
       <ul className="space-y-3 sm:space-y-4 mb-8 flex-1">
         {features.map((feature, i) => (
           <li key={i} className="flex items-start gap-3">
-            <span className="text-green-500 text-lg sm:text-xl flex-shrink-0">✓</span>
-            <span className="text-sm sm:text-base text-gray-700">{feature}</span>
+            <span className={`text-lg sm:text-xl flex-shrink-0 ${feature.included ? 'text-green-500' : 'text-gray-300'}`}>
+              {feature.included ? '✓' : '✗'}
+            </span>
+            <span className={`text-sm sm:text-base ${feature.included ? 'text-gray-700' : 'text-gray-400'}`}>
+              {feature.text}
+            </span>
           </li>
         ))}
       </ul>
