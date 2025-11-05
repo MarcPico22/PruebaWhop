@@ -1613,8 +1613,8 @@ router.get('/api/admin/stats', authenticateToken, (req, res) => {
       return res.status(403).json({ error: 'Acceso denegado' });
     }
 
-    const totalUsers = db.prepare('SELECT COUNT(*) as count FROM users').get().count;
-    const totalRecovered = db.prepare('SELECT COUNT(*) as count FROM payments WHERE status = "recovered"').get().count;
+    const totalUsers = db.prepare('SELECT COUNT(*) as count FROM users').get().count || 0;
+    const totalRecovered = db.prepare('SELECT COUNT(*) as count FROM payments WHERE status = "recovered"').get().count || 0;
     const proUsers = db.prepare('SELECT COUNT(*) as count FROM subscriptions WHERE plan = "pro"').get().count || 0;
     
     // Calcular MRR (Monthly Recurring Revenue)
@@ -1623,16 +1623,23 @@ router.get('/api/admin/stats', authenticateToken, (req, res) => {
     const mrr = (proCount * 29) + (enterpriseCount * 99); // $29/mes Pro, $99/mes Enterprise
 
     res.json({
-      totalUsers,
-      totalRecovered,
-      proUsers,
-      enterpriseUsers: enterpriseCount,
-      mrr
+      totalUsers: totalUsers || 0,
+      totalRecovered: totalRecovered || 0,
+      proUsers: proUsers || 0,
+      enterpriseUsers: enterpriseCount || 0,
+      mrr: mrr || 0
     });
 
   } catch (error) {
     console.error('❌ Error obteniendo stats:', error);
-    res.status(500).json({ error: 'Error obteniendo stats' });
+    // Devolver valores por defecto en caso de error para evitar crash del frontend
+    res.json({
+      totalUsers: 0,
+      totalRecovered: 0,
+      proUsers: 0,
+      enterpriseUsers: 0,
+      mrr: 0
+    });
   }
 });
 
