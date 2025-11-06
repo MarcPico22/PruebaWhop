@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { API_URL } from '../config';
 
 /**
- * Componente para configurar integraciones (Stripe + SendGrid + Whop)
+ * Componente para configurar integraciones (Stripe + Resend + Whop)
  * Cada empresa configura sus propias API keys
  */
 function IntegrationsSettings() {
@@ -19,9 +19,9 @@ function IntegrationsSettings() {
     stripe_webhook_secret: ''
   });
   
-  // Estado para SendGrid
-  const [sendgridData, setSendgridData] = useState({
-    sendgrid_api_key: '',
+  // Estado para Resend
+  const [resendData, setResendData] = useState({
+    resend_api_key: '',
     from_email: ''
   });
   
@@ -98,32 +98,32 @@ function IntegrationsSettings() {
   };
 
   /**
-   * Guarda configuración de SendGrid
+   * Guarda configuración de Resend
    */
-  const saveSendGrid = async (e) => {
+  const saveResend = async (e) => {
     e.preventDefault();
     setSaving(true);
     setMessage(null);
     
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('${API_URL}/api/integrations', {
+      const response = await fetch(`${API_URL}/api/integrations/resend`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify(sendgridData)
+        body: JSON.stringify(resendData)
       });
       
       const result = await response.json();
       
       if (response.ok) {
-        setMessage({ type: 'success', text: '✅ SendGrid configurado correctamente' });
-        setSendgridData({ sendgrid_api_key: '', from_email: '' });
+        setMessage({ type: 'success', text: '✅ Resend configurado correctamente' });
+        setResendData({ resend_api_key: '', from_email: '' });
         await loadIntegrations();
       } else {
-        setMessage({ type: 'error', text: `❌ ${result.error || 'Error guardando SendGrid'}` });
+        setMessage({ type: 'error', text: `❌ ${result.error || 'Error guardando Resend'}` });
       }
     } catch (error) {
       setMessage({ type: 'error', text: '❌ Error de conexión' });
@@ -215,7 +215,7 @@ function IntegrationsSettings() {
     <div style={{ maxWidth: '800px', margin: '0 auto' }}>
       <h2>⚙️ Integraciones</h2>
       <p style={{ color: '#666', marginBottom: '30px' }}>
-        Configura tus propias API keys de Stripe y SendGrid. Todas las keys se guardan encriptadas.
+        Configura tus propias API keys de Stripe y resend. Todas las keys se guardan encriptadas.
       </p>
 
       {/* Mensaje de feedback */}
@@ -255,19 +255,19 @@ function IntegrationsSettings() {
           💳 Stripe
         </button>
         <button
-          onClick={() => setActiveTab('sendgrid')}
+          onClick={() => setActiveTab('resend')}
           style={{
             padding: '12px 24px',
             border: 'none',
             background: 'none',
             cursor: 'pointer',
             fontWeight: '600',
-            color: activeTab === 'sendgrid' ? '#2563EB' : '#6B7280',
-            borderBottom: activeTab === 'sendgrid' ? '3px solid #2563EB' : 'none',
+            color: activeTab === 'resend' ? '#2563EB' : '#6B7280',
+            borderBottom: activeTab === 'resend' ? '3px solid #2563EB' : 'none',
             marginBottom: '-2px'
           }}
         >
-          📧 SendGrid
+          📧 resend
         </button>
         <button
           onClick={() => setActiveTab('whop')}
@@ -403,13 +403,13 @@ function IntegrationsSettings() {
         </div>
       )}
 
-      {/* SendGrid Tab */}
-      {activeTab === 'sendgrid' && (
+      {/* resend Tab */}
+      {activeTab === 'resend' && (
         <div>
-          <h3>Configuración de SendGrid</h3>
+          <h3>Configuración de resend</h3>
           
           {/* Estado actual */}
-          {currentIntegrations?.is_sendgrid_connected && (
+          {currentIntegrations?.is_resend_connected && (
             <div style={{
               padding: '16px',
               backgroundColor: '#D1FAE5',
@@ -418,10 +418,10 @@ function IntegrationsSettings() {
               marginBottom: '20px'
             }}>
               <p style={{ margin: '0 0 8px 0', fontWeight: '600', color: '#065F46' }}>
-                ✅ SendGrid conectado
+                ✅ resend conectado
               </p>
               <p style={{ margin: '4px 0', fontSize: '14px', color: '#047857', fontFamily: 'monospace' }}>
-                API Key: {currentIntegrations.sendgrid_api_key || 'No configurada'}
+                API Key: {currentIntegrations.resend_api_key || 'No configurada'}
               </p>
               <p style={{ margin: '4px 0', fontSize: '14px', color: '#047857' }}>
                 Email remitente: {currentIntegrations.from_email || 'No configurado'}
@@ -429,15 +429,15 @@ function IntegrationsSettings() {
             </div>
           )}
 
-          <form onSubmit={saveSendGrid}>
+          <form onSubmit={saveresend}>
             <div style={{ marginBottom: '20px' }}>
               <label style={{ display: 'block', fontWeight: '600', marginBottom: '8px' }}>
                 API Key *
               </label>
               <input
                 type="password"
-                value={sendgridData.sendgrid_api_key}
-                onChange={(e) => setSendgridData({ ...sendgridData, sendgrid_api_key: e.target.value })}
+                value={resendData.resend_api_key}
+                onChange={(e) => setresendData({ ...resendData, resend_api_key: e.target.value })}
                 placeholder="SG...."
                 style={{
                   width: '100%',
@@ -450,7 +450,7 @@ function IntegrationsSettings() {
                 required
               />
               <p style={{ fontSize: '12px', color: '#6B7280', marginTop: '4px' }}>
-                Crea una API key en <a href="https://app.sendgrid.com/settings/api_keys" target="_blank" rel="noopener noreferrer">SendGrid API Keys</a>
+                Crea una API key en <a href="https://app.resend.com/settings/api_keys" target="_blank" rel="noopener noreferrer">resend API Keys</a>
               </p>
             </div>
 
@@ -460,8 +460,8 @@ function IntegrationsSettings() {
               </label>
               <input
                 type="email"
-                value={sendgridData.from_email}
-                onChange={(e) => setSendgridData({ ...sendgridData, from_email: e.target.value })}
+                value={resendData.from_email}
+                onChange={(e) => setresendData({ ...resendData, from_email: e.target.value })}
                 placeholder="no-reply@tuempresa.com"
                 style={{
                   width: '100%',
@@ -473,7 +473,7 @@ function IntegrationsSettings() {
                 required
               />
               <p style={{ fontSize: '12px', color: '#6B7280', marginTop: '4px' }}>
-                Debe ser un email verificado en SendGrid
+                Debe ser un email verificado en resend
               </p>
             </div>
 
@@ -490,7 +490,7 @@ function IntegrationsSettings() {
                 cursor: saving ? 'not-allowed' : 'pointer'
               }}
             >
-              {saving ? 'Guardando...' : 'Guardar SendGrid'}
+              {saving ? 'Guardando...' : 'Guardar resend'}
             </button>
           </form>
         </div>
@@ -640,7 +640,7 @@ function IntegrationsSettings() {
           <li>Todas las API keys se guardan <strong>encriptadas</strong> en la base de datos</li>
           <li>Solo tú puedes ver y usar tus propias keys</li>
           <li>Stripe cobra directamente a tu cuenta (no a la nuestra)</li>
-          <li>SendGrid envía emails desde tu cuenta de email verificada</li>
+          <li>resend envía emails desde tu cuenta de email verificada</li>
           <li>Puedes actualizar las keys en cualquier momento</li>
         </ul>
       </div>

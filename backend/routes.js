@@ -38,7 +38,7 @@ const {
   decrypt, 
   maskApiKey, 
   validateStripeKey, 
-  validateSendGridKey 
+  validateResendKey 
 } = require('./encryption');
 const { getAllPlans, getPlan, getUsagePercentage, shouldShowLimitWarning } = require('./plans');
 const { 
@@ -867,12 +867,12 @@ router.get('/api/integrations', authenticateToken, (req, res) => {
       stripe_webhook_secret: integrations.stripe_webhook_secret 
         ? maskApiKey(decrypt(integrations.stripe_webhook_secret)) 
         : null,
-      sendgrid_api_key: integrations.sendgrid_api_key 
-        ? maskApiKey(decrypt(integrations.sendgrid_api_key)) 
+      resend_api_key: integrations.resend_api_key 
+        ? maskApiKey(decrypt(integrations.resend_api_key)) 
         : null,
       from_email: integrations.from_email || '',
       is_stripe_connected: Boolean(integrations.is_stripe_connected),
-      is_sendgrid_connected: Boolean(integrations.is_sendgrid_connected),
+      is_resend_connected: Boolean(integrations.is_resend_connected),
       updated_at: integrations.updated_at
     };
     
@@ -893,7 +893,7 @@ router.post('/api/integrations', authenticateToken, (req, res) => {
       stripe_secret_key, 
       stripe_publishable_key, 
       stripe_webhook_secret,
-      sendgrid_api_key,
+      resend_api_key,
       from_email 
     } = req.body;
     
@@ -929,14 +929,14 @@ router.post('/api/integrations', authenticateToken, (req, res) => {
       updates.stripe_webhook_secret = encrypt(stripe_webhook_secret);
     }
     
-    // Validar y encriptar SendGrid API Key
-    if (sendgrid_api_key !== undefined && sendgrid_api_key !== '') {
-      if (!validateSendGridKey(sendgrid_api_key)) {
+    // Validar y encriptar Resend API Key
+    if (resend_api_key !== undefined && resend_api_key !== '') {
+      if (!validateResendKey(resend_api_key)) {
         return res.status(400).json({ 
-          error: 'SendGrid API Key inválida. Debe comenzar con SG.' 
+          error: 'Resend API Key inválida. Debe comenzar con re_' 
         });
       }
-      updates.sendgrid_api_key = encrypt(sendgrid_api_key);
+      updates.resend_api_key = encrypt(resend_api_key);
     }
     
     // Email de envío
@@ -949,8 +949,8 @@ router.post('/api/integrations', authenticateToken, (req, res) => {
       updates.is_stripe_connected = true;
     }
     
-    if (sendgrid_api_key) {
-      updates.is_sendgrid_connected = true;
+    if (resend_api_key) {
+      updates.is_resend_connected = true;
     }
     
     // Actualizar en DB
@@ -969,12 +969,12 @@ router.post('/api/integrations', authenticateToken, (req, res) => {
       stripe_webhook_secret: updated.stripe_webhook_secret 
         ? maskApiKey(decrypt(updated.stripe_webhook_secret)) 
         : null,
-      sendgrid_api_key: updated.sendgrid_api_key 
-        ? maskApiKey(decrypt(updated.sendgrid_api_key)) 
+      resend_api_key: updated.resend_api_key 
+        ? maskApiKey(decrypt(updated.resend_api_key)) 
         : null,
       from_email: updated.from_email || '',
       is_stripe_connected: Boolean(updated.is_stripe_connected),
-      is_sendgrid_connected: Boolean(updated.is_sendgrid_connected)
+      is_resend_connected: Boolean(updated.is_resend_connected)
     };
     
     res.json({ 
@@ -1692,6 +1692,19 @@ router.delete('/api/admin/users/:userId', authenticateToken, (req, res) => {
     res.status(500).json({ error: 'Error eliminando usuario' });
   }
 });
+
+// ============================================
+// HELPER FUNCTIONS
+// ============================================
+
+/**
+ * Valida que la API key de Resend sea válida
+ */
+function validateResendKey(apiKey) {
+  if (!apiKey || typeof apiKey !== 'string') return false;
+  // Resend API keys empiezan con "re_"
+  return apiKey.trim().startsWith('re_') && apiKey.length > 20;
+}
 
 module.exports = router;
 

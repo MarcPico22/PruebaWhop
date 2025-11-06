@@ -1,46 +1,46 @@
-const { MailerSend, EmailParams, Sender, Recipient } = require('mailersend');
+const { Resend } = require('resend');
 const { getTenantIntegrations } = require('./db');
 const { decrypt } = require('./encryption');
 
 /**
- * Obtiene la configuración de MailerSend del tenant
+ * Obtiene la configuración de Resend del tenant
  */
-function getMailerSendConfig(tenantId) {
+function getResendConfig(tenantId) {
   if (!tenantId) {
-    // Fallback a demo config o env global
-    const demoKey = process.env.DEMO_MAILERSEND_API_KEY || process.env.MAILERSEND_API_KEY;
-    const demoEmail = process.env.DEMO_FROM_EMAIL || process.env.FROM_EMAIL || 'no-reply@demo.local';
+    // Fallback a env global
+    const globalKey = process.env.RESEND_API_KEY;
+    const fromEmail = process.env.FROM_EMAIL || 'onboarding@resend.dev';
     
-    if (demoKey && demoKey.startsWith('mlsn.')) {
-      return { apiKey: demoKey, fromEmail: demoEmail, isDemo: true };
-    }
-    
-    return { apiKey: null, fromEmail: demoEmail, isDemo: true };
-  }
-  
-  const integrations = getTenantIntegrations(tenantId);
-  
-  if (!integrations.mailersend_api_key) {
-    // Fallback a demo o env global
-    const demoKey = process.env.DEMO_MAILERSEND_API_KEY || process.env.MAILERSEND_API_KEY;
-    const fromEmail = integrations.from_email || process.env.FROM_EMAIL || 'no-reply@demo.local';
-    
-    if (demoKey && demoKey.startsWith('mlsn.')) {
-      console.warn(`⚠️ Usando MailerSend DEMO/GLOBAL key para tenant ${tenantId}`);
-      return { apiKey: demoKey, fromEmail, isDemo: true };
+    if (globalKey && globalKey.startsWith('re_')) {
+      return { apiKey: globalKey, fromEmail, isDemo: true };
     }
     
     return { apiKey: null, fromEmail, isDemo: true };
   }
   
-  const apiKey = decrypt(integrations.mailersend_api_key);
-  const fromEmail = integrations.from_email || process.env.FROM_EMAIL || 'no-reply@empresa.com';
+  const integrations = getTenantIntegrations(tenantId);
+  
+  if (!integrations.resend_api_key) {
+    // Fallback a env global
+    const globalKey = process.env.RESEND_API_KEY;
+    const fromEmail = integrations.from_email || process.env.FROM_EMAIL || 'onboarding@resend.dev';
+    
+    if (globalKey && globalKey.startsWith('re_')) {
+      console.warn(`⚠️ Usando Resend GLOBAL key para tenant ${tenantId}`);
+      return { apiKey: globalKey, fromEmail, isDemo: true };
+    }
+    
+    return { apiKey: null, fromEmail, isDemo: true };
+  }
+  
+  const apiKey = decrypt(integrations.resend_api_key);
+  const fromEmail = integrations.from_email || process.env.FROM_EMAIL || 'onboarding@resend.dev';
   
   return { apiKey, fromEmail, isDemo: false };
 }
 
 /**
- * Envía email (o loguea si no hay MailerSend configurado)
+ * Envía email (o loguea si no hay Resend configurado)
  * @param {string} to - Email destinatario
  * @param {string} subject - Asunto
  * @param {string} text - Contenido texto plano
@@ -48,11 +48,11 @@ function getMailerSendConfig(tenantId) {
  * @param {string} tenantId - ID del tenant (opcional)
  */
 async function sendEmail(to, subject, text, html, tenantId = null) {
-  const config = getMailerSendConfig(tenantId);
+  const config = getResendConfig(tenantId);
   
   // Si no hay API key, solo loguear
   if (!config.apiKey || !config.apiKey.trim()) {
-    console.log('\n📧 EMAIL (simulado, no hay MailerSend configurado):');
+    console.log('\n📧 EMAIL (simulado, no hay Resend configurado):');
     console.log(`   Tenant: ${tenantId || 'N/A'}`);
     console.log(`   Para: ${to}`);
     console.log(`   De: ${config.fromEmail}`);
@@ -62,23 +62,20 @@ async function sendEmail(to, subject, text, html, tenantId = null) {
   }
   
   try {
-    // Inicializar MailerSend con la key del tenant
-    const mailerSend = new MailerSend({
-      apiKey: config.apiKey,
+    // Inicializar Resend con la key del tenant
+    const resend = new Resend(config.apiKey);
+    
+    const fromName = process.env.FROM_NAME || 'Whop Recovery';
+    
+    await resend.emails.send({
+      from: `${fromName} <${config.fromEmail}>`,
+      to: [to],
+      subject: subject,
+      html: html || text,
+      text: text || html.replace(/<[^>]*>/g, '')
     });
     
-    const sentFrom = new Sender(config.fromEmail, process.env.FROM_NAME || 'Whop Recovery');
-    const recipients = [new Recipient(to)];
-    
-    const emailParams = new EmailParams()
-      .setFrom(sentFrom)
-      .setTo(recipients)
-      .setSubject(subject)
-      .setHtml(html || text)
-      .setText(text || html.replace(/<[^>]*>/g, ''));
-    
-    await mailerSend.email.send(emailParams);
-    console.log(`✅ Email enviado a ${to}${config.isDemo ? ' (DEMO/GLOBAL)' : ''}`);
+    console.log(`✅ Email enviado a ${to}${config.isDemo ? ' (GLOBAL)' : ''}`);
     return { sent: true, isDemo: config.isDemo };
   } catch (error) {
     console.error('❌ Error enviando email:', error.message);
@@ -189,5 +186,5 @@ module.exports = {
   sendRetryFailedEmail,
   sendPaymentRecoveredEmail,
   sendPaymentPermanentFailEmail,
-  getMailerSendConfig
+  getResendConfig
 };

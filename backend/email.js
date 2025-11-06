@@ -1,14 +1,12 @@
-const { MailerSend, EmailParams, Sender, Recipient } = require('mailersend');
+const { Resend } = require('resend');
 
-// Inicializar MailerSend
-const mailerSend = new MailerSend({
-  apiKey: process.env.MAILERSEND_API_KEY || 'mlsn.11cc30e3226e6ace9de8977af0f828a7ede366974ae0428958a23ceb706d6085',
-});
+// Inicializar Resend
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 // Configuración
-const FROM_EMAIL = process.env.FROM_EMAIL || 'noreply@test-q3enl6kqrd842vwr.mlsender.net';
+const FROM_EMAIL = process.env.FROM_EMAIL || 'onboarding@resend.dev';
 const FROM_NAME = process.env.FROM_NAME || 'Whop Recovery';
-const SUPPORT_EMAIL = process.env.SUPPORT_EMAIL || 'support@test-q3enl6kqrd842vwr.mlsender.net';
+const SUPPORT_EMAIL = process.env.SUPPORT_EMAIL || 'support@whoprecovery.com';
 const BASE_URL = process.env.BASE_URL || 'https://www.whoprecovery.com';
 
 // Template base para todos los emails
@@ -138,21 +136,26 @@ const getEmailTemplate = (content) => `
 `;
 
 /**
- * Helper function to send emails with MailerSend
+ * Helper function to send emails with Resend
  */
-async function sendEmail({ to, toName, subject, html, text }) {
+async function sendEmail({ to, subject, html, text }) {
   try {
-    const sentFrom = new Sender(FROM_EMAIL, FROM_NAME);
-    const recipients = [new Recipient(to, toName || '')];
+    if (!process.env.RESEND_API_KEY) {
+      console.log(`📧 EMAIL (simulado, no hay Resend configurado):`);
+      console.log(`   Para: ${to}`);
+      console.log(`   Asunto: ${subject}`);
+      console.log(`   Contenido: ${text ? text.substring(0, 100) : 'HTML email'}...`);
+      return { success: true, simulated: true };
+    }
+
+    const result = await resend.emails.send({
+      from: `${FROM_NAME} <${FROM_EMAIL}>`,
+      to: [to],
+      subject: subject,
+      html: html,
+      text: text
+    });
     
-    const emailParams = new EmailParams()
-      .setFrom(sentFrom)
-      .setTo(recipients)
-      .setSubject(subject)
-      .setHtml(html)
-      .setText(text);
-    
-    const result = await mailerSend.email.send(emailParams);
     console.log(`✅ Email sent to ${to}: ${subject}`);
     return { success: true, result };
   } catch (error) {
@@ -288,7 +291,6 @@ El equipo de Whop Recovery
 
   return await sendEmail({
     to: userEmail,
-    toName: userName,
     subject: '✅ Pago confirmado - Whop Recovery',
     html: getEmailTemplate(content),
     text
@@ -352,7 +354,6 @@ El equipo de Whop Recovery
 
   return await sendEmail({
     to: userEmail,
-    toName: userName,
     subject: '⚠️ Problema con tu pago - Whop Recovery',
     html: getEmailTemplate(content),
     text
@@ -408,7 +409,6 @@ El equipo de Whop Recovery
 
   return await sendEmail({
     to: userEmail,
-    toName: userName,
     subject: '💰 ¡Pago recuperado! - Whop Recovery',
     html: getEmailTemplate(content),
     text
@@ -465,14 +465,11 @@ El equipo de Whop Recovery
 
   return await sendEmail({
     to: userEmail,
-    toName: userName,
     subject: '¡Bienvenido a Whop Recovery! 🎉',
     html: getEmailTemplate(content),
     text
   });
 }
-
-// 6. Onboarding Day 3
 async function sendOnboardingDay3Email(userEmail, userName) {
   const content = `
     <h2>Hola${userName ? ' ' + userName : ''},</h2>
@@ -525,7 +522,6 @@ El equipo de Whop Recovery
 
   return await sendEmail({
     to: userEmail,
-    toName: userName,
     subject: '💪 Tips para recuperar más pagos - Día 3',
     html: getEmailTemplate(content),
     text
@@ -588,7 +584,6 @@ El equipo de Whop Recovery
 
   return await sendEmail({
     to: userEmail,
-    toName: userName,
     subject: '⏰ Tu trial termina en 7 días',
     html: getEmailTemplate(content),
     text
@@ -626,5 +621,5 @@ module.exports = {
   sendOnboardingDay7Email,
   scheduleOnboardingEmails,
   // Exportar instancia por si se necesita acceso directo
-  mailerSend
+  resend
 };
