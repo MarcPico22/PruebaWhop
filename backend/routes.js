@@ -37,8 +37,7 @@ const {
   encrypt, 
   decrypt, 
   maskApiKey, 
-  validateStripeKey, 
-  validateResendKey 
+  validateStripeKey
 } = require('./encryption');
 const { getAllPlans, getPlan, getUsagePercentage, shouldShowLimitWarning } = require('./plans');
 const { 
