@@ -1670,12 +1670,42 @@ router.delete('/api/admin/users/:userId', authenticateToken, (req, res) => {
     const tenantId = user.tenant_id;
 
     // Eliminar datos relacionados con el tenant (en orden de dependencias)
-    db.prepare('DELETE FROM achievements WHERE user_id = ?').run(userId);
-    db.prepare('DELETE FROM notification_settings WHERE tenant_id = ?').run(tenantId);
-    db.prepare('DELETE FROM tenant_integrations WHERE tenant_id = ?').run(tenantId);
-    db.prepare('DELETE FROM config WHERE tenant_id = ?').run(tenantId);
-    db.prepare('DELETE FROM payments WHERE tenant_id = ?').run(tenantId);
-    db.prepare('DELETE FROM subscriptions WHERE tenant_id = ?').run(tenantId);
+    // Usar try-catch para cada DELETE en caso de que alguna tabla no exista
+    try {
+      db.prepare('DELETE FROM achievements WHERE user_id = ?').run(userId);
+    } catch (e) {
+      console.log('⚠️ No se pudo eliminar achievements (tabla no existe)');
+    }
+    
+    try {
+      db.prepare('DELETE FROM notification_settings WHERE tenant_id = ?').run(tenantId);
+    } catch (e) {
+      console.log('⚠️ No se pudo eliminar notification_settings');
+    }
+    
+    try {
+      db.prepare('DELETE FROM tenant_integrations WHERE tenant_id = ?').run(tenantId);
+    } catch (e) {
+      console.log('⚠️ No se pudo eliminar tenant_integrations');
+    }
+    
+    try {
+      db.prepare('DELETE FROM config WHERE tenant_id = ?').run(tenantId);
+    } catch (e) {
+      console.log('⚠️ No se pudo eliminar config');
+    }
+    
+    try {
+      db.prepare('DELETE FROM payments WHERE tenant_id = ?').run(tenantId);
+    } catch (e) {
+      console.log('⚠️ No se pudo eliminar payments');
+    }
+    
+    try {
+      db.prepare('DELETE FROM subscriptions WHERE tenant_id = ?').run(tenantId);
+    } catch (e) {
+      console.log('⚠️ No se pudo eliminar subscriptions');
+    }
     
     // Finalmente, eliminar el usuario
     db.prepare('DELETE FROM users WHERE id = ?').run(userId);
