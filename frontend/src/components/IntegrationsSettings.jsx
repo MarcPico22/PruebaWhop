@@ -429,7 +429,7 @@ function IntegrationsSettings() {
             </div>
           )}
 
-          <form onSubmit={saveresend}>
+          <form onSubmit={saveResend}>
             <div style={{ marginBottom: '20px' }}>
               <label style={{ display: 'block', fontWeight: '600', marginBottom: '8px' }}>
                 API Key *

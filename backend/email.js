@@ -183,7 +183,7 @@ async function sendWelcomeEmail(userEmail, userName) {
     <h3>📋 Próximos pasos:</h3>
     <ol>
       <li>Conecta tu cuenta de Whop/Stripe (toma 2 minutos)</li>
-      <li>Configura tus preferencias de reintentos</li>
+      <li>Configura Resend para enviar emails a tus clientes</li>
       <li>¡Empieza a recuperar dinero automáticamente!</li>
     </ol>
     
@@ -211,8 +211,8 @@ Qué puedes esperar:
 - Dashboard en tiempo real
 
 Próximos pasos:
-1. Conecta tu cuenta de Stripe
-2. Configura tus preferencias de reintentos
+1. Conecta tu cuenta de Whop/Stripe
+2. Configura Resend para enviar emails a tus clientes
 3. ¡Empieza a recuperar dinero automáticamente!
 
 Ir al Dashboard: ${BASE_URL}/dashboard
