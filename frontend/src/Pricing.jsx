@@ -58,14 +58,14 @@ function Pricing() {
     try {
       setLoading(true);
       const token = localStorage.getItem('token');
-      
+
       if (token) {
         const response = await axios.get(`${API_URL}/api/subscription`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         setCurrentSubscription(response.data.subscription);
       }
-      
+
       setLoading(false);
     } catch (err) {
       console.error('Error cargando datos:', err);
@@ -77,17 +77,17 @@ function Pricing() {
     try {
       setUpgrading(true);
       setError('');
-      
+
       const token = localStorage.getItem('token');
-      
+
       if (!token) {
         navigate('/login');
         return;
       }
-      
+
       let finalPlanId = planId;
       let price = planId === 'PRO' ? (billingPeriod === 'yearly' ? 499 : 49) : (billingPeriod === 'yearly' ? 2099 : 199);
-      
+
       if (billingPeriod === 'yearly' && planId !== 'FREE') {
         finalPlanId = `${planId}_YEARLY`;
       } else if (billingPeriod === 'monthly' && planId !== 'FREE') {
@@ -96,7 +96,7 @@ function Pricing() {
 
       // 📊 Track inicio de checkout
       trackCheckoutStart(finalPlanId, planId, price, billingPeriod);
-      
+
       const response = await axios.post(
         `${API_URL}/api/create-checkout`,
         { planId: finalPlanId },
@@ -104,7 +104,7 @@ function Pricing() {
       );
 
       window.location.href = response.data.url;
-      
+
     } catch (err) {
       console.error('Error creando checkout:', err);
       setError(err.response?.data?.error || 'Error iniciando proceso de pago');
@@ -127,38 +127,42 @@ function Pricing() {
           <p className="text-lg sm:text-xl text-gray-600 mb-8 sm:mb-12">
             {t('landing.pricing.subtitle')}
           </p>
-          
+
           {/* Billing Toggle - Mobile Optimized */}
           <div className="inline-flex items-center gap-3 sm:gap-4 bg-white p-4 sm:p-6 rounded-2xl shadow-lg border-2 border-gray-200">
-            <span className={`text-sm sm:text-base font-semibold transition-colors ${
-              billingPeriod === 'monthly' ? 'text-purple-600' : 'text-gray-500'
-            }`}>
+            <span className={`text-sm sm:text-base font-semibold transition-colors ${billingPeriod === 'monthly' ? 'text-purple-600' : 'text-gray-500'
+              }`}>
               {t('pricing.billing.monthly')}
             </span>
-            
+
             {/* Toggle Switch - Touch Optimized (48px) */}
             <button
               onClick={() => setBillingPeriod(prev => prev === 'monthly' ? 'yearly' : 'monthly')}
-              className={`relative w-16 sm:w-20 h-10 sm:h-12 rounded-full transition-colors active:scale-95 ${
-                billingPeriod === 'yearly' ? 'bg-purple-600' : 'bg-gray-300'
-              }`}
+              className={`relative w-16 sm:w-20 h-10 sm:h-12 rounded-full transition-colors active:scale-95 ${billingPeriod === 'yearly' ? 'bg-purple-600' : 'bg-gray-300'
+                }`}
               aria-label="Toggle billing period"
             >
-              <div className={`absolute top-1 w-8 sm:w-10 h-8 sm:h-10 bg-white rounded-full shadow-md transition-transform ${
-                billingPeriod === 'yearly' ? 'translate-x-7 sm:translate-x-9' : 'translate-x-1'
-              }`} />
+              <div className={`absolute top-1 w-8 sm:w-10 h-8 sm:h-10 bg-white rounded-full shadow-md transition-transform ${billingPeriod === 'yearly' ? 'translate-x-7 sm:translate-x-9' : 'translate-x-1'
+                }`} />
             </button>
-            
+
             <div className="flex items-center gap-2">
-              <span className={`text-sm sm:text-base font-semibold transition-colors ${
-                billingPeriod === 'yearly' ? 'text-purple-600' : 'text-gray-500'
-              }`}>
+              <span className={`text-sm sm:text-base font-semibold transition-colors ${billingPeriod === 'yearly' ? 'text-purple-600' : 'text-gray-500'
+                }`}>
                 {t('pricing.billing.yearly')}
               </span>
               <span className="px-2 sm:px-3 py-1 text-xs sm:text-sm font-bold bg-green-500 text-white rounded-full">
                 {t('pricing.billing.discount')}
               </span>
             </div>
+          </div>
+
+          {/* 0% Commission Badge */}
+          <div className="mt-6 flex justify-center">
+            <span className="inline-flex items-center gap-2 px-4 py-2 bg-green-100 text-green-800 rounded-full text-sm font-bold border border-green-200">
+              <span className="text-lg">💰</span>
+              {t('pricing.zeroCommission')}
+            </span>
           </div>
 
           {/* Current Plan Badge */}
@@ -187,7 +191,7 @@ function Pricing() {
             billingPeriod={billingPeriod}
             features={PLAN_FEATURES.FREE}
             isCurrentPlan={isCurrentPlan('FREE')}
-            onUpgrade={() => {}}
+            onUpgrade={() => { }}
             disabled={true}
             badge={null}
           />
@@ -237,34 +241,32 @@ function Pricing() {
 }
 
 // Componente PricingCard separado y responsive
-function PricingCard({ 
-  name, 
-  planId, 
-  price, 
+function PricingCard({
+  name,
+  planId,
+  price,
   monthlyEquivalent,
-  billingPeriod, 
-  features, 
-  isCurrentPlan, 
-  onUpgrade, 
-  upgrading, 
+  billingPeriod,
+  features,
+  isCurrentPlan,
+  onUpgrade,
+  upgrading,
   badge,
   highlighted,
-  disabled 
+  disabled
 }) {
   return (
-    <div className={`relative bg-white rounded-2xl shadow-xl border-2 p-6 sm:p-8 flex flex-col ${
-      highlighted 
-        ? 'border-purple-500 scale-100 sm:scale-105 shadow-2xl' 
+    <div className={`relative bg-white rounded-2xl shadow-xl border-2 p-6 sm:p-8 flex flex-col ${highlighted
+        ? 'border-purple-500 scale-100 sm:scale-105 shadow-2xl'
         : 'border-gray-200'
-    } ${isCurrentPlan ? 'ring-4 ring-indigo-500 ring-opacity-50' : ''}`}>
+      } ${isCurrentPlan ? 'ring-4 ring-indigo-500 ring-opacity-50' : ''}`}>
       {/* Badge */}
       {badge && (
         <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-          <span className={`px-4 py-1.5 text-xs font-bold rounded-full shadow-lg ${
-            highlighted 
+          <span className={`px-4 py-1.5 text-xs font-bold rounded-full shadow-lg ${highlighted
               ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white'
               : 'bg-gradient-to-r from-yellow-400 to-orange-400 text-gray-900'
-          }`}>
+            }`}>
             {badge}
           </span>
         </div>
@@ -308,13 +310,12 @@ function PricingCard({
           onUpgrade(planId);
         }}
         disabled={isCurrentPlan || upgrading || disabled}
-        className={`w-full py-4 px-6 rounded-xl text-base sm:text-lg font-bold transition-all active:scale-95 ${
-          isCurrentPlan
+        className={`w-full py-4 px-6 rounded-xl text-base sm:text-lg font-bold transition-all active:scale-95 ${isCurrentPlan
             ? 'bg-gray-100 text-gray-500 cursor-default'
             : highlighted
-            ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:from-purple-700 hover:to-indigo-700 shadow-lg'
-            : 'bg-indigo-600 text-white hover:bg-indigo-700'
-        } ${(disabled || upgrading) ? 'opacity-50 cursor-not-allowed' : ''}`}
+              ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:from-purple-700 hover:to-indigo-700 shadow-lg'
+              : 'bg-indigo-600 text-white hover:bg-indigo-700'
+          } ${(disabled || upgrading) ? 'opacity-50 cursor-not-allowed' : ''}`}
       >
         {upgrading ? 'Procesando...' : isCurrentPlan ? '✓ Plan Actual' : 'Seleccionar Plan'}
       </button>

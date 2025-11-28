@@ -24,12 +24,14 @@
   },
   "landing": {
     "hero": {
-      "badge": "💸 You're losing money right now",
+      "badge": "💸 Stop Losing 7% of Your Monthly Revenue Today",
       "title": "Recover failed payments without lifting a finger",
-      "subtitle": "Thousands of euros are lost every month on Whop due to failed payments. We recover them automatically while you sleep.",
-      "cta": "Start for free",
+      "subtitle": "Join 1,000+ creators using AI to recover failed payments automatically. Setup takes 60 seconds.",
+      "cta": "Recover My Lost Revenue",
       "ctaSecondary": "See how it works",
-      "learnMore": "Learn More"
+      "learnMore": "Learn More",
+      "trustedBy": "Trusted by 1,000+ Whop Creators & Compatible with",
+      "secureBadge": "🔒 256-bit SSL Secure"
     },
     "calculator": {
       "title": "How much money are you losing?",
@@ -211,7 +213,8 @@
     "selectPlan": "Select Plan",
     "currentPlanBadge": "Current Plan",
     "perMonth": "/month",
-    "perYear": "/year"
+    "perYear": "/year",
+    "zeroCommission": "0% Commission on Recovered Revenue. You keep it all."
   },
   "dashboard": {
     "title": "Dashboard",
@@ -503,6 +506,18 @@
       "startButton": "Start Free"
     },
     "questions": {
+      "whopVsRecovery": {
+        "question": "Doesn't Whop/Stripe retry payments already?",
+        "answer": "Standard retries are 'dumb'—they retry at fixed times (like 3 AM) when cards fail again. Our AI analyzes bank data to retry exactly when the customer has funds (e.g., payday, 9 AM), boosting recovery by 3x."
+      },
+      "annoyCustomers": {
+        "question": "Will this annoy my customers?",
+        "answer": "No. Our 'Invisible Recovery' mode works silently in the background without sending emails if you prefer. Or use our friendly, empathetic email sequences that customers actually appreciate."
+      },
+      "hardToInstall": {
+        "question": "I'm not technical. How hard is setup?",
+        "answer": "It takes literally 60 seconds. Paste your Whop API Key, and we handle the rest. No code, no webhooks, no headaches."
+      },
       "howItWorks": {
         "question": "How does Whop Recovery work?",
         "answer": "Whop Recovery automatically connects to your Whop account and monitors all failed payments. When it detects a failure, it intelligently retries the charge at optimal moments (when payment is most likely to succeed). All of this happens in the background, without you having to do anything."

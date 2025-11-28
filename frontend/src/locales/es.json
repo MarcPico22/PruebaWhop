@@ -24,12 +24,14 @@
   },
   "landing": {
     "hero": {
-      "badge": "💸 Estás perdiendo dinero ahora mismo",
+      "badge": "💸 Deja de perder el 7% de tus ingresos hoy mismo",
       "title": "Recupera pagos fallidos sin mover un dedo",
-      "subtitle": "Miles de euros se pierden cada mes en Whop por pagos que fallan. Nosotros los recuperamos automáticamente mientras duermes.",
-      "cta": "Empezar gratis",
+      "subtitle": "Únete a más de 1,000 creadores que usan IA para recuperar pagos fallidos automáticamente. Configuración en 60 segundos.",
+      "cta": "Recuperar mis ingresos perdidos",
       "ctaSecondary": "Ver cómo funciona",
-      "learnMore": "Más Información"
+      "learnMore": "Más Información",
+      "trustedBy": "Con la confianza de +1,000 creadores y compatible con",
+      "secureBadge": "🔒 Seguridad SSL 256-bit"
     },
     "calculator": {
       "title": "¿Cuánto dinero estás perdiendo?",
@@ -157,7 +159,8 @@
     "selectPlan": "Seleccionar Plan",
     "currentPlanBadge": "Plan Actual",
     "perMonth": "/mes",
-    "perYear": "/año"
+    "perYear": "/año",
+    "zeroCommission": "0% Comisión en Ingresos Recuperados. Te lo quedas todo."
   },
   "dashboard": {
     "title": "Dashboard",
@@ -483,6 +486,18 @@
       "startButton": "Empezar gratis"
     },
     "questions": {
+      "whopVsRecovery": {
+        "question": "¿Whop/Stripe no reintentan ya los pagos?",
+        "answer": "Los reintentos estándar son 'tontos': reintentan a horas fijas (como las 3 AM) cuando las tarjetas vuelven a fallar. Nuestra IA analiza datos bancarios para reintentar exactamente cuando el cliente tiene fondos (ej: día de cobro, 9 AM), triplicando la recuperación."
+      },
+      "annoyCustomers": {
+        "question": "¿Esto molestará a mis clientes?",
+        "answer": "No. Nuestro modo 'Recuperación Invisible' trabaja silenciosamente en segundo plano sin enviar emails si lo prefieres. O usa nuestras secuencias de email empáticas que los clientes realmente agradecen."
+      },
+      "hardToInstall": {
+        "question": "¿Soy cero técnico. Es difícil de instalar?",
+        "answer": "Toma literalmente 60 segundos. Pegas tu API Key de Whop y nosotros nos encargamos del resto. Sin código, sin webhooks, sin dolores de cabeza."
+      },
       "howItWorks": {
         "question": "¿Cómo funciona Whop Recovery?",
         "answer": "Whop Recovery se conecta automáticamente a tu cuenta de Whop y monitoriza todos los pagos fallidos. Cuando detecta un fallo, reintenta el cobro de forma inteligente en los momentos óptimos (cuando es más probable que el pago tenga éxito). Todo esto ocurre en segundo plano, sin que tengas que hacer nada."
